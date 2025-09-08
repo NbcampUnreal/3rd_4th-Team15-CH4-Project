@@ -19,7 +19,10 @@ Saved/
 
 .vscode/
 .idea/
-
+Plugins/Developer/RiderLink/
+*/Source/*.rej
 # Visual Studio cache
 .vs/
 *.ipch
+.vsconfig
+*.sln.DotSettings.user

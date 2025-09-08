@@ -1,8 +1,45 @@
+## Auto detect text files and perform LF normalization ##
+* text=auto
 
+# Unreal Engine Assets
 *.uasset filter=lfs diff=lfs merge=lfs -text
-*.umap  filter=lfs diff=lfs merge=lfs -text
-*.png   filter=lfs diff=lfs merge=lfs -text
-*.jpg   filter=lfs diff=lfs merge=lfs -text
-*.jpeg  filter=lfs diff=lfs merge=lfs -text
-*.tga   filter=lfs diff=lfs merge=lfs -text
-*.exr   filter=lfs diff=lfs merge=lfs -text
+*.umap filter=lfs diff=lfs merge=lfs -text
+*.ubulk filter=lfs diff=lfs merge=lfs -text
+*.locres filter=lfs diff=lfs merge=lfs -text
+
+# 3D Models & Source files
+*.fbx filter=lfs diff=lfs merge=lfs -text
+*.obj filter=lfs diff=lfs merge=lfs -text
+*.3ds filter=lfs diff=lfs merge=lfs -text
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.xcf filter=lfs diff=lfs merge=lfs -text
+
+# Textures and images
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.bmp filter=lfs diff=lfs merge=lfs -text
+*.tga filter=lfs diff=lfs merge=lfs -text
+*.exr filter=lfs diff=lfs merge=lfs -text
+*.ico filter=lfs diff=lfs merge=lfs -text
+*.icns filter=lfs diff=lfs merge=lfs -text
+
+# Audio
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
+*.ogg filter=lfs diff=lfs merge=lfs -text
+*.flac filter=lfs diff=lfs merge=lfs -text
+*.bank filter=lfs diff=lfs merge=lfs -text
+
+# Video
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.mov filter=lfs diff=lfs merge=lfs -text
+*.bk2 filter=lfs diff=lfs merge=lfs -text
+
+# Binaries & others
+*.bin filter=lfs diff=lfs merge=lfs -text
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.exe filter=lfs diff=lfs merge=lfs -text
+*.lib filter=lfs diff=lfs merge=lfs -text
+*.pdb filter=lfs diff=lfs merge=lfs -text
+*.rcc filter=lfs diff=lfs merge=lfs -text
