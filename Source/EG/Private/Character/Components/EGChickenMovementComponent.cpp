@@ -78,7 +78,10 @@ void UEGChickenMovementComponent::PerformStartSprint()
 		return;
 	}
 
-	OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	if (OwnerCharacter->HasAuthority())		// 서버에서만 실행
+	{
+		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	}
 }
 
 void UEGChickenMovementComponent::PerformStopSprint()
@@ -100,8 +103,11 @@ void UEGChickenMovementComponent::PerformDash()
 		return;
 	}
 
-	const FVector DashDirection = OwnerCharacter->GetActorForwardVector();
-	OwnerCharacter->LaunchCharacter(DashDirection * DashStrength, true, true);
+	if (OwnerCharacter->HasAuthority())		// 서버에서만 실행
+	{
+		const FVector DashDirection = OwnerCharacter->GetActorForwardVector();
+		OwnerCharacter->LaunchCharacter(DashDirection * DashStrength, true, true);
+	}
 }
 
 

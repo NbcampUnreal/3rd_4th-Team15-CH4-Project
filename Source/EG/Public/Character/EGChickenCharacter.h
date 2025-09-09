@@ -25,6 +25,7 @@ public:
 public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 #pragma endregion
 
 	
@@ -56,9 +57,13 @@ private:
 	void HandleStopFreeLook();
 	
 	UFUNCTION(Server, Reliable)
-	void ServerHandleDash();
+	void ServerRPCHandleDash();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCHandleSprint(bool bNewIsSprint);
 
 	void ExecuteDash();
+	void ExecuteSprint(bool bNewIsSprint);
 
 
 protected:
@@ -83,9 +88,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
 	TObjectPtr<UInputAction> IA_FreeLook;
 
+	UPROPERTY(Replicated)
+	uint8 bIsSprinting:1;
+
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
 	bool bIsFreeLooking = false;
+
 #pragma endregion
 	
 };

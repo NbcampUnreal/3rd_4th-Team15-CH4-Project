@@ -8,13 +8,15 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Net/UnrealNetwork.h"
 #include "Public/Character/Components/EGChickenMovementComponent.h"
 
 
 AEGChickenCharacter::AEGChickenCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;			// JM : Tick 비활성화
-
+	bReplicates = true;								// JM : Replicates 활성화
+	
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
@@ -80,6 +82,12 @@ void AEGChickenCharacter::BeginPlay()
 	}
 }
 
+void AEGChickenCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AEGChickenCharacter, bIsSprinting);
+}
+
 void AEGChickenCharacter::HandleMoveInput(const FInputActionValue& InValue)
 {
 	if (!ChickenMovementComponent)
@@ -102,21 +110,26 @@ void AEGChickenCharacter::HandleLookInput(const FInputActionValue& InValue)
 
 void AEGChickenCharacter::HandleStartSprintInput()
 {
-	if (!ChickenMovementComponent)
+	if (HasAuthority())	// JM: 서버라면 바로 실행
 	{
-		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+		ExecuteSprint(true);
 	}
-	ChickenMovementComponent->PerformStartSprint();
+	else				// JM: 클라라면 ServerRPC 요청 (Server Correction 과정에서 끊겨 보임)
+	{
+		ServerRPCHandleSprint(true);	
+	}
 }
 
 void AEGChickenCharacter::HandleStopSprintInput()
 {
-	if (!ChickenMovementComponent)
+	if (HasAuthority())	// JM: 서버라면 바로 실행
 	{
-		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
-		return;
+		ExecuteSprint(false);
 	}
-	ChickenMovementComponent->PerformStopSprint();
+	else				// JM: 클라라면 ServerRPC 요청 (Server Correction 과정에서 끊겨 보임)
+	{
+		ServerRPCHandleSprint(false);	
+	}
 }
 
 void AEGChickenCharacter::HandleDash()
@@ -127,7 +140,7 @@ void AEGChickenCharacter::HandleDash()
 	}
 	else				// JM: 클라라면 ServerRPC 요청 (Server Correction 과정에서 끊겨 보임)
 	{
-		ServerHandleDash();	
+		ServerRPCHandleDash();	
 	}
 }
 
@@ -149,9 +162,14 @@ void AEGChickenCharacter::HandleStopFreeLook()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
-void AEGChickenCharacter::ServerHandleDash_Implementation()
+void AEGChickenCharacter::ServerRPCHandleDash_Implementation()
 {
 	ExecuteDash();
+}
+
+void AEGChickenCharacter::ServerRPCHandleSprint_Implementation(bool bNewIsSprint)
+{
+	ExecuteSprint(bNewIsSprint);
 }
 
 void AEGChickenCharacter::ExecuteDash()
@@ -162,4 +180,26 @@ void AEGChickenCharacter::ExecuteDash()
 		return;
 	}
 	ChickenMovementComponent->PerformDash();
+}
+
+void AEGChickenCharacter::ExecuteSprint(bool bNewIsSprint)
+{
+	bIsSprinting = bNewIsSprint;
+	
+	if (bNewIsSprint == true)	// 스프린트 시작
+	{
+		if (!ChickenMovementComponent)
+		{
+			EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+		}
+		ChickenMovementComponent->PerformStartSprint();
+	}
+	else						// 스프린트 종료
+	{
+		if (!ChickenMovementComponent)
+		{
+			EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+		}
+		ChickenMovementComponent->PerformStopSprint();
+	}
 }
