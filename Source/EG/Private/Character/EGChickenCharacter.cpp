@@ -8,11 +8,12 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Public/Character/Components/EGChickenMovementComponent.h"
 
 
 AEGChickenCharacter::AEGChickenCharacter()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;			// JM : Tick 비활성화
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -20,7 +21,7 @@ AEGChickenCharacter::AEGChickenCharacter()
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 1080.0f, 0.0f);
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->TargetArmLength = 400.f;
@@ -30,6 +31,8 @@ AEGChickenCharacter::AEGChickenCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->bUsePawnControlRotation = false;
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+
+	ChickenMovementComponent = CreateDefaultSubobject<UEGChickenMovementComponent>(TEXT("ChickenMovementComponent"));
 }
 
 void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -38,22 +41,34 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 	UEnhancedInputComponent* EIC = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	EIC->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::HandleMoveInput);
+	EIC->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleMoveInput);
 
-	EIC->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::HandleLookInput);
+	EIC->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleLookInput);
 
-	EIC->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-	EIC->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	EIC->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+	EIC->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-	EIC->BindAction(SprintAction, ETriggerEvent::Triggered, this, &ThisClass::HandleStartSprintInput);
-	EIC->BindAction(SprintAction, ETriggerEvent::Completed, this, &ThisClass::HandleStopSprintInput);
-	EIC->BindAction(DashAction, ETriggerEvent::Triggered, this, &ThisClass::HandleDash);
+	EIC->BindAction(IA_Sprint, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleStartSprintInput);
+	EIC->BindAction(IA_Sprint, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopSprintInput);
+	EIC->BindAction(IA_Dash, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleDash);
+	EIC->BindAction(IA_FreeLook, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleStartFreeLook);
+	EIC->BindAction(IA_FreeLook, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopFreeLook);
 }
 
 void AEGChickenCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	if (IsLocallyControlled() == true)
+
+	if (ChickenMovementComponent)	// JM : MovementComponent 초기화
+	{
+		ChickenMovementComponent->Initialize(this);
+	}
+	else
+	{
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+	}
+	
+	if (IsLocallyControlled() == true)	// JM : Client에서만 실행하여 IMC 매핑 (서버에선 실행 X)
 	{
 		APlayerController* PC = Cast<APlayerController>(GetController());
 		checkf(IsValid(PC) == true, TEXT("PlayerController is invalid."));
@@ -61,58 +76,90 @@ void AEGChickenCharacter::BeginPlay()
 		UEnhancedInputLocalPlayerSubsystem* EILPS = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
 		checkf(IsValid(EILPS) == true, TEXT("EnhancedInputLocalPlayerSubsystem is invalid."));
 
-		EILPS->AddMappingContext(InputMappingContext, 0);
+		EILPS->AddMappingContext(IMC_Chicken, 0);
 	}
 }
 
 void AEGChickenCharacter::HandleMoveInput(const FInputActionValue& InValue)
 {
-	if (IsValid(Controller) == false)
+	if (!ChickenMovementComponent)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Controller is invalid."));
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
 		return;
 	}
-
-	const FVector2D InMovementVector = InValue.Get<FVector2D>();
-
-	const FRotator ControlRotation = Controller->GetControlRotation();
-	const FRotator ControlYawRotation(0.0f, ControlRotation.Yaw, 0.0f);
-
-	const FVector ForwardDirection = FRotationMatrix(ControlYawRotation).GetUnitAxis(EAxis::X);
-	const FVector RightDirection = FRotationMatrix(ControlYawRotation).GetUnitAxis(EAxis::Y);
-
-	AddMovementInput(ForwardDirection, InMovementVector.X);
-	AddMovementInput(RightDirection, InMovementVector.Y);
+	ChickenMovementComponent->PerformMove(InValue.Get<FVector2D>());
 }
 
 void AEGChickenCharacter::HandleLookInput(const FInputActionValue& InValue)
 {
-	if (IsValid(Controller) == false)
+	if (!ChickenMovementComponent)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Controller is invalid."));
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
 		return;
 	}
-
-	const FVector2D InLookVector = InValue.Get<FVector2D>();
-
-	AddControllerYawInput(InLookVector.X);
-	AddControllerPitchInput(InLookVector.Y);
+	ChickenMovementComponent->PerformLook(InValue.Get<FVector2D>());
 }
 
 void AEGChickenCharacter::HandleStartSprintInput()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 1000.f;
+	if (!ChickenMovementComponent)
+	{
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+	}
+	ChickenMovementComponent->PerformStartSprint();
 }
 
 void AEGChickenCharacter::HandleStopSprintInput()
 {
-	
-	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	if (!ChickenMovementComponent)
+	{
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+		return;
+	}
+	ChickenMovementComponent->PerformStopSprint();
 }
 
 void AEGChickenCharacter::HandleDash()
 {
-	FVector Dir = GetActorForwardVector();
-	LaunchCharacter(Dir * 1000.f, true, true);
-	LOG_JM(LogJM, Warning, TEXT("Dashed"));
+	if (HasAuthority())	// JM: 서버라면 바로 실행
+	{
+		ExecuteDash();
+	}
+	else				// JM: 클라라면 ServerRPC 요청 (Server Correction 과정에서 끊겨 보임)
+	{
+		ServerHandleDash();	
+	}
+}
+
+void AEGChickenCharacter::HandleStartFreeLook()
+{
+	bIsFreeLooking = true;
+
+	// 캐릭터가 회전하지 않음
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+}
+
+void AEGChickenCharacter::HandleStopFreeLook()
+{
+	bIsFreeLooking = false;
+
+	// 카메라 방향으로 캐릭터 회전
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+}
+
+void AEGChickenCharacter::ServerHandleDash_Implementation()
+{
+	ExecuteDash();
+}
+
+void AEGChickenCharacter::ExecuteDash()
+{
+	if (!ChickenMovementComponent)
+	{
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+		return;
+	}
+	ChickenMovementComponent->PerformDash();
 }

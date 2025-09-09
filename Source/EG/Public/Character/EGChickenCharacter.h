@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "EGChickenCharacter.generated.h"
 
+class UEGChickenMovementComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UInputAction;
@@ -19,15 +20,18 @@ class EG_API AEGChickenCharacter : public ACharacter
 
 public:
 	AEGChickenCharacter();
-
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
-	virtual void BeginPlay() override;
-
+	
+#pragma region ACharacter Overrides
 public:
-	FORCEINLINE USpringArmComponent* GetSpringArm() const { return SpringArm; }
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void BeginPlay() override;
+#pragma endregion
 
-	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
+	
+#pragma region Components
+public:
+	FORCEINLINE USpringArmComponent* GetSpringArm() const { return SpringArm; }	// JM : DedicatedX에서 가져옴. 아직 쓰진 않음
+	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }			// JM : DedicatedX에서 가져옴. 아직 쓰진 않음
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Components")
@@ -36,31 +40,52 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Components")
 	TObjectPtr<UCameraComponent> Camera;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AEGChickenCharacter|Components")
+	UEGChickenMovementComponent* ChickenMovementComponent;
+#pragma endregion
+
+	
+#pragma region Input
 private:
 	void HandleMoveInput(const FInputActionValue& InValue);
-
 	void HandleLookInput(const FInputActionValue& InValue);
 	void HandleStartSprintInput();
 	void HandleStopSprintInput();
 	void HandleDash();
+	void HandleStartFreeLook();
+	void HandleStopFreeLook();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerHandleDash();
+
+	void ExecuteDash();
+
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
-	TObjectPtr<UInputMappingContext> InputMappingContext;
+	TObjectPtr<UInputMappingContext> IMC_Chicken;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
-	TObjectPtr<UInputAction> MoveAction;
+	TObjectPtr<UInputAction> IA_Move;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
-	TObjectPtr<UInputAction> LookAction;
+	TObjectPtr<UInputAction> IA_Look;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
-	TObjectPtr<UInputAction> JumpAction;
+	TObjectPtr<UInputAction> IA_Jump;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
-	TObjectPtr<UInputAction> SprintAction;
+	TObjectPtr<UInputAction> IA_Sprint;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
-	TObjectPtr<UInputAction> DashAction;
+	TObjectPtr<UInputAction> IA_Dash;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_FreeLook;
+
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	bool bIsFreeLooking = false;
+#pragma endregion
+	
 };
