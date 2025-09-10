@@ -4,6 +4,7 @@
 
 //#include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
+#include "Delegates/DelegateCombinations.h"
 #include "EG_GameStateBase.generated.h"
 
 UENUM(BlueprintType)
@@ -20,6 +21,10 @@ enum class EMatchState : uint8
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountdownUpdated, int32, NewCountdown);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayTimeUpdated, int32, NewPlayTime);
+
 UCLASS()
 class EG_API AEG_GameStateBase : public AGameStateBase
 {
@@ -42,6 +47,13 @@ public:
 	 UPROPERTY(ReplicatedUsing = OnRep_RemainingPlayTime, VisibleAnywhere, BlueprintReadOnly)
 	 int32 RemainingPlayTime = 100;
 
+	 UPROPERTY(BlueprintAssignable, Category = "GameState|Events")
+	 FOnCountdownUpdated OnCountdownUpdated;
+
+	 UPROPERTY(BlueprintAssignable, Category = "GameState|Events")
+	 FOnPlayTimeUpdated OnPlayTimeUpdated;
+
+protected:
 	UFUNCTION()
 	void OnRep_RemainingCountdown();
 

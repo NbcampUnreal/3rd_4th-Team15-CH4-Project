@@ -12,6 +12,8 @@ void AEG_GameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	EG_LOG_NET(LogJM, Log, TEXT(""));
+
 	DOREPLIFETIME(ThisClass, AlivePlayerControllerCount);
 	DOREPLIFETIME(ThisClass, MatchState);
 	DOREPLIFETIME(ThisClass, RemainingCountdown);
@@ -20,12 +22,14 @@ void AEG_GameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 void AEG_GameStateBase::OnRep_RemainingCountdown()
 {
-    //UE_LOG(LogTemp, Log, TEXT("Countdown updated: %d"), RemainingCountdown);
-	EG_LOG_NET(LogEGNet, Log, TEXT("Begin: %d"), RemainingCountdown);
+	EG_LOG_NET(LogJM, Log, TEXT("Countdown updated: %d"), RemainingCountdown);
+
+	OnCountdownUpdated.Broadcast(RemainingCountdown);
 }
 
 void AEG_GameStateBase::OnRep_RemainingPlayTime()
 {
     UE_LOG(LogTemp, Log, TEXT("Play Time: %d"), RemainingPlayTime);
-    
+
+	OnPlayTimeUpdated.Broadcast(RemainingPlayTime);    
 }
