@@ -5,6 +5,8 @@
 #include "Runtime/AIModule/Classes/AIController.h"
 #include "EGAIController.generated.h"
 
+class UAIConfigData;
+
 UCLASS()
 class EG_API AEGAIController : public AAIController
 {
@@ -13,9 +15,14 @@ class EG_API AEGAIController : public AAIController
 public:
 	AEGAIController();
 
+	UAIConfigData* GetConfigData() const;
+
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AIController|AI")
 	UBehaviorTree* BehaviorTreeAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AIController|Config")
+	UAIConfigData* ConfigData;
 };

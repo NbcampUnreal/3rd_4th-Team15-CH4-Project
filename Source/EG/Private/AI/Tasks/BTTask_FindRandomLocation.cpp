@@ -6,8 +6,10 @@
 #include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+#include "AI/EGAIController.h"
+#include "AI/DataAsset/AIConfigData.h"
+
 UBTTask_FindRandomLocation::UBTTask_FindRandomLocation()
-	: SearchRadius(500.0f)
 {
 	NodeName = TEXT("Find Random Location");
 }
@@ -16,21 +18,26 @@ EBTNodeResult::Type UBTTask_FindRandomLocation::ExecuteTask(UBehaviorTreeCompone
 {
 	if (AAIController* AIController = OwnerComp.GetAIOwner())
 	{
-		if (APawn* Pawn = AIController->GetPawn())
+		if (AEGAIController* EGAIController = Cast<AEGAIController>(AIController))
 		{
-			if (UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(Pawn->GetWorld()))
+			if (APawn* Pawn = EGAIController->GetPawn())
 			{
-				FVector Origin = Pawn->GetActorLocation();
-				FNavLocation RandomPoint;
-
-				if (NavSys->GetRandomPointInNavigableRadius(Origin, SearchRadius, RandomPoint))
+				if (UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(Pawn->GetWorld()))
 				{
-					OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation", RandomPoint.Location);
-					return EBTNodeResult::Succeeded;
+					FVector Origin = Pawn->GetActorLocation();
+					FNavLocation RandomPoint;
+
+					if (NavSys->GetRandomPointInNavigableRadius(Origin, EGAIController->GetConfigData()->MoveRadius, RandomPoint))
+					{
+						OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation", RandomPoint.Location);
+						return EBTNodeResult::Succeeded;
+					}
 				}
 			}
 		}
 	}
+
+	
 	
 	return EBTNodeResult::Failed;
 }
