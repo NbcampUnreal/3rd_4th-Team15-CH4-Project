@@ -11,6 +11,8 @@ public class EG : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		
+		PublicIncludePaths.AddRange(new string[] { "EG" });
 
         PublicIncludePaths.AddRange(new string[] { "EG" });
 
