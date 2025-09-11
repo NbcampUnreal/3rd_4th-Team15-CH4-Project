@@ -35,10 +35,10 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="EGChickenMovementComponent|Movement")
-	float WalkSpeed = 600.0f;
+	float WalkSpeed = 400.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category="EGChickenMovementComponent|Movement")
-	float SprintSpeed = 1000.0f;
+	float SprintSpeed = 700.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category="EGChickenMovementComponent|Movement")
 	float DashStrength = 1000.0f;
