@@ -32,6 +32,9 @@ public:
 	void PerformStartSprint();
 	void PerformStopSprint();
 	void PerformDash();
+	void PerformAttack();
+	void PerformLayEgg();
+	void PerformPeck();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="EGChickenMovementComponent|Movement")
