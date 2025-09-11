@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerStart.h"
-#include "EG_PlayerStart.generated.h"
+#include "EGPlayerStart.generated.h"
 
 UCLASS()
-class EG_API AEG_PlayerStart : public APlayerStart
+class EG_API AEGPlayerStart : public APlayerStart
 {
 	GENERATED_BODY()
 
 public:
-	AEG_PlayerStart(const FObjectInitializer& ObjectInitializer);	
+	AEGPlayerStart(const FObjectInitializer& ObjectInitializer);	
 	int32 GetPlayerIndex();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PlayerIndex")

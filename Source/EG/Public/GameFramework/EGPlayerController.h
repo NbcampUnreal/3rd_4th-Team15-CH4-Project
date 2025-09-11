@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "EG_PlayerController.generated.h"
+#include "EGPlayerController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EG_API AEG_PlayerController : public APlayerController
+class EG_API AEGPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 

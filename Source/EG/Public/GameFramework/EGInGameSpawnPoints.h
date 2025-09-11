@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "EG_InGameSpawnPoints.generated.h"
+#include "EGInGameSpawnPoints.generated.h"
 
 UCLASS()
-class EG_API AEG_InGameSpawnPoints : public AActor
+class EG_API AEGInGameSpawnPoints : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	AEG_InGameSpawnPoints();
+	AEGInGameSpawnPoints();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SpawnPoint")
 	int32 SpawnSortNumber;

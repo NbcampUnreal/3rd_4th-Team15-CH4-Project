@@ -5,7 +5,7 @@
 //#include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
 #include "Delegates/DelegateCombinations.h"
-#include "EG_GameStateBase.generated.h"
+#include "EGGameStateBase.generated.h"
 
 UENUM(BlueprintType)
 enum class EMatchState : uint8
@@ -26,7 +26,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountdownUpdated, int32, NewCount
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayTimeUpdated, int32, NewPlayTime);
 
 UCLASS()
-class EG_API AEG_GameStateBase : public AGameStateBase
+class EG_API AEGGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
 

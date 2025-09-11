@@ -1,34 +1,33 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "EG/Public/GameFramework/EGGameModeBase.h"
 #include "EngineUtils.h"
-
-#include "EG/Public/GameFramework/EG_GameModeBase.h"
-#include "EG/Public/GameFramework/EG_PlayerStart.h"
+#include "EG/Public/GameFramework/EGPlayerStart.h"
 #include "EGLog.h"
 #include "Character/EGChickenCharacter.h"
-#include "GameFramework/EG_InGameSpawnPoints.h"
+#include "GameFramework/EGInGameSpawnPoints.h"
 
 
-void AEG_GameModeBase::BeginPlay()
+void AEGGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
 
     GetWorldTimerManager().SetTimer(
     MyTimerHandle,
     this,
-    &AEG_GameModeBase::GameStart, 
+    &AEGGameModeBase::GameStart, 
     5.0f,
     true 
     );
 }
 
-void AEG_GameModeBase::PostLogin(APlayerController* NewPlayer)
+void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
 
     static int32 NextIndex = 0;
 
-    if (AEG_PlayerController* PC = Cast<AEG_PlayerController>(NewPlayer))
+    if (AEGPlayerController* PC = Cast<AEGPlayerController>(NewPlayer))
     {
         PC->SetPlayerIndex(NextIndex);
         NextIndex++;
@@ -44,7 +43,7 @@ void AEG_GameModeBase::PostLogin(APlayerController* NewPlayer)
 
     }
 
-    if (AEG_PlayerController* EGPC = Cast<AEG_PlayerController>(NewPlayer))
+    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(NewPlayer))
     {
         APlayingPlayerControllers.Add(EGPC);
 
@@ -66,14 +65,14 @@ void AEG_GameModeBase::PostLogin(APlayerController* NewPlayer)
 
 
 
-void AEG_GameModeBase::Logout(AController* Exiting)
+void AEGGameModeBase::Logout(AController* Exiting)
 {
     Super::Logout(Exiting);
 
-    if (AEG_PlayerController* EGPC = Cast<AEG_PlayerController>(Exiting))
+    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(Exiting))
     {
         EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPC->PlayerIndex);
-        APlayingPlayerControllers.RemoveAll([EGPC](const TWeakObjectPtr<AEG_PlayerController>& P)
+        APlayingPlayerControllers.RemoveAll([EGPC](const TWeakObjectPtr<AEGPlayerController>& P)
         {
             return !P.IsValid() || P.Get() == EGPC;
         });
@@ -81,7 +80,7 @@ void AEG_GameModeBase::Logout(AController* Exiting)
 }
 
 
-void AEG_GameModeBase::InitializeSpawnPoint()
+void AEGGameModeBase::InitializeSpawnPoint()
 {
     PlayerStartList.Empty();
 
@@ -91,9 +90,9 @@ void AEG_GameModeBase::InitializeSpawnPoint()
         UE_LOG(LogTemp, Warning, TEXT("[why] World is invalid. Abort building PlayerStartList."));
     }
 	
-    for (TActorIterator<AEG_PlayerStart> It(World); It; ++It)
+    for (TActorIterator<AEGPlayerStart> It(World); It; ++It)
     {
-        AEG_PlayerStart* PS = *It;
+        AEGPlayerStart* PS = *It;
         if (!IsValid(PS))
         {
             continue;
@@ -102,15 +101,15 @@ void AEG_GameModeBase::InitializeSpawnPoint()
     }
 }
 
-AActor* AEG_GameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+AActor* AEGGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
     InitializeSpawnPoint();
 
-    if (AEG_PlayerController* PC = Cast<AEG_PlayerController>(Player))
+    if (AEGPlayerController* PC = Cast<AEGPlayerController>(Player))
     {
         int32 PlayerIndex = GetNumPlayers()-1; //PC->PlayerIndex or PlayerController index
         
-        if (AEG_PlayerStart** FoundStart = PlayerStartList.Find(PlayerIndex))
+        if (AEGPlayerStart** FoundStart = PlayerStartList.Find(PlayerIndex))
         {
             return *FoundStart;
         }
@@ -121,13 +120,13 @@ AActor* AEG_GameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 }
 
 
-void AEG_GameModeBase::GameStart()
+void AEGGameModeBase::GameStart()
 {
     if (GetNumPlayers() > 1)
     {
         UWorld* World = GetWorld();
         
-        for (TActorIterator<AEG_InGameSpawnPoints> It(World); It; ++It)
+        for (TActorIterator<AEGInGameSpawnPoints> It(World); It; ++It)
         {
             AInGameSpawnPoints.Add(*It);
             //AInGameSpawnPoints.Init(10, 5);
@@ -135,7 +134,7 @@ void AEG_GameModeBase::GameStart()
         
         for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
         {
-            if (AEG_PlayerController* PC = Cast<AEG_PlayerController>(It->Get()))
+            if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
             {
                 if (ACharacter* ChickChar = Cast<AEGChickenCharacter>(PC->GetPawn()))
                 {

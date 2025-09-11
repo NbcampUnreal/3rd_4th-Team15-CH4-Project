@@ -1,16 +1,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EG_InGameSpawnPoints.h"
+#include "EGInGameSpawnPoints.h"
 #include "GameFramework/GameModeBase.h"
-#include "GameFramework/EG_PlayerController.h"
-#include "EG_GameModeBase.generated.h"
+#include "GameFramework/EGPlayerController.h"
+#include "EGGameModeBase.generated.h"
 
-class AEG_PlayerStart;
+class AEGPlayerStart;
 
 
 UCLASS()
-class EG_API AEG_GameModeBase : public AGameModeBase
+class EG_API AEGGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
@@ -28,15 +28,15 @@ public:
 	FTimerHandle MyTimerHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spawn")
-	TMap<int32, AEG_PlayerStart*> PlayerStartList;
+	TMap<int32, AEGPlayerStart*> PlayerStartList;
 	UPROPERTY(VisibleAnywhere, Category="Spawn")
-	TArray<TWeakObjectPtr<AEG_InGameSpawnPoints>> AInGameSpawnPoints;
+	TArray<TWeakObjectPtr<AEGInGameSpawnPoints>> AInGameSpawnPoints;
 
 protected:
 	bool bGameStarted = false;
 	
 	UPROPERTY(VisibleAnywhere, Category="Players")
-	TArray<TWeakObjectPtr<AEG_PlayerController>> APlayingPlayerControllers;
+	TArray<TWeakObjectPtr<AEGPlayerController>> APlayingPlayerControllers;
 
 	
 	

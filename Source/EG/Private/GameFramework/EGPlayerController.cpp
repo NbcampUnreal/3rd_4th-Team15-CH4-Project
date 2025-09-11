@@ -1,19 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameFramework/EG_PlayerController.h"
+#include "GameFramework/EGPlayerController.h"
 #include "EGLog.h"
 #include "Net/UnrealNetwork.h"
 
 
-void AEG_PlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AEG_PlayerController, PlayerIndex);
+	DOREPLIFETIME(AEGPlayerController, PlayerIndex);
 }
 
-void AEG_PlayerController::SetPlayerIndex(int32 NewIndex)
+void AEGPlayerController::SetPlayerIndex(int32 NewIndex)
 {
 	if (HasAuthority())
 	{
