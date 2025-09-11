@@ -12,13 +12,10 @@ class EG_API AEG_PlayerStart : public APlayerStart
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
-	AEG_PlayerStart();
-	int GetPlayerIndex();
+	AEG_PlayerStart(const FObjectInitializer& ObjectInitializer);	
+	int32 GetPlayerIndex();
 	
-	UPROPERTY(VisibleAnywhere, EditAnywhere)
-	int PlayerIndex;	
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PlayerIndex")
+	int32 PlayerIndex;	
+
 };

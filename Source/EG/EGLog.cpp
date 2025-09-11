@@ -4,6 +4,8 @@
 #include "Modules/ModuleManager.h"
 
 DEFINE_LOG_CATEGORY(LogJM);
+DEFINE_LOG_CATEGORY(LogMS);
+
 
 /* DedicatedX Log 예시 */
 /*
