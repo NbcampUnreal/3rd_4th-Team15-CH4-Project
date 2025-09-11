@@ -1,15 +1,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EG_InGameSpawnPoints.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameFramework/EG_PlayerController.h"
 #include "EG_GameModeBase.generated.h"
 
 class AEG_PlayerStart;
-class AEG_PlayerController;
-class AEG_GameStateBase;
+
 
 UCLASS()
-class YOURGAME_API AEG_GameModeBase : public AGameModeBase
+class EG_API AEG_GameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
@@ -20,21 +21,23 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Game")
 	void GameStart();
-	
-protected:
-	UFUNCTION(BlueprintCallable, Category="Spawn")
-	void InitializeSpawnPoint();
 
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+	void InitializeSpawnPoint();
 
-	bool IsSpawnPointAvailable(const AActor* Start) const;
+	FTimerHandle MyTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spawn")
+	TMap<int32, AEG_PlayerStart*> PlayerStartList;
+	UPROPERTY(VisibleAnywhere, Category="Spawn")
+	TArray<TWeakObjectPtr<AEG_InGameSpawnPoints>> AInGameSpawnPoints;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Spawn")
-	TArray<AEG_PlayerStart*> SpawnPoints;
-
 	bool bGameStarted = false;
 	
 	UPROPERTY(VisibleAnywhere, Category="Players")
 	TArray<TWeakObjectPtr<AEG_PlayerController>> APlayingPlayerControllers;
+
+	
+	
 };

@@ -4,20 +4,14 @@
 
 
 
-AEG_PlayerStart::AEG_PlayerStart()
-{
+AEG_PlayerStart::AEG_PlayerStart(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{	
 	PrimaryActorTick.bCanEverTick = false;
-	
+	PlayerIndex = 0;	
 }
 
-void AEG_PlayerStart::BeginPlay()
-{
-	Super::BeginPlay();
-
-	PlayerIndex = 0;
-}
-
-int AEG_PlayerStart::GetPlayerIndex()
+int32 AEG_PlayerStart::GetPlayerIndex()
 {
 	return PlayerIndex;
 }
