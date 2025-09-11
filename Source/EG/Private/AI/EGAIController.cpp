@@ -18,9 +18,11 @@ void AEGAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	if (BehaviorTreeAsset)
+	if (HasAuthority())
 	{
-		RunBehaviorTree(BehaviorTreeAsset);
+		if (BehaviorTreeAsset)
+		{
+			RunBehaviorTree(BehaviorTreeAsset);
+		}
 	}
 }
-

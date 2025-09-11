@@ -2,13 +2,14 @@
 
 #include "AI/Tasks/BTTask_RandomWait.h"
 
+#include "AI/EGAICharacter.h"
 #include "AI/EGAIController.h"
 #include "AI/DataAsset/AIConfigData.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_RandomWait::UBTTask_RandomWait()
 	: RemainingTime(0.f)
 {
-	bNotifyTick = true;
 	NodeName = TEXT("Random Wait");
 }
 
@@ -18,25 +19,23 @@ EBTNodeResult::Type UBTTask_RandomWait::ExecuteTask(UBehaviorTreeComponent& Owne
 	{
 		if (AEGAIController* EGAIController = Cast<AEGAIController>(AIController))
 		{
-			float MinWaitTime = EGAIController->GetConfigData()->MinWaitTime;
-			float MaxWaitTime = EGAIController->GetConfigData()->MaxWaitTime;
+			if (AEGAICharacter* EGAICharacter = Cast<AEGAICharacter>(EGAIController->GetPawn()))
+			{
+				if (UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent())
+				{
+					float MinWaitTime = EGAIController->GetConfigData()->MinWaitTime;
+					float MaxWaitTime = EGAIController->GetConfigData()->MaxWaitTime;
 
-			RemainingTime = FMath::FRandRange(MinWaitTime, MaxWaitTime);
+					RemainingTime = EGAICharacter->RandomStream.FRandRange(MinWaitTime, MaxWaitTime);
+					RemainingTime += (EGAICharacter->GetUniqueID() % 100) * 0.01f;
 
-			return EBTNodeResult::InProgress;
+					Blackboard->SetValueAsFloat("WaitTime", RemainingTime);
+
+					return EBTNodeResult::Succeeded;
+				}
+			}
 		}
 	}
 	
 	return EBTNodeResult::Failed;
-}
-
-void UBTTask_RandomWait::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
-{
-	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-	
-	RemainingTime -= DeltaSeconds;
-	if (RemainingTime <= 0.f)
-	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}
 }

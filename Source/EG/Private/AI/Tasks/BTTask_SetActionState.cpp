@@ -20,6 +20,15 @@ EBTNodeResult::Type UBTTask_SetActionState::ExecuteTask(UBehaviorTreeComponent& 
 		{
 			if (UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent())
 			{
+				// Not Idle -> Idle
+				if (Blackboard->GetValueAsEnum("ActionState") != static_cast<uint8>(EAIState::Idle))
+				{
+					Blackboard->SetValueAsEnum("ActionState", static_cast<uint8>(EAIState::Idle));
+
+					return EBTNodeResult::Succeeded;
+				}
+
+				// Idle -> Random Action
 				float TotalWeight = 0.f;
 				for (auto& Entry : EGAIController->GetConfigData()->ActionProbabilities)
 				{
