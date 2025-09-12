@@ -55,6 +55,9 @@ private:
 	void HandleDash();
 	void HandleStartFreeLook();
 	void HandleStopFreeLook();
+	void HandleAttack();
+	void HandleLayEgg();
+	void HandlePeck();
 	
 	UFUNCTION(Server, Reliable)
 	void ServerRPCHandleDash();
@@ -62,8 +65,20 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerRPCHandleSprint(bool bNewIsSprint);
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPCHandleAttack();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCHandleLayEgg();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCHandlePeck();
+
 	void ExecuteDash();
 	void ExecuteSprint(bool bNewIsSprint);
+	void ExecuteAttack();
+	void ExecuteLayEgg();
+	void ExecutePeck();
 
 
 protected:
@@ -87,6 +102,15 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
 	TObjectPtr<UInputAction> IA_FreeLook;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_Attack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_LayEgg;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_Peck;
 
 	UPROPERTY(Replicated)
 	uint8 bIsSprinting:1;
