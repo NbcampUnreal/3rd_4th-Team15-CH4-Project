@@ -1,22 +1,21 @@
-// EGAI_PeckAbility.h
+// EGAI_LayEggAbility.h
 
 #pragma once
 
 #include "Abilities/GameplayAbility.h"
-#include "EGAI_PeckAbility.generated.h"
+#include "EGAI_LayEggAbility.generated.h"
 
 class UAbilityTask_PlayMontageAndWait;
-
 /**
  * 
  */
 UCLASS()
-class EG_API UEGAI_PeckAbility : public UGameplayAbility
+class EG_API UEGAI_LayEggAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 
 public:
-	UEGAI_PeckAbility();
+	UEGAI_LayEggAbility();
 
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 								const FGameplayAbilityActorInfo* ActorInfo,
@@ -30,7 +29,7 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* PeckMontage;
+	UAnimMontage* LayEggMontage;
 
 	UPROPERTY()
 	UAbilityTask_PlayMontageAndWait* MontageTask;

@@ -13,7 +13,7 @@ void UEGAI_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UEGAI_AttributeSet, MoveSpeed, COND_NONE, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEGAI_AttributeSet, MoveSpeed, COND_None, REPNOTIFY_Always);
 }
 
 void UEGAI_AttributeSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldMoveSpeed)

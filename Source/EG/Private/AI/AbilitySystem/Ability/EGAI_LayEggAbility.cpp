@@ -1,19 +1,18 @@
-// EGAI_PeckAbility.cpp
+// EGAI_LayEggAbility.cpp
 
+#include "AI/AbilitySystem/Ability/EGAI_LayEggAbility.h"
 
-#include "AI/AbilitySystem/Ability/EGAI_PeckAbility.h"
-
-#include "GameFramework/Character.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "GameFramework/Character.h"
 
-UEGAI_PeckAbility::UEGAI_PeckAbility()
-	: PeckMontage(nullptr)
+UEGAI_LayEggAbility::UEGAI_LayEggAbility()
+	: LayEggMontage(nullptr)
 	, MontageTask(nullptr)
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UEGAI_PeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+void UEGAI_LayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
@@ -30,7 +29,7 @@ void UEGAI_PeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		return;
 	}
 
-	MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, PeckMontage);
+	MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, LayEggMontage);
 	if (MontageTask)
 	{
 		MontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
@@ -44,13 +43,14 @@ void UEGAI_PeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	}
 }
 
-void UEGAI_PeckAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+void UEGAI_LayEggAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UEGAI_PeckAbility::OnMontageFinished()
+void UEGAI_LayEggAbility::OnMontageFinished()
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
