@@ -55,6 +55,9 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EIC->BindAction(IA_Dash, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleDash);
 	EIC->BindAction(IA_FreeLook, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleStartFreeLook);
 	EIC->BindAction(IA_FreeLook, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopFreeLook);
+	EIC->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleAttack);
+	EIC->BindAction(IA_LayEgg, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleLayEgg);
+	EIC->BindAction(IA_Peck, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandlePeck);
 }
 
 void AEGChickenCharacter::BeginPlay()
@@ -162,6 +165,42 @@ void AEGChickenCharacter::HandleStopFreeLook()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
+void AEGChickenCharacter::HandleAttack()
+{
+	if (HasAuthority())	// JM : 서버라면 바로 실행
+	{
+		ExecuteAttack();
+	}
+	else				// JM : 클라라면 ServerRPC 요청
+	{
+		ServerRPCHandleAttack();
+	}
+}
+
+void AEGChickenCharacter::HandleLayEgg()
+{
+	if (HasAuthority())	// JM : 서버라면 바로 실행
+	{
+		ExecuteLayEgg();
+	}
+	else				// JM : 클라라면 ServerRPC 요청
+	{
+		ServerRPCHandleLayEgg();
+	}
+}
+
+void AEGChickenCharacter::HandlePeck()
+{
+	if (HasAuthority())	// JM : 서버라면 바로 실행
+	{
+		ExecutePeck();
+	}
+	else				// JM : 클라라면 ServerRPC 요청
+	{
+		ServerRPCHandlePeck();
+	}
+}
+
 void AEGChickenCharacter::ServerRPCHandleDash_Implementation()
 {
 	ExecuteDash();
@@ -170,6 +209,21 @@ void AEGChickenCharacter::ServerRPCHandleDash_Implementation()
 void AEGChickenCharacter::ServerRPCHandleSprint_Implementation(bool bNewIsSprint)
 {
 	ExecuteSprint(bNewIsSprint);
+}
+
+void AEGChickenCharacter::ServerRPCHandleAttack_Implementation()
+{
+	ExecuteAttack();
+}
+
+void AEGChickenCharacter::ServerRPCHandleLayEgg_Implementation()
+{
+	ExecuteLayEgg();
+}
+
+void AEGChickenCharacter::ServerRPCHandlePeck_Implementation()
+{
+	ExecutePeck();
 }
 
 void AEGChickenCharacter::ExecuteDash()
@@ -202,4 +256,34 @@ void AEGChickenCharacter::ExecuteSprint(bool bNewIsSprint)
 		}
 		ChickenMovementComponent->PerformStopSprint();
 	}
+}
+
+void AEGChickenCharacter::ExecuteAttack()
+{
+	if (!ChickenMovementComponent)
+	{
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+		return;
+	}
+	ChickenMovementComponent->PerformAttack();
+}
+
+void AEGChickenCharacter::ExecuteLayEgg()
+{
+	if (!ChickenMovementComponent)
+	{
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+		return;
+	}
+	ChickenMovementComponent->PerformLayEgg();
+}
+
+void AEGChickenCharacter::ExecutePeck()
+{
+	if (!ChickenMovementComponent)
+	{
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+		return;
+	}
+	ChickenMovementComponent->PerformPeck();
 }
