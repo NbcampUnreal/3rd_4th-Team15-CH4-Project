@@ -4,8 +4,10 @@
 #include "EngineUtils.h"
 #include "EG/Public/GameFramework/EGPlayerStart.h"
 #include "EGLog.h"
+#include "EG/Public/GameFramework/EGGameStateBase.h"
 #include "Character/EGChickenCharacter.h"
 #include "GameFramework/EGInGameSpawnPoints.h"
+#include "GameFramework/EGPlayerState.h"
 
 
 void AEGGameModeBase::BeginPlay()
@@ -13,13 +15,28 @@ void AEGGameModeBase::BeginPlay()
     Super::BeginPlay();
 
     GetWorldTimerManager().SetTimer(
-    MyTimerHandle,
+    TimerHandle,
     this,
     &AEGGameModeBase::GameStart, 
     5.0f,
     true 
     );
 }
+/*
+void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
+    FString& ErrorMessage)
+{
+    Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+    
+    const bool bMatchStarted = bGameStarted || HasMatchStarted();
+
+    if (bMatchStarted)
+    {
+        ErrorMessage = TEXT("MatchInProgress"); // 비어 있으면 허용, 채우면 거절
+        return;
+    }
+}
+*/
 
 void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
@@ -63,8 +80,6 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
     */
 }
 
-
-
 void AEGGameModeBase::Logout(AController* Exiting)
 {
     Super::Logout(Exiting);
@@ -79,7 +94,6 @@ void AEGGameModeBase::Logout(AController* Exiting)
     }
 }
 
-
 void AEGGameModeBase::InitializeSpawnPoint()
 {
     PlayerStartList.Empty();
@@ -87,7 +101,7 @@ void AEGGameModeBase::InitializeSpawnPoint()
     UWorld* World = GetWorld();
     if (!IsValid(World))
     {
-        UE_LOG(LogTemp, Warning, TEXT("[why] World is invalid. Abort building PlayerStartList."));
+        EG_LOG_ROLE(LogMS, Warning, TEXT("[why] World is invalid. Abort building PlayerStartList."));
     }
 	
     for (TActorIterator<AEGPlayerStart> It(World); It; ++It)
@@ -105,6 +119,7 @@ AActor* AEGGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
     InitializeSpawnPoint();
 
+    
     if (AEGPlayerController* PC = Cast<AEGPlayerController>(Player))
     {
         int32 PlayerIndex = GetNumPlayers()-1; //PC->PlayerIndex or PlayerController index
@@ -122,34 +137,94 @@ AActor* AEGGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 
 void AEGGameModeBase::GameStart()
 {
+    GameOver();
+    
     if (GetNumPlayers() > 1)
     {
         UWorld* World = GetWorld();
         
+        AInGameSpawnPoints.Empty();
         for (TActorIterator<AEGInGameSpawnPoints> It(World); It; ++It)
         {
             AInGameSpawnPoints.Add(*It);
-            //AInGameSpawnPoints.Init(10, 5);
         }
-        
+
+        // 무작위 셔플
+        for (int32 i = 0; i < AInGameSpawnPoints.Num(); i++)
+        {
+            int32 SwapIdx = FMath::RandRange(0, AInGameSpawnPoints.Num()-1);
+            AInGameSpawnPoints.Swap(i, SwapIdx);
+        }
+
+        // 플레이어 순서대로 배정
+        int32 SpawnIdx = 0;
         for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
         {
             if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
             {
                 if (ACharacter* ChickChar = Cast<AEGChickenCharacter>(PC->GetPawn()))
                 {
-                    int32 RandomInt = FMath::RandRange(1, AInGameSpawnPoints.Num()-1);
-                    if (AInGameSpawnPoints[RandomInt].IsValid())
+                    if (AInGameSpawnPoints.IsValidIndex(SpawnIdx))
                     {
-                        FVector StartLocation = AInGameSpawnPoints[RandomInt]->GetActorLocation();
-                        FRotator StartRotation = FRotator::ZeroRotator;
-                        ChickChar->SetActorLocationAndRotation(StartLocation, StartRotation);
-                    }                
+                        FVector StartLocation = AInGameSpawnPoints[SpawnIdx]->GetActorLocation();
+                        ChickChar->SetActorLocation(StartLocation);
+                        SpawnIdx++;
+                    }
                 }
-                //PC->ClientGameStarted();
             }
-        }        
+        }
+        for (int k = SpawnIdx; k < AInGameSpawnPoints.Num(); k++)
+        {
+            if (AInGameSpawnPoints[k].IsValid())
+            {
+                EG_LOG_ROLE(LogMS, Warning, TEXT("Ai spawn at : %d"), 
+                    AInGameSpawnPoints[k]->GetSpawnSortNum());
+            }
+        }
+        EG_LOG_ROLE(LogMS, Warning, TEXT("-------------------------------------"));
     }
+}
+
+void AEGGameModeBase::GameOver()
+{
+    if (!GetWorld())
+    {
+        EG_LOG_ROLE(LogMS, Warning, TEXT("GameOver called with invalid World!"));
+        return;
+    }
+
+    TArray<TPair<TWeakObjectPtr<AEGPlayerController>, int32>> FinalPlayerScores;
     
-    
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
+        {
+            if (AEGPlayerState* PS = Cast<AEGPlayerState>(PC->PlayerState))
+            {
+                FinalPlayerScores.Add(TPair<TWeakObjectPtr<AEGPlayerController>, int32>(PC, PS->GetPlayerEggCount()));
+            }
+            else
+            {
+                EG_LOG_ROLE(LogMS, Warning, TEXT("Invalid PlayerState for PlayerController"));
+            }
+        }
+    }
+
+    FinalPlayerScores.Sort([](const auto& A, const auto& B)
+    {
+        if (A.Value != B.Value)
+            return A.Value > B.Value;
+        return A.Key.IsValid() && B.Key.IsValid() && A.Key->PlayerIndex < B.Key->PlayerIndex;
+    });
+
+    if (FinalPlayerScores.IsValidIndex(0))
+    {
+        auto FirstPlayer = FinalPlayerScores[0].Key;
+        if (FirstPlayer.IsValid())
+        {
+            EG_LOG_ROLE(LogMS, Warning, TEXT("Player: %d is winnder, Score: %d"), 
+                FirstPlayer->PlayerIndex, 
+                FinalPlayerScores[0].Value);
+        }
+    }
 }

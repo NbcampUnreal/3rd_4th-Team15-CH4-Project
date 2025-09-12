@@ -15,5 +15,8 @@ public:
 	AEGInGameSpawnPoints();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SpawnPoint")
-	int32 SpawnSortNumber;
+	int32 SpawnSortNum;
+
+public:
+	int32 GetSpawnSortNum();
 };

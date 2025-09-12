@@ -19,7 +19,7 @@ public:
 	int32 PlayerIndex;
     
     void SetPlayerIndex(int32 NewIndex);
-
+	
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	

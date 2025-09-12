@@ -27,6 +27,7 @@ public class EG : ModuleRules
 
         PublicIncludePaths.AddRange(new string[] { "EG" });
 		
+        
          string PhotonRoot = Path.Combine(ModuleDirectory, "..", "..", "ThirdParty", "Photon");
 
         PublicIncludePaths.AddRange(new string[]
@@ -81,5 +82,7 @@ public class EG : ModuleRules
         // PrivateDependencyModuleNames.Add("OnlineSubsystem");
 
         // To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+        
     }
+    
 }
