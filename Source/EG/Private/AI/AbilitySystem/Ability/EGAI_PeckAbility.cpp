@@ -30,7 +30,7 @@ void UEGAI_PeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		return;
 	}
 
-	MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, PeckMontage);
+	MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("Peck"), PeckMontage);
 	if (MontageTask)
 	{
 		MontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);

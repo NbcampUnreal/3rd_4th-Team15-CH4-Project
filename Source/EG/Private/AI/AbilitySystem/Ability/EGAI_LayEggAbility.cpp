@@ -29,7 +29,7 @@ void UEGAI_LayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 		return;
 	}
 
-	MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, LayEggMontage);
+	MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("Lay Egg"), LayEggMontage);
 	if (MontageTask)
 	{
 		MontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageFinished);
