@@ -1,5 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// EGPeckCooldownEffect.cpp
 
 #include "AbilitySystem/GameplayEffect/EGPeckCooldownEffect.h"
 
+UEGPeckCooldownEffect::UEGPeckCooldownEffect()
+{
+	DurationPolicy = EGameplayEffectDurationType::HasDuration;
+
+	DurationMagnitude = FGameplayEffectModifierMagnitude(5.0f);
+	
+}
