@@ -26,10 +26,7 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AICharacter|GAS")
-	TSubclassOf<UGameplayAbility> PeckAbilityClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "AICharacter|GAS")
-	TSubclassOf<UGameplayAbility> LayEggAbilityClass;
+	TArray<TSubclassOf<UGameplayAbility>> GrantedAbilityClasses;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "AICharacter|GAS")
@@ -45,4 +42,8 @@ private:
 public:
 	UPROPERTY()
 	FRandomStream RandomStream;
+
+	// Set AI State -> Angry
+	UFUNCTION(BlueprintCallable)
+	void OnAngryMode();
 };

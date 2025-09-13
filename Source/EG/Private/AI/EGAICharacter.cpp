@@ -4,7 +4,10 @@
 
 #include "AbilitySystemComponent.h"
 #include "EGLog.h"
+#include "AI/EGAIController.h"
+#include "AI/EGAIState.h"
 #include "AI/AbilitySystem/AttributeSet/EGAI_AttributeSet.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 AEGAICharacter::AEGAICharacter()
 {
@@ -47,12 +50,27 @@ void AEGAICharacter::GiveAbilities()
 
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
-	if (PeckAbilityClass)
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : GrantedAbilityClasses)
 	{
-		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(PeckAbilityClass, 1, INDEX_NONE, this));
+		if (AbilityClass)
+		{
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, INDEX_NONE, this));
+		}
 	}
-	if (LayEggAbilityClass)
+}
+
+void AEGAICharacter::OnAngryMode()
+{
+	if (HasAuthority())
 	{
-		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(LayEggAbilityClass, 1, INDEX_NONE, this));
+		if (AEGAIController* EGAIController = Cast<AEGAIController>(GetController()))
+		{
+			if (UBlackboardComponent* Blackboard = EGAIController->GetBlackboardComponent())
+			{
+				EG_LOG(LogKH, Log, TEXT("%s : Angry"), *this->GetName());
+				
+				Blackboard->SetValueAsEnum("ActionState", static_cast<uint8>(EAIState::Angry));
+			}
+		}
 	}
 }
