@@ -103,11 +103,44 @@ void UEGChickenMovementComponent::PerformDash()
 		return;
 	}
 
-	if (OwnerCharacter->HasAuthority())		// 서버에서만 실행
+	if (OwnerCharacter->HasAuthority())		// 서버에서만 실행 (TODO: 이미 Character에서 조건검사를 하는데 필요한가..?)
 	{
 		const FVector DashDirection = OwnerCharacter->GetActorForwardVector();
 		OwnerCharacter->LaunchCharacter(DashDirection * DashStrength, true, true);
 	}
+}
+
+void UEGChickenMovementComponent::PerformAttack()
+{
+	if (!OwnerCharacter)
+	{
+		EG_LOG_SUBOBJECT_ROLE(LogJM, Warning, TEXT("No OwnerCharacter"));
+		return;
+	}
+
+	EG_LOG_SUBOBJECT_ROLE(LogJM, Log, TEXT("Do Attack"));
+}
+
+void UEGChickenMovementComponent::PerformLayEgg()
+{
+	if (!OwnerCharacter)
+	{
+		EG_LOG_SUBOBJECT_ROLE(LogJM, Warning, TEXT("No OwnerCharacter"));
+		return;
+	}
+
+	EG_LOG_SUBOBJECT_ROLE(LogJM, Log, TEXT("Do Lay Egg"));
+}
+
+void UEGChickenMovementComponent::PerformPeck()
+{
+	if (!OwnerCharacter)
+	{
+		EG_LOG_SUBOBJECT_ROLE(LogJM, Warning, TEXT("No OwnerCharacter"));
+		return;
+	}
+
+	EG_LOG_SUBOBJECT_ROLE(LogJM, Log, TEXT("Do Peck"));
 }
 
 

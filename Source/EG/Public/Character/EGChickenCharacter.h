@@ -12,6 +12,9 @@ class UCameraComponent;
 class USpringArmComponent;
 class UInputAction;
 class UInputMappingContext;
+class UAbilitySystemComponent;
+class UEGCharacterAttributeSet;
+class UGameplayAbility;
 
 UCLASS()
 class EG_API AEGChickenCharacter : public ACharacter
@@ -55,6 +58,9 @@ private:
 	void HandleDash();
 	void HandleStartFreeLook();
 	void HandleStopFreeLook();
+	void HandleAttack();
+	void HandleLayEgg();
+	void HandlePeck();
 	
 	UFUNCTION(Server, Reliable)
 	void ServerRPCHandleDash();
@@ -62,8 +68,20 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerRPCHandleSprint(bool bNewIsSprint);
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPCHandleAttack();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCHandleLayEgg();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCHandlePeck();
+
 	void ExecuteDash();
 	void ExecuteSprint(bool bNewIsSprint);
+	void ExecuteAttack();
+	void ExecuteLayEgg();
+	void ExecutePeck();
 
 
 protected:
@@ -88,6 +106,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
 	TObjectPtr<UInputAction> IA_FreeLook;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_Attack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_LayEgg;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_Peck;
+
 	UPROPERTY(Replicated)
 	uint8 bIsSprinting:1;
 
@@ -96,5 +123,22 @@ public:
 	bool bIsFreeLooking = false;
 
 #pragma endregion
-	
+
+// GAS로 스킬 사용 코드 (작성자 : 김세훈)
+#pragma region GAS
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TObjectPtr<UEGCharacterAttributeSet> AttributeSet;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> PeckAbilityClass;
+
+#pragma endregion
 };

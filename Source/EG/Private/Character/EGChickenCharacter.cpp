@@ -10,6 +10,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "Net/UnrealNetwork.h"
 #include "Public/Character/Components/EGChickenMovementComponent.h"
+#include "AbilitySystemComponent.h"
+#include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
 
 
 AEGChickenCharacter::AEGChickenCharacter()
@@ -35,6 +37,10 @@ AEGChickenCharacter::AEGChickenCharacter()
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
 	ChickenMovementComponent = CreateDefaultSubobject<UEGChickenMovementComponent>(TEXT("ChickenMovementComponent"));
+
+	// GAS 사용을 위한 ASC와 AttributeSet 생성 (작성자 : 김세훈)
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AttributeSet = CreateDefaultSubobject<UEGCharacterAttributeSet>(TEXT("AttributeSet"));
 }
 
 void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -55,6 +61,9 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EIC->BindAction(IA_Dash, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleDash);
 	EIC->BindAction(IA_FreeLook, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleStartFreeLook);
 	EIC->BindAction(IA_FreeLook, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopFreeLook);
+	EIC->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleAttack);
+	EIC->BindAction(IA_LayEgg, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleLayEgg);
+	EIC->BindAction(IA_Peck, ETriggerEvent::Started, this, &AEGChickenCharacter::HandlePeck); // Start로 바꾸기 (작성자 : 김세훈)
 }
 
 void AEGChickenCharacter::BeginPlay()
@@ -79,6 +88,26 @@ void AEGChickenCharacter::BeginPlay()
 		checkf(IsValid(EILPS) == true, TEXT("EnhancedInputLocalPlayerSubsystem is invalid."));
 
 		EILPS->AddMappingContext(IMC_Chicken, 0);
+	}
+
+	// GAS에서 처음에 꼭 해줘야 하는 Init 코드 (작성자 : 김세훈)
+	if (HasAuthority())
+	{
+		if (IsValid(AbilitySystemComponent))
+		{
+			AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+			for (const auto& AbilityClass : StartupAbilities)
+			{
+				if (IsValid(AbilityClass))
+				{
+					AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0, this));
+					UE_LOG(LogTemp, Log, TEXT("Give Ability : %s"), *AbilityClass->GetName());
+				}
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("GAS Initialized"));
+		}
 	}
 }
 
@@ -162,6 +191,42 @@ void AEGChickenCharacter::HandleStopFreeLook()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
+void AEGChickenCharacter::HandleAttack()
+{
+	if (HasAuthority())	// JM : 서버라면 바로 실행
+	{
+		ExecuteAttack();
+	}
+	else				// JM : 클라라면 ServerRPC 요청
+	{
+		ServerRPCHandleAttack();
+	}
+}
+
+void AEGChickenCharacter::HandleLayEgg()
+{
+	if (HasAuthority())	// JM : 서버라면 바로 실행
+	{
+		ExecuteLayEgg();
+	}
+	else				// JM : 클라라면 ServerRPC 요청
+	{
+		ServerRPCHandleLayEgg();
+	}
+}
+
+void AEGChickenCharacter::HandlePeck()
+{
+	if (HasAuthority())	// JM : 서버라면 바로 실행
+	{
+		ExecutePeck();
+	}
+	else				// JM : 클라라면 ServerRPC 요청
+	{
+		ServerRPCHandlePeck();
+	}
+}
+
 void AEGChickenCharacter::ServerRPCHandleDash_Implementation()
 {
 	ExecuteDash();
@@ -170,6 +235,21 @@ void AEGChickenCharacter::ServerRPCHandleDash_Implementation()
 void AEGChickenCharacter::ServerRPCHandleSprint_Implementation(bool bNewIsSprint)
 {
 	ExecuteSprint(bNewIsSprint);
+}
+
+void AEGChickenCharacter::ServerRPCHandleAttack_Implementation()
+{
+	ExecuteAttack();
+}
+
+void AEGChickenCharacter::ServerRPCHandleLayEgg_Implementation()
+{
+	ExecuteLayEgg();
+}
+
+void AEGChickenCharacter::ServerRPCHandlePeck_Implementation()
+{
+	ExecutePeck();
 }
 
 void AEGChickenCharacter::ExecuteDash()
@@ -201,5 +281,50 @@ void AEGChickenCharacter::ExecuteSprint(bool bNewIsSprint)
 			EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
 		}
 		ChickenMovementComponent->PerformStopSprint();
+	}
+}
+
+void AEGChickenCharacter::ExecuteAttack()
+{
+	if (!ChickenMovementComponent)
+	{
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+		return;
+	}
+	ChickenMovementComponent->PerformAttack();
+}
+
+void AEGChickenCharacter::ExecuteLayEgg()
+{
+	if (!ChickenMovementComponent)
+	{
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+		return;
+	}
+	ChickenMovementComponent->PerformLayEgg();
+}
+
+void AEGChickenCharacter::ExecutePeck()
+{
+	// Peck Ability 실행시키기 (작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent) && IsValid(PeckAbilityClass))
+	{
+		FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag("Ability.Cooldown.Peck");
+		if (!AbilitySystemComponent->HasMatchingGameplayTag(CooldownTag))
+		{
+			bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(PeckAbilityClass);
+			if (bSuccess)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Peck ability activated"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Peck ability failed (cooldown)"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Peck Ability failed - cooldownTag having"));
+		}
 	}
 }
