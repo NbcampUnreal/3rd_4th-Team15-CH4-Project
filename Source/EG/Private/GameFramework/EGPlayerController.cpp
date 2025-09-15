@@ -13,6 +13,18 @@ void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(AEGPlayerController, PlayerIndex);
 }
 
+void AEGPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	if (!IsLocalController())
+	{
+		return;
+	}
+
+	FInputModeGameOnly GameOnly;
+	SetInputMode(GameOnly);
+}
+
 void AEGPlayerController::SetPlayerIndex(int32 NewIndex)
 {
 	if (HasAuthority())

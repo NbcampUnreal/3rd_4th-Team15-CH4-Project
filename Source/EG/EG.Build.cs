@@ -18,14 +18,15 @@ public class EG : ModuleRules
 			"AIModule", "NavigationSystem",
 			
 			// GAS
-			"GameplayAbilities", "GameplayTags", "GameplayTasks"
+			"GameplayAbilities", "GameplayTags", "GameplayTasks",
+
+			// UI
+			"UMG"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 		
 		PublicIncludePaths.AddRange(new string[] { "EG" });
-
-        PublicIncludePaths.AddRange(new string[] { "EG" });
 		
     }
     
