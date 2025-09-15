@@ -3,7 +3,9 @@
 #include "CoreMinimal.h"
 #include "EGInGameSpawnPoints.h"
 #include "GameFramework/GameModeBase.h"
+#include "AI/EGAICharacter.h"
 #include "GameFramework/EGPlayerController.h"
+
 #include "EGGameModeBase.generated.h"
 
 class AEGPlayerStart;
@@ -35,7 +37,10 @@ public:
 	void InitializeSpawnPoint();
 
 	FTimerHandle TimerHandle;
-
+	
+	UPROPERTY(EditAnywhere, Category="Spawn")
+	TSubclassOf<AEGAICharacter> AICharacter;
+	
 protected:
 	bool bGameStarted = false;
 

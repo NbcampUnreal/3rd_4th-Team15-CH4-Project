@@ -10,6 +10,7 @@
 #include "GameFramework/EGPlayerState.h"
 
 
+
 void AEGGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
@@ -18,8 +19,8 @@ void AEGGameModeBase::BeginPlay()
     TimerHandle,
     this,
     &AEGGameModeBase::GameStart, 
-    5.0f,
-    true 
+    10.0f,
+    false 
     );
 }
 /*
@@ -118,18 +119,14 @@ void AEGGameModeBase::InitializeSpawnPoint()
 AActor* AEGGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
     InitializeSpawnPoint();
-
     
-    if (AEGPlayerController* PC = Cast<AEGPlayerController>(Player))
-    {
-        int32 PlayerIndex = GetNumPlayers()-1; //PC->PlayerIndex or PlayerController index
+    int32 PlayerIndex = GetNumPlayers()-1;
         
         if (AEGPlayerStart** FoundStart = PlayerStartList.Find(PlayerIndex))
         {
             return *FoundStart;
         }
-    }
-    
+        
     EG_LOG_ROLE(LogMS, Warning, TEXT("No SpawnPoint found for index %d, using Super."));
     return Super::ChoosePlayerStart_Implementation(Player);
 }
@@ -149,14 +146,14 @@ void AEGGameModeBase::GameStart()
             AInGameSpawnPoints.Add(*It);
         }
 
-        // 무작위 셔플
+        // random suffle
         for (int32 i = 0; i < AInGameSpawnPoints.Num(); i++)
         {
             int32 SwapIdx = FMath::RandRange(0, AInGameSpawnPoints.Num()-1);
             AInGameSpawnPoints.Swap(i, SwapIdx);
         }
 
-        // 플레이어 순서대로 배정
+        //player teleport
         int32 SpawnIdx = 0;
         for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
         {
@@ -167,6 +164,8 @@ void AEGGameModeBase::GameStart()
                     if (AInGameSpawnPoints.IsValidIndex(SpawnIdx))
                     {
                         FVector StartLocation = AInGameSpawnPoints[SpawnIdx]->GetActorLocation();
+                        FRotator SpawnRotation(0.f , FMath::RandRange(0, 360), 0.f);
+                        PC->SetControlRotation(SpawnRotation);
                         ChickChar->SetActorLocation(StartLocation);
                         SpawnIdx++;
                     }
@@ -177,13 +176,34 @@ void AEGGameModeBase::GameStart()
         {
             if (AInGameSpawnPoints[k].IsValid())
             {
+                /*
                 EG_LOG_ROLE(LogMS, Warning, TEXT("Ai spawn at : %d"), 
                     AInGameSpawnPoints[k]->GetSpawnSortNum());
+                */
+                FVector SpawnLocation = AInGameSpawnPoints[k]->GetActorLocation();
+                FRotator SpawnRotation(0.f , FMath::RandRange(0, 360), 0.f);
+
+                FActorSpawnParameters SpawnParams;
+                SpawnParams.Owner = this;
+                SpawnParams.Instigator = GetInstigator();
+                SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+                AEGAICharacter* SpawnedActor = GetWorld()->SpawnActor<AEGAICharacter>(AICharacter, SpawnLocation, SpawnRotation, SpawnParams);
+                if (SpawnedActor)
+                {
+                    EG_LOG_ROLE(LogMS, Warning, TEXT("ai Spawn"));
+                }
+                else
+                {
+                    EG_LOG_ROLE(LogMS, Warning, TEXT("ai Spawn fail"));
+                }
+                
             }
         }
         EG_LOG_ROLE(LogMS, Warning, TEXT("-------------------------------------"));
     }
 }
+
 
 void AEGGameModeBase::GameOver()
 {
