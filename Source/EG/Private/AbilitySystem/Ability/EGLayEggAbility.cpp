@@ -2,7 +2,6 @@
 
 #include "AbilitySystem/Ability/EGLayEggAbility.h"
 
-#include "EGLog.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
 #include "AbilitySystem/GameplayEffect/EGLayEggCooldownEffect.h"
@@ -15,7 +14,6 @@ UEGLayEggAbility::UEGLayEggAbility()
 
 	CostGameplayEffectClass = UEGLayEggCostEffect::StaticClass();
 	CooldownGameplayEffectClass = UEGLayEggCooldownEffect::StaticClass();
-	LayEggEffectClass = nullptr;
 }
 
 void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -64,24 +62,6 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 				                                                        ActorInfo->AvatarActor->GetActorRotation());
 
 				UE_LOG(LogTemp, Log, TEXT("Egg Spawned"));
-			}
-		}
-
-		if (IsValid(LayEggEffectClass) && ActorInfo->AbilitySystemComponent.IsValid())
-		{
-			FGameplayEffectContextHandle ContextHandle = ActorInfo->AbilitySystemComponent->MakeEffectContext();
-			ContextHandle.AddSourceObject(this);
-
-			FGameplayEffectSpecHandle SpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(
-				LayEggEffectClass, 1, ContextHandle);
-
-			if (SpecHandle.IsValid())
-			{
-				ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-
-				float CurrentEnergy = ActorInfo->AbilitySystemComponent->
-				                                 GetNumericAttribute(UEGCharacterAttributeSet::GetEggEnergyAttribute());
-				UE_LOG(LogTemp, Log, TEXT("CurrentEnergy: %0.1f"), CurrentEnergy);
 			}
 		}
 	}

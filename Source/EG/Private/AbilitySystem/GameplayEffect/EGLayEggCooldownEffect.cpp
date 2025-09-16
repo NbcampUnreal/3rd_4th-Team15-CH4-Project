@@ -7,7 +7,7 @@ UEGLayEggCooldownEffect::UEGLayEggCooldownEffect()
 {
 	DurationPolicy = EGameplayEffectDurationType::HasDuration;
 
-	DurationMagnitude = FScalableFloat(5.0f);
+	DurationMagnitude = FScalableFloat(1.0f);
 
 	UTargetTagsGameplayEffectComponent* TargetTags = CreateDefaultSubobject<UTargetTagsGameplayEffectComponent>(TEXT("TargetTags"));
 	if (TargetTags)
