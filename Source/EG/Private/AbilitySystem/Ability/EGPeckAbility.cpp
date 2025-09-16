@@ -35,9 +35,8 @@ void UEGPeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	{
 		UAbilityTask_PlayMontageAndWait* PlayMontageTask =
 			UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
-				this, NAME_None, PeckMontage,
-				1.0f, NAME_None,
-				false, 1.0f);
+				this, NAME_None, PeckMontage, 1.0f,
+				NAME_None, false, 1.0f);
 
 		if (IsValid(PlayMontageTask))
 		{
@@ -82,7 +81,7 @@ void UEGPeckAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 
 void UEGPeckAbility::OnMontageFinished()
 {
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
 void UEGPeckAbility::OnMontageCancelled()

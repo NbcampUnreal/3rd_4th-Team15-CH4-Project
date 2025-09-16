@@ -1,17 +1,16 @@
-// EGPeckEffect.cpp
+// EGLayEggCostEffect.cpp
 
-#include "AbilitySystem/GameplayEffect/EGPeckEffect.h"
+#include "AbilitySystem/GameplayEffect/EGLayEggCostEffect.h"
 #include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
 
-UEGPeckEffect::UEGPeckEffect()
+UEGLayEggCostEffect::UEGLayEggCostEffect()
 {
 	DurationPolicy = EGameplayEffectDurationType::Instant;
 
 	FGameplayModifierInfo EggEnergyModifier;
-	EggEnergyModifier.ModifierMagnitude = FScalableFloat(10.0f);
+	EggEnergyModifier.ModifierMagnitude = FScalableFloat(-100.0f);
 	EggEnergyModifier.ModifierOp = EGameplayModOp::Additive;
 	EggEnergyModifier.Attribute = UEGCharacterAttributeSet::GetEggEnergyAttribute();
 
 	Modifiers.Add(EggEnergyModifier);
-	
 }
