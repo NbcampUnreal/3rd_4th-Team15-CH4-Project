@@ -15,6 +15,8 @@ class EG_API AEGPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	virtual void BeginPlay() override;
+
 	UPROPERTY(Replicated, BlueprintReadOnly, Category="Player")
 	int32 PlayerIndex;
     

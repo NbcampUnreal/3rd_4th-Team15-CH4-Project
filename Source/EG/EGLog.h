@@ -6,6 +6,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogJM, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogMS, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogKH, Log, All);
 
 #define NETMODE_TCHAR ((GetNetMode() == ENetMode::NM_Client) ? *FString::Printf(TEXT("Client%02d"), UE::GetPlayInEditorID()) : ((GetNetMode() == ENetMode::NM_Standalone) ? TEXT("StandAlone") : TEXT("Server")))
 #define FUNCTION_TCHAR (ANSI_TO_TCHAR(__FUNCTION__))

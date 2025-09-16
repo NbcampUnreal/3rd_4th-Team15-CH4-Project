@@ -12,6 +12,9 @@ class UCameraComponent;
 class USpringArmComponent;
 class UInputAction;
 class UInputMappingContext;
+class UAbilitySystemComponent;
+class UEGCharacterAttributeSet;
+class UGameplayAbility;
 
 UCLASS()
 class EG_API AEGChickenCharacter : public ACharacter
@@ -120,5 +123,22 @@ public:
 	bool bIsFreeLooking = false;
 
 #pragma endregion
-	
+
+// GAS로 스킬 사용 코드 (작성자 : 김세훈)
+#pragma region GAS
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TObjectPtr<UEGCharacterAttributeSet> AttributeSet;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> PeckAbilityClass;
+
+#pragma endregion
 };
