@@ -26,9 +26,16 @@ public:
 	FGameplayAttributeData EggEnergy;
 	ATTRIBUTE_ACCESSORS(UEGCharacterAttributeSet, EggEnergy)
 
+	UPROPERTY(BlueprintReadOnly, Category = "Stamina", ReplicatedUsing = OnRep_Stamina)
+	FGameplayAttributeData Stamina;
+	ATTRIBUTE_ACCESSORS(UEGCharacterAttributeSet, Stamina)
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
 	virtual void OnRep_EggEnergy(const FGameplayAttributeData& OldEggEnergy);
+
+	UFUNCTION()
+	virtual void OnRep_Stamina(const FGameplayAttributeData& OldEggEnergy);
 };

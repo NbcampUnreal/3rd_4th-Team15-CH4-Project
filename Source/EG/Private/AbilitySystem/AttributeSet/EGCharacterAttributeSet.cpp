@@ -6,6 +6,7 @@
 UEGCharacterAttributeSet::UEGCharacterAttributeSet()
 {
 	InitEggEnergy(100.0f);
+	InitStamina(100.0f);
 }
 
 void UEGCharacterAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -13,9 +14,15 @@ void UEGCharacterAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UEGCharacterAttributeSet, EggEnergy, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UEGCharacterAttributeSet, Stamina, COND_None, REPNOTIFY_Always);
 }
 
 void UEGCharacterAttributeSet::OnRep_EggEnergy(const FGameplayAttributeData& OldEggEnergy)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UEGCharacterAttributeSet, EggEnergy, OldEggEnergy)
+}
+
+void UEGCharacterAttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldEggEnergy)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UEGCharacterAttributeSet, Stamina, OldEggEnergy)
 }

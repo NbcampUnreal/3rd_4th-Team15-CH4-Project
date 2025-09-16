@@ -1,25 +1,24 @@
-// EGLayEggAbility.h
+//EGDashAbility.h
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "EGLayEggAbility.generated.h"
+#include "EGDashAbility.generated.h"
 
 UCLASS()
-class EG_API UEGLayEggAbility : public UGameplayAbility
+class EG_API UEGDashAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 
 public:
-	UEGLayEggAbility();
+	UEGDashAbility();
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	                             const FGameplayAbilityActorInfo* ActorInfo,
 	                             const FGameplayAbilityActivationInfo ActivationInfo,
 	                             const FGameplayEventData* TriggerEventData) override;
-
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle,
 	                        const FGameplayAbilityActorInfo* ActorInfo,
 	                        const FGameplayAbilityActivationInfo ActivationInfo,
@@ -27,15 +26,15 @@ protected:
 	                        bool bWasCancelled) override;
 
 	UFUNCTION()
-	void OnMontageFinished();
-
-	UFUNCTION()
-	void OnMontageCancelled();
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "LayEgg")
-	TObjectPtr<UAnimMontage> LayEggMontage;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "LayEgg")
-	TSubclassOf<AActor> EggActorClass;
+	void OnDashFinished();
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dash")
+	float DashDuration = 0.2f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dash")
+	float DashDistance = 500.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dash")
+	bool bIgnoreGravity = true;
+
 };
