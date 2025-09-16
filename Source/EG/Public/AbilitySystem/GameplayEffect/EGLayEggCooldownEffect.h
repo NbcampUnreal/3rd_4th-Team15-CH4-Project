@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// EGLayEggCooldownEffect.h
 
 #pragma once
 
@@ -6,12 +6,11 @@
 #include "GameplayEffect.h"
 #include "EGLayEggCooldownEffect.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class EG_API UEGLayEggCooldownEffect : public UGameplayEffect
 {
 	GENERATED_BODY()
-	
+
+public:
+	UEGLayEggCooldownEffect();
 };

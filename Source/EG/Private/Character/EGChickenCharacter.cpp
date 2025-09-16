@@ -58,11 +58,11 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 	EIC->BindAction(IA_Sprint, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleStartSprintInput);
 	EIC->BindAction(IA_Sprint, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopSprintInput);
-	EIC->BindAction(IA_Dash, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleDash);
+	EIC->BindAction(IA_Dash, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleDash); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_FreeLook, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleStartFreeLook);
 	EIC->BindAction(IA_FreeLook, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopFreeLook);
 	EIC->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleAttack);
-	EIC->BindAction(IA_LayEgg, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleLayEgg);
+	EIC->BindAction(IA_LayEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayEgg); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_Peck, ETriggerEvent::Started, this, &AEGChickenCharacter::HandlePeck); // Start로 바꾸기 (작성자 : 김세훈)
 }
 
@@ -205,14 +205,20 @@ void AEGChickenCharacter::HandleAttack()
 
 void AEGChickenCharacter::HandleLayEgg()
 {
-	if (HasAuthority())	// JM : 서버라면 바로 실행
-	{
-		ExecuteLayEgg();
-	}
-	else				// JM : 클라라면 ServerRPC 요청
-	{
-		ServerRPCHandleLayEgg();
-	}
+	// LayEggAbility 실행 방식 수정(작성자 : 김세훈)
+	EG_LOG_ROLE(LogTemp, Log, TEXT("start"));
+	
+	ExecuteLayEgg();
+	
+	// if (HasAuthority())	// JM : 서버라면 바로 실행
+	// {
+	// }
+	// else				// JM : 클라라면 ServerRPC 요청
+	// {
+	// 	//ServerRPCHandleLayEgg();
+	// }
+	
+	EG_LOG_ROLE(LogTemp, Log, TEXT("end"));
 }
 
 void AEGChickenCharacter::HandlePeck()
@@ -244,7 +250,9 @@ void AEGChickenCharacter::ServerRPCHandleAttack_Implementation()
 
 void AEGChickenCharacter::ServerRPCHandleLayEgg_Implementation()
 {
+	EG_LOG_ROLE(LogTemp, Log, TEXT("start"));
 	ExecuteLayEgg();
+	EG_LOG_ROLE(LogTemp, Log, TEXT("end"));
 }
 
 void AEGChickenCharacter::ServerRPCHandlePeck_Implementation()
@@ -254,12 +262,34 @@ void AEGChickenCharacter::ServerRPCHandlePeck_Implementation()
 
 void AEGChickenCharacter::ExecuteDash()
 {
-	if (!ChickenMovementComponent)
+	// if (!ChickenMovementComponent)
+	// {
+	// 	EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+	// 	return;
+	// }
+	// ChickenMovementComponent->PerformDash();
+
+	// Dash Ability 실행시키기 (작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent) && IsValid(DashAbilityClass))
 	{
-		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
-		return;
+		FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag("Ability.Cooldown.Dash");
+		if (!AbilitySystemComponent->HasMatchingGameplayTag(CooldownTag))
+		{
+			bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(DashAbilityClass);
+			if (bSuccess)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Dash ability activated"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Dash ability failed (cooldown)"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Dash Ability failed - cooldownTag having"));
+		}
 	}
-	ChickenMovementComponent->PerformDash();
 }
 
 void AEGChickenCharacter::ExecuteSprint(bool bNewIsSprint)
@@ -296,12 +326,29 @@ void AEGChickenCharacter::ExecuteAttack()
 
 void AEGChickenCharacter::ExecuteLayEgg()
 {
-	if (!ChickenMovementComponent)
+	// LayEgg Ability 실행시키기 (작성자 : 김세훈)
+	EG_LOG_ROLE(LogTemp, Log, TEXT("start"));
+	if (IsValid(AbilitySystemComponent) && IsValid(LayEggAbilityClass))
 	{
-		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
-		return;
+		FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag("Ability.Cooldown.LayEgg");
+		if (!AbilitySystemComponent->HasMatchingGameplayTag(CooldownTag))
+		{
+			bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(LayEggAbilityClass);
+			if (bSuccess)
+			{
+				EG_LOG_ROLE(LogTemp, Log, TEXT("LayEgg ability activated"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("LayEgg ability failed (cooldown)"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("LayEgg Ability failed - cooldownTag having"));
+		}
 	}
-	ChickenMovementComponent->PerformLayEgg();
+	EG_LOG_ROLE(LogTemp, Log, TEXT("end"));
 }
 
 void AEGChickenCharacter::ExecutePeck()
