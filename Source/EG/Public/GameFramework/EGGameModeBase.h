@@ -17,16 +17,17 @@ class EG_API AEGGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-
-	/*
+	
 	 virtual void PreLogin(const FString& Options,
 						  const FString& Address,
 						  const FUniqueNetIdRepl& UniqueId,
 						  FString& ErrorMessage) override;
-	*/
+	
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
+	void StartCount();
+	void EndCount();
 
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
 	void GameStart();
@@ -36,7 +37,8 @@ public:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
 
-	FTimerHandle TimerHandle;
+	FTimerHandle GameStartingTimerHandle;
+	FTimerHandle GameEndTimerHandle;
 	
 	UPROPERTY(EditAnywhere, Category="Spawn")
 	TSubclassOf<AEGAICharacter> AICharacter;

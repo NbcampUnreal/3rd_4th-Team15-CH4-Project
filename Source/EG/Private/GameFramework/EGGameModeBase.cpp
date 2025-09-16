@@ -10,34 +10,25 @@
 #include "GameFramework/EGPlayerState.h"
 
 
-
 void AEGGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
 
-    GetWorldTimerManager().SetTimer(
-    TimerHandle,
-    this,
-    &AEGGameModeBase::GameStart, 
-    10.0f,
-    false 
-    );
+    StartCount();
 }
-/*
+
 void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
     FString& ErrorMessage)
 {
     Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
-    
-    const bool bMatchStarted = bGameStarted || HasMatchStarted();
 
-    if (bMatchStarted)
+    if (APlayingPlayerControllers.Num() >= 6)
     {
-        ErrorMessage = TEXT("MatchInProgress"); // 비어 있으면 허용, 채우면 거절
+        ErrorMessage = TEXT("ServerError_MaxPlayersReached");
         return;
     }
 }
-*/
+
 
 void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
@@ -55,30 +46,14 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
         EG_LOG_ROLE(LogMS, Warning, TEXT("player %d cant join here."), NextIndex);
     }
 
-    /*
-    if (AEG_GameStateBase* GS = GetGameState<AEG_GameStateBase>())
+    if (APlayingPlayerControllers.Num() > 6)
     {
+        UE_LOG(LogTemp, Warning, TEXT("Too many players! Kicking..."));
 
+        // map deport
+        // NewPlayer->ClientTravel(TEXT("/Game/Maps/MainMenu"), TRAVEL_Absolute);
+        NewPlayer->Destroy();
     }
-
-    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(NewPlayer))
-    {
-        APlayingPlayerControllers.Add(EGPC);
-
-        EGPC->ClientNotifyMessage(FText::FromString(TEXT("Connected to the game server.")));
-    }
-
-    if (GetNumPlayers() > 1)
-    {
-        GameStart();
-    }
-
-    if (!bGameStarted && GetNumPlayers() > 1)
-    {
-        bGameStarted = true;
-        GameStart();
-    }
-    */
 }
 
 void AEGGameModeBase::Logout(AController* Exiting)
@@ -127,14 +102,47 @@ AActor* AEGGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
             return *FoundStart;
         }
         
-    EG_LOG_ROLE(LogMS, Warning, TEXT("No SpawnPoint found for index %d, using Super."));
+    EG_LOG_ROLE(LogMS, Warning, TEXT("No SpawnPoint found for index %d, using Super."), PlayerIndex);
     return Super::ChoosePlayerStart_Implementation(Player);
+}
+
+
+void AEGGameModeBase::StartCount()
+{
+    GetWorldTimerManager().SetTimer(
+    GameStartingTimerHandle,
+    this,
+    &AEGGameModeBase::GameStart, 
+    10.0f,
+    false 
+    );
+}
+
+void AEGGameModeBase::EndCount()
+{
+    AEGGameStateBase* GS = GetGameState<AEGGameStateBase>();
+    if (IsValid(GS))
+    {
+        float RemainTime = GS->RemainingPlayTime;
+
+        GetWorldTimerManager().SetTimer(
+            GameEndTimerHandle,
+            this,
+            &AEGGameModeBase::GameOver,
+            RemainTime,
+            false
+        );
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("GameState is not valid in BeginPlay!"));
+    }
 }
 
 
 void AEGGameModeBase::GameStart()
 {
-    GameOver();
+    EG_LOG_ROLE(LogMS, Warning, TEXT("Game Start"));
     
     if (GetNumPlayers() > 1)
     {
@@ -146,14 +154,12 @@ void AEGGameModeBase::GameStart()
             AInGameSpawnPoints.Add(*It);
         }
 
-        // random suffle
         for (int32 i = 0; i < AInGameSpawnPoints.Num(); i++)
         {
             int32 SwapIdx = FMath::RandRange(0, AInGameSpawnPoints.Num()-1);
             AInGameSpawnPoints.Swap(i, SwapIdx);
         }
 
-        //player teleport
         int32 SpawnIdx = 0;
         for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
         {
@@ -164,8 +170,6 @@ void AEGGameModeBase::GameStart()
                     if (AInGameSpawnPoints.IsValidIndex(SpawnIdx))
                     {
                         FVector StartLocation = AInGameSpawnPoints[SpawnIdx]->GetActorLocation();
-                        FRotator SpawnRotation(0.f , FMath::RandRange(0, 360), 0.f);
-                        PC->SetControlRotation(SpawnRotation);
                         ChickChar->SetActorLocation(StartLocation);
                         SpawnIdx++;
                     }
@@ -176,12 +180,8 @@ void AEGGameModeBase::GameStart()
         {
             if (AInGameSpawnPoints[k].IsValid())
             {
-                /*
-                EG_LOG_ROLE(LogMS, Warning, TEXT("Ai spawn at : %d"), 
-                    AInGameSpawnPoints[k]->GetSpawnSortNum());
-                */
                 FVector SpawnLocation = AInGameSpawnPoints[k]->GetActorLocation();
-                FRotator SpawnRotation(0.f , FMath::RandRange(0, 360), 0.f);
+                FRotator SpawnRotation(0.f, AInGameSpawnPoints[k]->GetActorRotation().Yaw, 0.f);
 
                 FActorSpawnParameters SpawnParams;
                 SpawnParams.Owner = this;
@@ -202,17 +202,14 @@ void AEGGameModeBase::GameStart()
         }
         EG_LOG_ROLE(LogMS, Warning, TEXT("-------------------------------------"));
     }
+    EndCount();
 }
 
 
 void AEGGameModeBase::GameOver()
 {
-    if (!GetWorld())
-    {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("GameOver called with invalid World!"));
-        return;
-    }
-
+    EG_LOG_ROLE(LogMS, Warning, TEXT("Game Over"));
+    
     TArray<TPair<TWeakObjectPtr<AEGPlayerController>, int32>> FinalPlayerScores;
     
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
@@ -239,12 +236,24 @@ void AEGGameModeBase::GameOver()
 
     if (FinalPlayerScores.IsValidIndex(0))
     {
-        auto FirstPlayer = FinalPlayerScores[0].Key;
-        if (FirstPlayer.IsValid())
+        int32 MaxScore = FinalPlayerScores[0].Value;
+
+        for (const auto& Pair : FinalPlayerScores)
         {
-            EG_LOG_ROLE(LogMS, Warning, TEXT("Player: %d is winnder, Score: %d"), 
-                FirstPlayer->PlayerIndex, 
-                FinalPlayerScores[0].Value);
+            if (Pair.Value == MaxScore)
+            {
+                auto Player = Pair.Key;
+                if (Player.IsValid())
+                {
+                    EG_LOG_ROLE(LogMS, Warning, TEXT("Player: %d is winner, Score: %d"),
+                        Player->PlayerIndex,
+                        Pair.Value);
+                }
+            }
+            else
+            {                               
+                break;
+            }
         }
     }
 }
