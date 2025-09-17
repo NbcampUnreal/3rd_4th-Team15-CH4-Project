@@ -1,7 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
-
+using System.Linq;
+using System.IO;
 public class EG : ModuleRules
 {
 	public EG(ReadOnlyTargetRules Target) : base(Target)
@@ -17,19 +18,16 @@ public class EG : ModuleRules
 			"AIModule", "NavigationSystem",
 			
 			// GAS
-			"GameplayAbilities", "GameplayTags", "GameplayTasks"
+			"GameplayAbilities", "GameplayTags", "GameplayTasks",
+
+			// UI
+			"UMG"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 		
 		PublicIncludePaths.AddRange(new string[] { "EG" });
-
-		// Uncomment if you are using Slate UI
-		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 		
-		// Uncomment if you are using online features
-		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
-
-		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
-	}
+    }
+    
 }

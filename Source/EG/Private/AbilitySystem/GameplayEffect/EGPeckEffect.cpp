@@ -8,8 +8,7 @@ UEGPeckEffect::UEGPeckEffect()
 	DurationPolicy = EGameplayEffectDurationType::Instant;
 
 	FGameplayModifierInfo EggEnergyModifier;
-
-	EggEnergyModifier.ModifierMagnitude = FGameplayEffectModifierMagnitude(10.0f);
+	EggEnergyModifier.ModifierMagnitude = FScalableFloat(10.0f);
 	EggEnergyModifier.ModifierOp = EGameplayModOp::Additive;
 	EggEnergyModifier.Attribute = UEGCharacterAttributeSet::GetEggEnergyAttribute();
 

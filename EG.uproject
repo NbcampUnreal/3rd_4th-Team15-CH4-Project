@@ -10,7 +10,10 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"GameplayAbilities",
-				"AIModule"
+				"AIModule",
+				"Engine",
+				"UMG",
+				"UMGEditor"
 			]
 		}
 	],
