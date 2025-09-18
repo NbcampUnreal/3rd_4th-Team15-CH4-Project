@@ -2,8 +2,10 @@
 
 #include "Item/ItemBase/EGItemBase.h"
 
-#include "AI/EGAICharacter.h"
+#include "EGLog.h"
 #include "Components/SphereComponent.h"
+#include "NiagaraComponent.h"
+#include "Character/EGChickenCharacter.h"
 
 
 AEGItemBase::AEGItemBase()
@@ -13,6 +15,9 @@ AEGItemBase::AEGItemBase()
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	SetRootComponent(CollisionComponent);
 	CollisionComponent->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+
+	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+	NiagaraComponent->SetupAttachment(CollisionComponent);
 }
 
 void AEGItemBase::BeginPlay()
@@ -25,9 +30,9 @@ void AEGItemBase::BeginPlay()
 void AEGItemBase::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor != this && OtherActor->IsA(AEGAICharacter::StaticClass()))
+	if (OtherActor && OtherActor != this && OtherActor->IsA(AEGChickenCharacter::StaticClass()))
 	{
-		OnPickUp(OtherActor);
+		Execute_OnPickUp(this, OtherActor);
 	}
 }
 

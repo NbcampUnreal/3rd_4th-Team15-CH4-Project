@@ -7,6 +7,7 @@
 #include "EGItemBase.generated.h"
 
 class USphereComponent;
+class UNiagaraComponent;
 
 UCLASS()
 class EG_API AEGItemBase : public AActor, public IEGItemInterface
@@ -21,6 +22,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Components")
 	USphereComponent* CollisionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item|Components")
+	UNiagaraComponent* NiagaraComponent;
 
 	UFUNCTION()
 	void OnOverlap(UPrimitiveComponent* OverlappedComp,
