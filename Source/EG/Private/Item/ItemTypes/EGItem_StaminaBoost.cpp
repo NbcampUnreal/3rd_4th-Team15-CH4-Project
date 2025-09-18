@@ -11,24 +11,28 @@ AEGItem_StaminaBoost::AEGItem_StaminaBoost()
 
 void AEGItem_StaminaBoost::OnPickUp_Implementation(AActor* PickUpActor)
 {
-	if (APawn* Pawn = Cast<APawn>(PickUpActor))
+	if (HasAuthority())
 	{
-		if (UAbilitySystemComponent* ASC = Pawn->FindComponentByClass<UAbilitySystemComponent>())
+		if (APawn* Pawn = Cast<APawn>(PickUpActor))
 		{
-			if (StaminaBoostEffectClass)
+			if (UAbilitySystemComponent* ASC = Pawn->FindComponentByClass<UAbilitySystemComponent>())
 			{
-				FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
-				Context.AddSourceObject(this);
-
-				FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(StaminaBoostEffectClass, 1, Context);
-				if (SpecHandle.IsValid())
+				if (StaminaBoostEffectClass)
 				{
-					ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-					EG_LOG(LogKH, Log, TEXT("Stamina Boost Item Activated"));
+					FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+					Context.AddSourceObject(this);
+
+					FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(StaminaBoostEffectClass, 1, Context);
+					if (SpecHandle.IsValid())
+					{
+						ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+						EG_LOG(LogKH, Log, TEXT("%s : Stamina Boost Item Activated"), *PickUpActor->GetName());
+					}
 				}
 			}
 		}
 	}
+		
 	
 	Super::OnPickUp_Implementation(PickUpActor);
 }
