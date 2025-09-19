@@ -27,7 +27,7 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LayEgg failed: Cost check failed"));
-		EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 
