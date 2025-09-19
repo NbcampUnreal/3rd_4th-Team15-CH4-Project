@@ -22,7 +22,7 @@ void UEGDashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 
@@ -40,7 +40,7 @@ void UEGDashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		UAbilityTask_ApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
 			this, NAME_None, Direction, Strength, DashDuration, false, nullptr,
 			ERootMotionFinishVelocityMode::MaintainLastRootMotionVelocity,
-			FVector::ZeroVector, 0.0f, bIgnoreGravity);
+			FVector::ZeroVector, 0.0f, true);
 
 	if (RMTask)
 	{
