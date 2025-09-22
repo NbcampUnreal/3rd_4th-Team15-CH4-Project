@@ -8,6 +8,7 @@
 
 class UCharacterMovementComponent;
 class AEGChickenCharacter;
+class UAbilitySystemComponent;
 
 UCLASS()
 class EG_API UEGChickenAnimInstance : public UAnimInstance
@@ -25,6 +26,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UEGChickenAnimInstance|Character")
 	TObjectPtr<UCharacterMovementComponent> OwnerCharacterMovementComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UEGChickenAnimInstance|Character")
+	TObjectPtr<UAbilitySystemComponent> OwnerCharacterASC; // (작성자 : 김세훈)
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UEGChickenAnimInstance|Movement")
 	FVector Velocity;
 	
@@ -36,4 +40,8 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UEGChickenAnimInstance|Movement")
 	uint8 bIsFalling : 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="UEGChickenAnimInstance|GAS")
+	bool bIsStun; // (작성자 : 김세훈)
+	
 };

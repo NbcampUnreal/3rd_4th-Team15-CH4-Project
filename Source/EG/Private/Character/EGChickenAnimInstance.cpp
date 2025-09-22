@@ -4,6 +4,7 @@
 
 #include "Character/EGChickenCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AbilitySystemComponent.h"
 
 void UEGChickenAnimInstance::NativeInitializeAnimation()
 {
@@ -13,6 +14,7 @@ void UEGChickenAnimInstance::NativeInitializeAnimation()
 	if (IsValid(OwnerCharacter))
 	{
 		OwnerCharacterMovementComponent = OwnerCharacter->GetCharacterMovement();
+		OwnerCharacterASC = OwnerCharacter->GetAbilitySystemComponent();
 	}
 }
 
@@ -20,7 +22,7 @@ void UEGChickenAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (IsValid(OwnerCharacter) == false || IsValid(OwnerCharacterMovementComponent) == false)
+	if (IsValid(OwnerCharacter) == false || IsValid(OwnerCharacterMovementComponent) == false || IsValid(OwnerCharacterASC) == false) // ASC유효 체크(작성자 : 김세훈)
 	{
 		return;
 	}
@@ -29,4 +31,6 @@ void UEGChickenAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	GroundSpeed = FVector(Velocity.X, Velocity.Y, 0.f).Size();
 	bShouldMove = ((OwnerCharacterMovementComponent->GetCurrentAcceleration().IsNearlyZero()) == false) && (3.f < GroundSpeed);
 	bIsFalling = OwnerCharacterMovementComponent->IsFalling();
+
+	bIsStun = OwnerCharacterASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Status.Stunned"))); // stun 태그 유무 확인(작성자 : 김세훈)
 }
