@@ -11,11 +11,11 @@ UEGItem_StaminaBoostEffect::UEGItem_StaminaBoostEffect()
 	DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	DurationMagnitude = FGameplayEffectModifierMagnitude(FScalableFloat(BoostDuration));
 
-	FGameplayModifierInfo StaminaModifier;
-	StaminaModifier.ModifierOp = EGameplayModOp::Override;
-	StaminaModifier.ModifierMagnitude = FGameplayEffectModifierMagnitude(FScalableFloat(100.f));
-	StaminaModifier.Attribute = UEGCharacterAttributeSet::GetStaminaAttribute();
-	Modifiers.Add(StaminaModifier);
+	//FGameplayModifierInfo StaminaModifier;
+	//StaminaModifier.ModifierOp = EGameplayModOp::Override;
+	//StaminaModifier.ModifierMagnitude = FGameplayEffectModifierMagnitude(FScalableFloat(100.f));
+	//StaminaModifier.Attribute = UEGCharacterAttributeSet::GetStaminaAttribute();
+	//Modifiers.Add(StaminaModifier);
 
 	UTargetTagsGameplayEffectComponent* TargetTags = CreateDefaultSubobject<UTargetTagsGameplayEffectComponent>(TEXT("TargetTags"));
 	FInheritedTagContainer TagChanges = TargetTags->GetConfiguredTargetTagChanges();
