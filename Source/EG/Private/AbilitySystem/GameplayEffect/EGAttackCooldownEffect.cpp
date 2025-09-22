@@ -5,7 +5,7 @@
 
 UEGAttackCooldownEffect::UEGAttackCooldownEffect()
 {
-	DurationPolicy = EGameplayEffectDurationType::Instant;
+	DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	
 	DurationMagnitude = FScalableFloat(7.0f);
 
