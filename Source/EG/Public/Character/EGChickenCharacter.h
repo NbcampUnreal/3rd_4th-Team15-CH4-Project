@@ -164,6 +164,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
 	TSubclassOf<UGameplayAbility> EggEnergyRegenAbilityClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
 	TSubclassOf<UGameplayAbility> SprintAbilityClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
