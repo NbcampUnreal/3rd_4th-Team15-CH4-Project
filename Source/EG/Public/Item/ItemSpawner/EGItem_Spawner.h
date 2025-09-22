@@ -36,6 +36,7 @@ private:
 	void HandleItemPickUp(AEGItemBase* PickedUpItem);
 	
 	void SpawnItem();
+	
 	TSubclassOf<AEGItemBase> GetRandomItemClass();
 
 };
