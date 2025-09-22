@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "EGChickenCharacter.generated.h"
@@ -17,7 +18,7 @@ class UEGCharacterAttributeSet;
 class UGameplayAbility;
 
 UCLASS()
-class EG_API AEGChickenCharacter : public ACharacter
+class EG_API AEGChickenCharacter : public ACharacter, public IAbilitySystemInterface  // IAbilitySystemInterface 상속 (작성자 : 김세훈)
 {
 	GENERATED_BODY()
 
@@ -129,7 +130,11 @@ public:
 // GAS로 스킬 사용 코드 (작성자 : 김세훈)
 #pragma region GAS
 
+public:
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 protected:
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
@@ -154,6 +159,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
 	TSubclassOf<UGameplayAbility> EggEnergyRegenAbilityClass;
 
+	TSubclassOf<UGameplayAbility> SprintAbilityClass;
+
+
 #pragma endregion
 
 // 스킬 패시브 (작성자: 김효영)
@@ -171,7 +179,6 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerRPCHandleEggEnergyRegen();
 	void ExecuteEggEnergyRegen();
-
 
 #pragma endregion
 };
