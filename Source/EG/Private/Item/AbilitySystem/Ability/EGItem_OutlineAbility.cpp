@@ -55,7 +55,7 @@ void UEGItem_OutlineAbility::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 				for (TActorIterator<AActor> It(World, OutlineActorClass); It; ++It)
 				{
 					AActor* Target = *It;
-					if (Target)
+					if (Target && Target != Character)
 					{
 						SetCustomDepth(Target, true);
 						OutlinedActors.Add(Target);

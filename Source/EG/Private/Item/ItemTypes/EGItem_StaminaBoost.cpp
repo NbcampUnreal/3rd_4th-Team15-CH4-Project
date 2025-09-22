@@ -7,6 +7,8 @@
 
 AEGItem_StaminaBoost::AEGItem_StaminaBoost()
 {
+	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 }
 
 void AEGItem_StaminaBoost::OnPickUp_Implementation(AActor* PickUpActor)

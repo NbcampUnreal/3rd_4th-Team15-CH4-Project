@@ -10,6 +10,7 @@
 AEGItem_OutlineActor::AEGItem_OutlineActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 }
 
 void AEGItem_OutlineActor::OnPickUp_Implementation(AActor* PickUpActor)

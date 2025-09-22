@@ -11,6 +11,7 @@
 AEGItem_ForceJump::AEGItem_ForceJump()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 }
 
 void AEGItem_ForceJump::OnPickUp_Implementation(AActor* PickUpActor)
