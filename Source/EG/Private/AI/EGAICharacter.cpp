@@ -27,10 +27,6 @@ void AEGAICharacter::BeginPlay()
 
 	if (HasAuthority())
 	{
-		// Initialize random stream
-		int32 Seed = GetUniqueID() ^ FDateTime::Now().GetMillisecond();
-		RandomStream.Initialize(Seed);
-
 		GiveAbilities();
 	}
 }

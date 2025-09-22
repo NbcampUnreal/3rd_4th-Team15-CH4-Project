@@ -30,6 +30,15 @@ void UEGCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attr
 
 	if (Attribute == GetStaminaAttribute())
 	{
+		// KH : For Stamina Boost Item 
+		if (const UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent())
+		{
+			if (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(TEXT("Buff.StaminaBoost"))))
+			{
+				NewValue = GetMaxStamina();
+			}
+		}
+
 		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxStamina());
 	}
 	else if (Attribute == GetEggEnergyAttribute())
