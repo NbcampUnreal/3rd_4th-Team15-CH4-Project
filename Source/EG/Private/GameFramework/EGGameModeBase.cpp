@@ -14,7 +14,7 @@ void AEGGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
 
-    StartCount();
+    //StartCount();
 }
 
 void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
@@ -141,11 +141,10 @@ void AEGGameModeBase::EndCount()
 
 
 void AEGGameModeBase::GameStart()
-{
-    EG_LOG_ROLE(LogMS, Warning, TEXT("Game Start"));
-    
+{       
     if (GetNumPlayers() > 1)
     {
+        EG_LOG_ROLE(LogMS, Warning, TEXT("Game Start"));
         UWorld* World = GetWorld();
         
         AInGameSpawnPoints.Empty();
