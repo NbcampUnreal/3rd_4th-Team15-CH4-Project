@@ -69,6 +69,17 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 				FCollisionShape::MakeSphere(SphereRadius),
 				QueryParams);
 
+			DrawDebugSphere(
+				GetWorld(), // 월드 포인터
+				SpawnLocation, // 중심 위치
+				SphereRadius, // 반지름
+				32, // 세그먼트 수
+				bHit ? FColor::Green : FColor::Red, // 충돌 시 초록색, 미충돌 시 빨간색
+				false, // 지속적으로 그릴지 여부
+				3.0f, // 표시 지속 시간 (초)
+				0, // 우선순위
+				1.0f);
+
 			if (bHit)
 			{
 				for (const FOverlapResult& Result : OverlapResults)
@@ -90,7 +101,7 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 							FGameplayEffectSpecHandle ResetEnergySpec = MakeOutgoingGameplayEffectSpec(
 								UEGResetEggEnergyEffect::StaticClass(), 1.0f);
-							
+
 							if (AEGChickenCharacter* Character = Cast<AEGChickenCharacter>(HitActor))
 							{
 								UAbilitySystemComponent* TargetASC = Character->GetAbilitySystemComponent();
@@ -101,7 +112,8 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 							{
 								AICharacter->OnAngryMode();
 								ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
-								ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*ResetEnergySpec.Data.Get());
+								ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(
+									*ResetEnergySpec.Data.Get());
 							}
 						}
 					}
