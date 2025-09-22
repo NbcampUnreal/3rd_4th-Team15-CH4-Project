@@ -29,5 +29,8 @@ class EG_API UEGItem_ConfigData : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SpawnInterval = 30.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FItemSpawnData> SpawnDataList;
 };

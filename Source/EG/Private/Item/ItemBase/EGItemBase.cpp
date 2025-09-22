@@ -33,6 +33,8 @@ void AEGItemBase::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 {
 	if (OtherActor && OtherActor != this && OtherActor->IsA(AEGChickenCharacter::StaticClass()))
 	{
+		OnItemPickUp.Broadcast(this);
+		
 		Execute_OnPickUp(this, OtherActor);
 	}
 }

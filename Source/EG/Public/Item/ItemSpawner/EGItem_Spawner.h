@@ -18,6 +18,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* SceneComponent;
@@ -25,10 +26,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemSpawner|Config")
 	UEGItem_ConfigData* ItemConfigData;
 
-private:
 	UPROPERTY()
-	FRandomStream RandomStream;
+	AEGItemBase* SpawnedItem;
+
+private:
+	FTimerHandle SpawnTimerHandle;
+
+	UFUNCTION()
+	void HandleItemPickUp(AEGItemBase* PickedUpItem);
 	
 	void SpawnItem();
 	TSubclassOf<AEGItemBase> GetRandomItemClass();
+
 };
