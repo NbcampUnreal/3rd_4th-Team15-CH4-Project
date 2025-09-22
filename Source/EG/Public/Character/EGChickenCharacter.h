@@ -161,6 +161,8 @@ protected:
 
 	TSubclassOf<UGameplayAbility> SprintAbilityClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> AttackAbilityClass;
 
 #pragma endregion
 
