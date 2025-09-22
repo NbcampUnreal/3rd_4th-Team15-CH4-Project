@@ -21,7 +21,10 @@ public class EG : ModuleRules
 			"GameplayAbilities", "GameplayTags", "GameplayTasks",
 
 			// UI
-			"UMG"
+			"UMG",
+			
+			// Niagara
+			"Niagara",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

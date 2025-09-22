@@ -12,6 +12,7 @@
 #include "Public/Character/Components/EGChickenMovementComponent.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
+#include "Components/PostProcessComponent.h"
 
 
 AEGChickenCharacter::AEGChickenCharacter()
@@ -42,6 +43,9 @@ AEGChickenCharacter::AEGChickenCharacter()
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AttributeSet = CreateDefaultSubobject<UEGCharacterAttributeSet>(TEXT("AttributeSet"));
+
+	// KH : 아웃라인 표시해주는 아이템을 위한 PostProcessComponent 생성
+	PostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcessComponent"));
 }
 
 void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "EGChickenCharacter.generated.h"
 
+class UPostProcessComponent;
 class UEGChickenMovementComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -47,6 +48,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AEGChickenCharacter|Components")
 	UEGChickenMovementComponent* ChickenMovementComponent;
+
+	// KH : PostProcessComponent For Item Of Outline Effect
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Components")	
+	TObjectPtr<UPostProcessComponent> PostProcess;
 #pragma endregion
 
 	
