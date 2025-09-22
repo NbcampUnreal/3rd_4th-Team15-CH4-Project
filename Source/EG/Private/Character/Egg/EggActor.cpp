@@ -24,3 +24,11 @@ void AEggActor::SetHealth(int32 NewHealth)
 {
 	Health = NewHealth;
 }
+
+void AEggActor::CheckHealthAndDestroy()
+{
+	if (Health <= 0)
+	{
+		Destroy();
+	}
+}

@@ -18,6 +18,8 @@ public:
 
 	void SetHealth(int32 NewHealth);
 
+	void CheckHealthAndDestroy();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Root")
 	TObjectPtr<USceneComponent> RootScene;
