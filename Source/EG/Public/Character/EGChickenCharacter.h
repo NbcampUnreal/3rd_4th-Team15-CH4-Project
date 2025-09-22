@@ -78,6 +78,8 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerRPCHandlePeck();
 
+	
+
 	void ExecuteDash();
 	void ExecuteSprint(bool bNewIsSprint);
 	void ExecuteAttack();
@@ -152,10 +154,33 @@ protected:
 	TSubclassOf<UGameplayAbility> DashAbilityClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> StaminaRegenAbilityClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> EggEnergyRegenAbilityClass;
+
 	TSubclassOf<UGameplayAbility> SprintAbilityClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
 	TSubclassOf<UGameplayAbility> AttackAbilityClass;
+
+#pragma endregion
+
+// 스킬 패시브 (작성자: 김효영)
+#pragma region Passive
+
+private:
+	// 스태미나 회복
+	void HandleStaminaRegen();
+	UFUNCTION(Server, Reliable)
+	void ServerRPCHandleStaminaRegen();
+	void ExecuteStaminaRegen();
+
+	// 알 에너지 회복
+	void HandleEggEnergyRegen();
+	UFUNCTION(Server, Reliable)
+	void ServerRPCHandleEggEnergyRegen();
+	void ExecuteEggEnergyRegen();
 
 #pragma endregion
 };

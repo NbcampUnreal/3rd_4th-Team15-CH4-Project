@@ -105,12 +105,14 @@ void AEGChickenCharacter::BeginPlay()
 				{
 					AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0, this));
 					UE_LOG(LogTemp, Log, TEXT("Give Ability : %s"), *AbilityClass->GetName());
+					HandleStaminaRegen();
+					HandleEggEnergyRegen();
 				}
 			}
 
 			UE_LOG(LogTemp, Warning, TEXT("GAS Initialized"));
 		}
-	}
+	}	
 }
 
 void AEGChickenCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -440,6 +442,65 @@ void AEGChickenCharacter::ExecutePeck()
 		}
 	}
 }
+
+// 스킬 패시브 (작성자: 김효영)
+#pragma region Passive
+
+// 스태미나 회복
+void AEGChickenCharacter::HandleStaminaRegen()
+{
+	if (HasAuthority())	// JM : 서버라면 바로 실행
+	{
+		ExecuteStaminaRegen();
+	}
+	else				// JM : 클라라면 ServerRPC 요청
+	{
+		ServerRPCHandleStaminaRegen();
+	}
+}
+
+void AEGChickenCharacter::ServerRPCHandleStaminaRegen_Implementation()
+{
+	ExecuteStaminaRegen();
+}
+
+void AEGChickenCharacter::ExecuteStaminaRegen()
+{
+	if (AbilitySystemComponent && StaminaRegenAbilityClass)
+	{
+		const bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(StaminaRegenAbilityClass);
+		UE_LOG(LogTemp, Log, TEXT("StaminaRegen result: %s"), bSuccess ? TEXT("Success") : TEXT("Failed"));
+	}
+}
+
+// 알 에너지 회복
+void AEGChickenCharacter::HandleEggEnergyRegen()
+{
+	if (HasAuthority())	// JM : 서버라면 바로 실행
+	{
+		ExecuteEggEnergyRegen();
+	}
+	else				// JM : 클라라면 ServerRPC 요청
+	{
+		ServerRPCHandleEggEnergyRegen();
+	}
+}
+
+void AEGChickenCharacter::ServerRPCHandleEggEnergyRegen_Implementation()
+{
+	ExecuteEggEnergyRegen();
+}
+
+void AEGChickenCharacter::ExecuteEggEnergyRegen()
+{
+	if (AbilitySystemComponent && EggEnergyRegenAbilityClass)
+	{
+		const bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(EggEnergyRegenAbilityClass);
+		UE_LOG(LogTemp, Log, TEXT("EggEnergyRegen result: %s"), bSuccess ? TEXT("Success") : TEXT("Failed"));
+	}
+}
+
+#pragma endregion
 
 UAbilitySystemComponent* AEGChickenCharacter::GetAbilitySystemComponent() const
 {
