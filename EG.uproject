@@ -12,8 +12,7 @@
 				"GameplayAbilities",
 				"AIModule",
 				"Engine",
-				"UMG",
-				"UMGEditor"
+				"UMG"
 			]
 		}
 	],
@@ -28,6 +27,15 @@
 		{
 			"Name": "GameplayAbilities",
 			"Enabled": true
+		},
+		{
+			"Name": "Fab",
+			"Enabled": false,
+			"SupportedTargetPlatforms": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
 		}
 	]
 }

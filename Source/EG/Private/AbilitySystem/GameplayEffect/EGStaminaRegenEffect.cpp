@@ -5,13 +5,12 @@
 UEGStaminaRegenEffect::UEGStaminaRegenEffect()
 {
 	DurationPolicy = EGameplayEffectDurationType::Infinite;
-	//DurationMagnitude = FScalableFloat(60.0f);
-	Period = 1.0f;
+	Period = 0.2f;
 	bExecutePeriodicEffectOnApplication = true;
 
 	FGameplayModifierInfo StaminaRegenMod;
 	StaminaRegenMod.Attribute = UEGCharacterAttributeSet::GetStaminaAttribute();
 	StaminaRegenMod.ModifierOp = EGameplayModOp::Additive;
-	StaminaRegenMod.ModifierMagnitude = FScalableFloat(10.0f);
+	StaminaRegenMod.ModifierMagnitude = FScalableFloat(1.0f);
 	Modifiers.Add(StaminaRegenMod);
 }
