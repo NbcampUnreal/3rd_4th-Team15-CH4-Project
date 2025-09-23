@@ -64,6 +64,6 @@ private:
 	UFUNCTION()
 	void OnDurationFinished();
 
-	void SetMaterial(ACharacter* InCharacter, UMaterialInterface* InMaterial, UMaterialInstanceDynamic* InDynamicMaterial);
+	void SetMaterialParams(UMaterialInstanceDynamic* InDynamicMaterial);
 	void SetCustomDepth(AActor* Target, bool bIsCustomDepth);
 };
