@@ -15,6 +15,8 @@ void AEGGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(ThisClass, MatchState);
 	DOREPLIFETIME(ThisClass, RemainingCountdown);
 	DOREPLIFETIME(ThisClass, RemainingPlayTime);
+	DOREPLIFETIME(AEGGameStateBase, LeaderboardSnapshot); //kms
+	DOREPLIFETIME(AEGGameStateBase, RoundAward);		//kms
 }
 
 void AEGGameStateBase::OnRep_RemainingCountdown()

@@ -102,7 +102,12 @@ void AEGChickenCharacter::BeginPlay()
 	{
 		if (IsValid(AbilitySystemComponent))
 		{
-			AbilitySystemComponent->InitAbilityActorInfo(this, this);
+			/* kms 
+			if (APlayerState* PS = GetPlayerState())
+			{
+				AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+			}
+			 여기까지 kms*/
 
 			for (const auto& AbilityClass : StartupAbilities)
 			{
@@ -409,11 +414,6 @@ void AEGChickenCharacter::ExecuteLayEgg()
 			if (bSuccess)
 			{
 				EG_LOG_ROLE(LogTemp, Log, TEXT("LayEgg ability activated"));
-				// add egg count for GameState (작성자 : KMS)
-				if (AEGPlayerState* EGPlayerState = Cast<AEGPlayerState>(GetPlayerState()))
-				{
-					EGPlayerState->ServerAddEgg_Implementation(1);
-				}
 			}
 			else
 			{
@@ -516,3 +516,26 @@ UAbilitySystemComponent* AEGChickenCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }
+
+//kms
+void AEGChickenCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (APlayerState* PS = GetPlayerState())
+	{
+		// ASC의 OwnerActor = PlayerState, AvatarActor = 이 Character
+		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+	}
+}
+
+void AEGChickenCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	if (APlayerState* PS = GetPlayerState())
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+	}
+}
+//kms

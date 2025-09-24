@@ -51,8 +51,6 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
     {
         UE_LOG(LogTemp, Warning, TEXT("Too many players! Kicking..."));
 
-        // map deport
-        // NewPlayer->ClientTravel(TEXT("/Game/Maps/MainMenu"), TRAVEL_Absolute);
         NewPlayer->Destroy();
     }
 }
@@ -130,8 +128,8 @@ void AEGGameModeBase::EndCount()
             GameEndTimerHandle,
             this,
             &AEGGameModeBase::GameOver,
-            //RemainTime,
-            10.0f,
+            RemainTime,
+            //10.0f,
             false
         );
     }
@@ -221,26 +219,49 @@ void AEGGameModeBase::GameOver()
             {
                 FinalPlayerScores.Add(TPair<TWeakObjectPtr<AEGPlayerController>, int32>(PC, PS->GetPlayerEggCount()));
             }
-            else
-            {
-                EG_LOG_ROLE(LogMS, Warning, TEXT("Invalid PlayerState for PlayerController"));
-            }
         }
     }
 
     // player score calculate
     FinalPlayerScores.Sort([](const auto& A, const auto& B)
+  {
+      if (A.Value != B.Value)
+          return A.Value > B.Value;
+      return A.Key.IsValid() && B.Key.IsValid() && A.Key->PlayerIndex < B.Key->PlayerIndex;
+  });
+    /*
+    if (FinalPlayerScores.IsValidIndex(0))
     {
-        if (A.Value != B.Value)
-            return A.Value > B.Value;
-        return A.Key.IsValid() && B.Key.IsValid() && A.Key->PlayerIndex < B.Key->PlayerIndex;
-    });
+        int32 MaxScore = FinalPlayerScores[0].Value;
+
+        for (const auto& Pair : FinalPlayerScores)
+        {
+            if (Pair.Value == MaxScore)
+            {
+                auto Player = Pair.Key;
+                if (Player.IsValid())
+                {
+                    EG_LOG_ROLE(LogMS, Warning, TEXT("Player: %d is winner, Score: %d"),
+                        Player->PlayerIndex,
+                        Pair.Value);
+                }
+            }
+            else
+            {                               
+                break;
+            }
+        }
+        if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
+        {
+            EGGS->SetFinalResults(FinalPlayerScores);
+        }
         
-    if (AEGGameStateBase* GS = GetGameState<AEGGameStateBase>())
+    }*/
+    if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
     {
-        GS->SetFinalResults(FinalPlayerScores);
+        EGGS->SetFinalResults(FinalPlayerScores);
+        EGGS->FinalizeAward();
     }
-    
     ClearStage();
 }
 
@@ -272,7 +293,6 @@ void AEGGameModeBase::ClearStage()
     }
     
     //player goback playerstart
-    UE_LOG(LogTemp, Warning, TEXT("before Loop"));
     int32 SpawnNum = 0;
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {

@@ -19,25 +19,39 @@ void AEGPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 void AEGPlayerState::OnRep_PlayerEggCount()
 {
-	// 
+	UE_LOG(LogTemp, Warning, TEXT("OnRep_PlayerEggCount -> %s replicated egg count: %d"),
+		*GetName(), PlayerEggCount); 
 }
 
 void AEGPlayerState::ServerAddEgg_Implementation(int32 Amount)
 {
+	UE_LOG(LogTemp, Warning, TEXT("ServerAddEgg_Implementation called on %s with Amount: %d"),
+		*GetName(), Amount);
+
 	AddEgg_Internal(Amount);
 }
 
 void AEGPlayerState::ServerRemoveEgg_Implementation(int32 Amount)
 {
+	UE_LOG(LogTemp, Warning, TEXT("ServerRemoveEgg_Implementation called on %s with Amount: %d"),
+		*GetName(), Amount);
+
 	RemoveEgg_Internal(Amount);
 }
 
 void AEGPlayerState::AddEgg_Internal(int32 Amount)
 {
 	PlayerEggCount = FMath::Max(0, PlayerEggCount + Amount);
+
+	UE_LOG(LogTemp, Warning, TEXT("AddEgg_Internal -> %s new egg count: %d"),
+		*GetName(), PlayerEggCount);
 }
 
 void AEGPlayerState::RemoveEgg_Internal(int32 Amount)
 {
 	PlayerEggCount = FMath::Max(0, PlayerEggCount - Amount);
+
+	UE_LOG(LogTemp, Warning, TEXT("RemoveEgg_Internal -> %s new egg count: %d"),
+		*GetName(), PlayerEggCount);
 }
+
