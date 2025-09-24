@@ -13,6 +13,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
 #include "Components/PostProcessComponent.h"
+#include "GameFramework/EGPlayerState.h"
 
 
 AEGChickenCharacter::AEGChickenCharacter()
@@ -408,6 +409,11 @@ void AEGChickenCharacter::ExecuteLayEgg()
 			if (bSuccess)
 			{
 				EG_LOG_ROLE(LogTemp, Log, TEXT("LayEgg ability activated"));
+				// add egg count for GameState (작성자 : KMS)
+				if (AEGPlayerState* EGPlayerState = Cast<AEGPlayerState>(GetPlayerState()))
+				{
+					EGPlayerState->ServerAddEgg_Implementation(1);
+				}
 			}
 			else
 			{

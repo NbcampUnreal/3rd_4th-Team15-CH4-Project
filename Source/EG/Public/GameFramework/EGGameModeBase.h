@@ -33,6 +33,7 @@ public:
 	void GameStart();
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
 	void GameOver();
+	void ClearStage();
 
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
@@ -52,8 +53,4 @@ protected:
 	TMap<int32, AEGPlayerStart*> PlayerStartList;
 	UPROPERTY(VisibleAnywhere, Category="Spawn")
 	TArray<TWeakObjectPtr<AEGInGameSpawnPoints>> AInGameSpawnPoints;
-	
-
-	
-	
 };

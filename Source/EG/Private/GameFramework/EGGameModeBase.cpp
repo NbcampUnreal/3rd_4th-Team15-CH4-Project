@@ -6,6 +6,7 @@
 #include "EGLog.h"
 #include "EG/Public/GameFramework/EGGameStateBase.h"
 #include "Character/EGChickenCharacter.h"
+#include "Character/Egg/EggActor.h"
 #include "GameFramework/EGInGameSpawnPoints.h"
 #include "GameFramework/EGPlayerState.h"
 
@@ -129,7 +130,8 @@ void AEGGameModeBase::EndCount()
             GameEndTimerHandle,
             this,
             &AEGGameModeBase::GameOver,
-            RemainTime,
+            //RemainTime,
+            10.0f,
             false
         );
     }
@@ -155,27 +157,27 @@ void AEGGameModeBase::GameStart()
 
         for (int32 i = 0; i < AInGameSpawnPoints.Num(); i++)
         {
-            int32 SwapIdx = FMath::RandRange(0, AInGameSpawnPoints.Num()-1);
-            AInGameSpawnPoints.Swap(i, SwapIdx);
+            int32 SwapNum = FMath::RandRange(0, AInGameSpawnPoints.Num()-1);
+            AInGameSpawnPoints.Swap(i, SwapNum);
         }
 
-        int32 SpawnIdx = 0;
+        int32 SpawnNum = 0;
         for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
         {
             if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
             {
-                if (ACharacter* ChickChar = Cast<AEGChickenCharacter>(PC->GetPawn()))
+                if (ACharacter* EGPlayerChar = Cast<AEGChickenCharacter>(PC->GetPawn()))
                 {
-                    if (AInGameSpawnPoints.IsValidIndex(SpawnIdx))
+                    if (AInGameSpawnPoints.IsValidIndex(SpawnNum))
                     {
-                        FVector StartLocation = AInGameSpawnPoints[SpawnIdx]->GetActorLocation();
-                        ChickChar->SetActorLocation(StartLocation);
-                        SpawnIdx++;
+                        FVector StartLocation = AInGameSpawnPoints[SpawnNum]->GetActorLocation();
+                        EGPlayerChar->SetActorLocation(StartLocation);
+                        SpawnNum++;
                     }
                 }
             }
         }
-        for (int k = SpawnIdx; k < AInGameSpawnPoints.Num(); k++)
+        for (int k = SpawnNum; k < AInGameSpawnPoints.Num(); k++)
         {
             if (AInGameSpawnPoints[k].IsValid())
             {
@@ -226,32 +228,68 @@ void AEGGameModeBase::GameOver()
         }
     }
 
+    // player score calculate
     FinalPlayerScores.Sort([](const auto& A, const auto& B)
     {
         if (A.Value != B.Value)
             return A.Value > B.Value;
         return A.Key.IsValid() && B.Key.IsValid() && A.Key->PlayerIndex < B.Key->PlayerIndex;
     });
-
-    if (FinalPlayerScores.IsValidIndex(0))
+        
+    if (AEGGameStateBase* GS = GetGameState<AEGGameStateBase>())
     {
-        int32 MaxScore = FinalPlayerScores[0].Value;
+        GS->SetFinalResults(FinalPlayerScores);
+    }
+    
+    ClearStage();
+}
 
-        for (const auto& Pair : FinalPlayerScores)
+void AEGGameModeBase::ClearStage()
+{
+    UWorld* World = GetWorld();
+    if (!IsValid(World))
+    {
+        EG_LOG_ROLE(LogMS, Warning, TEXT("[why] World is invalid."));
+    }
+
+    //destroy all AI
+    for (TActorIterator<AEGAICharacter> It(World); It; ++It)
+    {
+        AEGAICharacter* EGAI = *It;
+        if (IsValid(EGAI))
         {
-            if (Pair.Value == MaxScore)
+            EGAI->Destroy();
+        }
+    }
+
+    for (TActorIterator<AEggActor> It(World); It; ++It)
+    {
+        AEggActor* EGG = *It;
+        if (IsValid(EGG))
+        {
+            EGG->Destroy();
+        }
+    }
+    
+    //player goback playerstart
+    UE_LOG(LogTemp, Warning, TEXT("before Loop"));
+    int32 SpawnNum = 0;
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
+        {
+            if (AEGPlayerState* PS =  Cast<AEGPlayerState>(PC->PlayerState))
             {
-                auto Player = Pair.Key;
-                if (Player.IsValid())
-                {
-                    EG_LOG_ROLE(LogMS, Warning, TEXT("Player: %d is winner, Score: %d"),
-                        Player->PlayerIndex,
-                        Pair.Value);
-                }
+                PS->RemoveEgg_Internal(PS->GetPlayerEggCount());
             }
-            else
-            {                               
-                break;
+            if (ACharacter* EGPlayerChar = Cast<AEGChickenCharacter>(PC->GetPawn()))
+            {
+                if (AEGPlayerStart** FoundStart = PlayerStartList.Find(SpawnNum))
+                {
+                    FVector StartLocation = (*FoundStart)->GetActorLocation();
+                    EGPlayerChar->SetActorLocation(StartLocation);
+                    SpawnNum++;
+                }
             }
         }
     }

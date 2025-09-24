@@ -4,22 +4,22 @@
 #include "GameFramework/EGPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
+
+AEGPlayerState::AEGPlayerState()
+{
+	PlayerName = "Player";
+	PlayerEggCount = 0;
+}
+
 void AEGPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AEGPlayerState, PlayerEggCount);
 }
 
-AEGPlayerState::AEGPlayerState()
-{
-}
-
 void AEGPlayerState::OnRep_PlayerEggCount()
 {
-	if (HasAuthority())
-	{
-		// ui update	
-	}
+	// 
 }
 
 void AEGPlayerState::ServerAddEgg_Implementation(int32 Amount)
