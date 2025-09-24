@@ -256,3 +256,16 @@ void AEGGameModeBase::GameOver()
         }
     }
 }
+
+
+// 김효영
+void AEGGameModeBase::ChangeLevel(const FString& MapName)
+{
+    if (HasAuthority()) // 서버에서만
+    {
+        FString Command = FString::Printf(TEXT("/Game/UI/Map/%s?listen"), *MapName);
+        GetWorld()->ServerTravel(Command);
+    }
+}
+
+// ===========================================================

@@ -45,6 +45,8 @@ protected:
 
 	void RefreshStamina(float NewValue);
 	void RefreshEggEnergy(float NewValue);
-};
 
 // 한국인
+};
+
+

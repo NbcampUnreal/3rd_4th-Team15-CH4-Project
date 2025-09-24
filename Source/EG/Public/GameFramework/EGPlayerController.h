@@ -23,6 +23,12 @@ public:
 	int32 PlayerIndex;
     
     void SetPlayerIndex(int32 NewIndex);
+
+	// 김효영
+	UFUNCTION(Server, Reliable)
+	void ServerRequestLevelChange(const FString& MapName);
+
+	// ===================================
 	
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

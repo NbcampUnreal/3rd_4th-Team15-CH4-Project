@@ -37,6 +37,12 @@ public:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
 
+	// ±èÈ¿¿µ
+	UFUNCTION(BlueprintCallable)
+	void ChangeLevel(const FString& MapName);
+
+	// ========================================
+
 	FTimerHandle GameStartingTimerHandle;
 	FTimerHandle GameEndTimerHandle;
 	
@@ -52,8 +58,6 @@ protected:
 	TMap<int32, AEGPlayerStart*> PlayerStartList;
 	UPROPERTY(VisibleAnywhere, Category="Spawn")
 	TArray<TWeakObjectPtr<AEGInGameSpawnPoints>> AInGameSpawnPoints;
-	
-
 	
 	
 };

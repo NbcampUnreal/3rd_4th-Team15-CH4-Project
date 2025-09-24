@@ -12,6 +12,9 @@
 #include "TimerManager.h"
 // =================================
 
+// 김효영
+#include "GameFramework/EGGameModeBase.h"
+
 void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -103,3 +106,19 @@ void AEGPlayerController::TryInitHUD_ASC()
 }
 
 // 한국인
+
+
+// 김효영
+void AEGPlayerController::ServerRequestLevelChange_Implementation(const FString& MapName)
+{
+	if (HasAuthority())
+	{
+		AEGGameModeBase* GM = Cast<AEGGameModeBase>(GetWorld()->GetAuthGameMode());
+		if (GM)
+		{
+			GM->ChangeLevel(MapName);
+		}
+	}
+}
+
+// =================================
