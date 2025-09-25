@@ -27,7 +27,6 @@ void UEGLevelSelectButton::HandleClicked()
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(PC))
         {
-            FString MapName = FString::Printf(TEXT("Level_%d"), LevelNum);
             EGPC->ServerRequestLevelChange(MapName);
         }
     }

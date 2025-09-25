@@ -17,7 +17,7 @@ class EG_API AEGGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	
+
 	 virtual void PreLogin(const FString& Options,
 						  const FString& Address,
 						  const FUniqueNetIdRepl& UniqueId,
@@ -37,11 +37,18 @@ public:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
 
-	// 김효영
+// 레벨 변경 (작성자 : 김효영)
+#pragma region LevelChange
 	UFUNCTION(BlueprintCallable)
 	void ChangeLevel(const FString& MapName);
 
-	// ========================================
+#pragma endregion
+
+// 채팅 (작성자 : 김효영)
+#pragma region Chatting
+	void SendChatMessage(const FString& Message);
+
+#pragma endregion
 
 	FTimerHandle GameStartingTimerHandle;
 	FTimerHandle GameEndTimerHandle;

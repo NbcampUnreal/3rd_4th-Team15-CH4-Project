@@ -123,6 +123,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
 	TObjectPtr<UInputAction> IA_Peck;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_Chatting;
+
 	UPROPERTY(Replicated)
 	uint8 bIsSprinting:1;
 
@@ -187,6 +190,13 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerRPCHandleEggEnergyRegen();
 	void ExecuteEggEnergyRegen();
+
+#pragma endregion
+
+// 채팅 (작성자: 김효영)
+#pragma region Chatting
+	protected:
+		void ChatButtonPressed(const FInputActionValue& Value);
 
 #pragma endregion
 };

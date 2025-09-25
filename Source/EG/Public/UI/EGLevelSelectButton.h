@@ -24,7 +24,7 @@ public:
     UButton* Button;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
-    int32 LevelNum = 1;
+    FString MapName = "";
 
 protected:
     UFUNCTION()

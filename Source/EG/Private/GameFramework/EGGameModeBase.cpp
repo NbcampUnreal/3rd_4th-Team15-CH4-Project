@@ -258,7 +258,8 @@ void AEGGameModeBase::GameOver()
 }
 
 
-// 김효영
+// 레벨 변경 (작성자 : 김효영)
+#pragma region LevelChange
 void AEGGameModeBase::ChangeLevel(const FString& MapName)
 {
     if (HasAuthority()) // 서버에서만
@@ -268,4 +269,21 @@ void AEGGameModeBase::ChangeLevel(const FString& MapName)
     }
 }
 
-// ===========================================================
+#pragma endregion
+
+// 채팅 (작성자 : 김효영)
+#pragma region Chatting
+void AEGGameModeBase::SendChatMessage(const FString& Message)
+{
+    // 모든 플레이어 컨트롤러에 대한 Iterator을 이용
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        AEGPlayerController* EGPC = Cast<AEGPlayerController>(*It);
+        if (EGPC)
+        {
+            EGPC->ClientAddChatMessage(Message);
+        }
+    }
+}
+
+#pragma endregion
