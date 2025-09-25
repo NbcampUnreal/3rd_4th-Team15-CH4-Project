@@ -61,6 +61,8 @@ private:
 	void HandleLookInput(const FInputActionValue& InValue);
 	void HandleStartSprintInput();
 	void HandleStopSprintInput();
+	void HandleJump();
+	void HandleStopJump();
 	void HandleDash();
 	void HandleStartFreeLook();
 	void HandleStopFreeLook();
@@ -68,25 +70,7 @@ private:
 	void HandleLayEgg();
 	void HandlePeck();
 	
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandleDash();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandleSprint(bool bNewIsSprint);
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandleAttack();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandleLayEgg();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandlePeck();
-
-	
-
 	void ExecuteDash();
-	void ExecuteSprint(bool bNewIsSprint);
 	void ExecuteAttack();
 	void ExecuteLayEgg();
 	void ExecutePeck();

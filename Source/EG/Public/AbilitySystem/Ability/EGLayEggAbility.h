@@ -26,6 +26,18 @@ protected:
 	                        bool bReplicateEndAbility,
 	                        bool bWasCancelled) override;
 
+	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle,
+	                                const FGameplayAbilityActorInfo* ActorInfo,
+	                                const FGameplayTagContainer* SourceTags = nullptr,
+	                                const FGameplayTagContainer* TargetTags = nullptr,
+	                                FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
+
+	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+	virtual void OnRemoveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+	
+	void OnEggEnergyChanged(const FOnAttributeChangeData& Data);
+
+
 	UFUNCTION()
 	void OnMontageFinished();
 
@@ -37,5 +49,4 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "LayEgg")
 	TSubclassOf<AActor> EggActorClass;
-	
 };
