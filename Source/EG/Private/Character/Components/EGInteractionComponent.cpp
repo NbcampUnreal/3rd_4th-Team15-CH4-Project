@@ -2,6 +2,7 @@
 
 #include "Character/Components/EGInteractionComponent.h"
 
+#include "EGLog.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/Character.h"
@@ -74,12 +75,29 @@ void UEGInteractionComponent::PerformInteraction()
 		{
 			if (HitActor->GetClass()->ImplementsInterface(UEGInteractInterface::StaticClass()))
 			{
-				IEGInteractInterface::Execute_Interact(HitActor);
+				if (GetOwner()->HasAuthority())
+				{
+					IEGInteractInterface::Execute_Interact(HitActor);
+				}
+				else
+				{
+					ServerRPC_Interact(HitActor);
+				}
 			}
 		}
 	}
 
 	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, false, 3.f, 0, 2.f);
+}
+
+void UEGInteractionComponent::ServerRPC_Interact_Implementation(AActor* Target)
+{
+	if (Target && Target->GetClass()->ImplementsInterface(UEGInteractInterface::StaticClass()))
+	{
+		EG_LOG(LogKH, Log, TEXT("Server RPC Interact Start"));
+		IEGInteractInterface::Execute_Interact(Target);
+		EG_LOG(LogKH, Log, TEXT("Server RPC Interact End"));
+	}
 }
 
 

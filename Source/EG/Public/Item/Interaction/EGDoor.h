@@ -19,6 +19,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	// IEGInteractInterface
 	UFUNCTION(BlueprintCallable)
@@ -42,9 +43,14 @@ protected:
 	UFUNCTION()
 	void HandleDoor(float Value);
 
+	UFUNCTION()
+	void OnRep_DoorState();
+
 private:
 	FRotator OpenRotation;
 	FRotator ClosedRotation;
 
+	UPROPERTY(ReplicatedUsing = OnRep_DoorState)
 	bool bIsOpen;
+
 };

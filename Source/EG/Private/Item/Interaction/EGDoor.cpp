@@ -2,7 +2,9 @@
 
 #include "Item/Interaction/EGDoor.h"
 
+#include "EGLog.h"
 #include "Components/BoxComponent.h"
+#include "Net/UnrealNetwork.h"
 
 AEGDoor::AEGDoor()
 {
@@ -18,6 +20,7 @@ AEGDoor::AEGDoor()
 	CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->SetupAttachment(Pivot);
 	CollisionComponent->SetCollisionProfileName(TEXT("IgnoreOnlyPawn"));
+	CollisionComponent->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 	DoorTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DoorTimeline"));
 
@@ -35,31 +38,49 @@ void AEGDoor::BeginPlay()
 	{
 		FOnTimelineFloat InterpFunction;
 		InterpFunction.BindUFunction(this, FName("HandleDoor"));
-		
+	
 		DoorTimeline->AddInterpFloat(DoorCurve, InterpFunction);
 		DoorTimeline->SetLooping(false);
 	}
 }
 
+void AEGDoor::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AEGDoor, bIsOpen);
+}
+
 void AEGDoor::Interact_Implementation()
 {
-	if (DoorTimeline->IsPlaying())
+	if (HasAuthority())
 	{
-		DoorTimeline->Reverse();
+		EG_LOG_NET(LogKH, Log, TEXT("Door Interact Start"));
+		if (!DoorTimeline->IsPlaying())
+		{
+			bIsOpen = !bIsOpen;
+			OnRep_DoorState();
+		}
+		EG_LOG_NET(LogKH, Log, TEXT("Door Interact End"));
 	}
 	else
 	{
-		if (bIsOpen)
-		{
-			DoorTimeline->ReverseFromEnd();
-		}
-		else
-		{
-			DoorTimeline->PlayFromStart();
-		}
+		EG_LOG_NET(LogKH, Log, TEXT("Door Interact Start"));
+		//ServerRPC_SetDoorState(bNewState);
+		EG_LOG_NET(LogKH, Log, TEXT("Door Interact End"));
 	}
-	
-	bIsOpen = !bIsOpen;
+}
+
+void AEGDoor::OnRep_DoorState()
+{
+	if (bIsOpen)
+	{
+		DoorTimeline->PlayFromStart();
+	}
+	else
+	{
+		DoorTimeline->ReverseFromEnd();
+	}
 }
 
 void AEGDoor::HandleDoor(float Value)

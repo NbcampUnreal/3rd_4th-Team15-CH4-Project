@@ -28,6 +28,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	float TraceDistance = 300.f;
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_Interact(AActor* Target);
 	
 	void SetupInput();
 	void HandleInteract(const FInputActionValue& Value);
