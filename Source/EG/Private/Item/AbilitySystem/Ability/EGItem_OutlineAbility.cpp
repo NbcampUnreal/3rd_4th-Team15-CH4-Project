@@ -45,8 +45,27 @@ void UEGItem_OutlineAbility::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 	if (ActorInfo->IsLocallyControlled())
 	{
-		SetMaterial(Character, OutlineMaterial, DynamicMaterial);
-		SetMaterial(Character, OutlineMaterial_Clip, DynamicMaterial_Clip);
+		if (OutlineMaterial)
+		{
+			DynamicMaterial = UMaterialInstanceDynamic::Create(OutlineMaterial, this);
+			SetMaterialParams(DynamicMaterial);
+			if (UPostProcessComponent* PPC = Character->FindComponentByClass<UPostProcessComponent>())
+			{
+				FWeightedBlendable Blendable(1.0f, DynamicMaterial);
+				PPC->Settings.WeightedBlendables.Array.Add(Blendable);
+			}
+		}
+
+		if (OutlineMaterial_Clip)
+		{
+			DynamicMaterial_Clip = UMaterialInstanceDynamic::Create(OutlineMaterial_Clip, this);
+			SetMaterialParams(DynamicMaterial_Clip);
+			if (UPostProcessComponent* PPC = Character->FindComponentByClass<UPostProcessComponent>())
+			{
+				FWeightedBlendable Blendable(1.0f, DynamicMaterial_Clip);
+				PPC->Settings.WeightedBlendables.Array.Add(Blendable);
+			}
+		}
 	
 		if (OutlineActorClass)
 		{
@@ -86,6 +105,8 @@ void UEGItem_OutlineAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 				return WB.Object == DynamicMaterial || WB.Object == DynamicMaterial_Clip;
 			});
 		}
+		DynamicMaterial = nullptr;
+		DynamicMaterial_Clip = nullptr;
 
 		for (AActor* OutlinedActor : OutlinedActors)
 		{
@@ -106,20 +127,14 @@ void UEGItem_OutlineAbility::OnDurationFinished()
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
-void UEGItem_OutlineAbility::SetMaterial(ACharacter* InCharacter, UMaterialInterface* InMaterial, UMaterialInstanceDynamic* InDynamicMaterial)
+void UEGItem_OutlineAbility::SetMaterialParams(UMaterialInstanceDynamic* InDynamicMaterial)
 {
-	if (InCharacter && InMaterial)
+	if (InDynamicMaterial)
 	{
-		InDynamicMaterial = UMaterialInstanceDynamic::Create(InMaterial, this);
 		InDynamicMaterial->SetScalarParameterValue(FName("Opacity"), Opacity);
 		InDynamicMaterial->SetVectorParameterValue(FName("Color"), Color);
 		InDynamicMaterial->SetScalarParameterValue(FName("OutlineOpacity"), OutlineOpacity);
 		InDynamicMaterial->SetVectorParameterValue(FName("OutlineColor"), OutlineColor);
-		if (UPostProcessComponent* PPC = InCharacter->FindComponentByClass<UPostProcessComponent>())
-		{
-			FWeightedBlendable Blendable(1.0f, InDynamicMaterial);
-			PPC->Settings.WeightedBlendables.Array.Add(Blendable);
-		}
 	}
 }
 

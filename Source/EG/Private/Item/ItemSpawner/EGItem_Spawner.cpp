@@ -5,6 +5,7 @@
 #include "EGLog.h"
 #include "Item/ItemBase/EGItemBase.h"
 #include "Item/ItemSpawner/EGItem_ConfigData.h"
+#include "Manager/EGDelegateManager.h"
 
 AEGItem_Spawner::AEGItem_Spawner()
 {
@@ -54,7 +55,8 @@ void AEGItem_Spawner::SpawnItem()
 
 		if (SpawnedItem)
 		{
-			SpawnedItem->OnItemPickUp.AddDynamic(this, &ThisClass::HandleItemPickUp);
+			auto* DelegateManager = GetGameInstance()->GetSubsystem<UEGDelegateManager>();
+			DelegateManager->OnItemPickUp.AddDynamic(this, &ThisClass::HandleItemPickUp);
 		}
 	}
 }

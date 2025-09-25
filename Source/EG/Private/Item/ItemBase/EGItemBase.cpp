@@ -2,10 +2,10 @@
 
 #include "Item/ItemBase/EGItemBase.h"
 
-#include "EGLog.h"
 #include "Components/SphereComponent.h"
 #include "NiagaraComponent.h"
 #include "Character/EGChickenCharacter.h"
+#include "Manager/EGDelegateManager.h"
 
 
 AEGItemBase::AEGItemBase()
@@ -33,7 +33,8 @@ void AEGItemBase::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 {
 	if (OtherActor && OtherActor != this && OtherActor->IsA(AEGChickenCharacter::StaticClass()))
 	{
-		OnItemPickUp.Broadcast(this);
+		auto* DelegateManager = GetGameInstance()->GetSubsystem<UEGDelegateManager>();
+		DelegateManager->BroadcastItemPickUp(this);
 		
 		Execute_OnPickUp(this, OtherActor);
 	}
