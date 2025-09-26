@@ -4,9 +4,9 @@
 #include "Components/ProgressBar.h"
 #include "WBP_HUD.generated.h"
 
-// 헤더는 가볍게: 전방선언
 class UAbilitySystemComponent;
 struct FOnAttributeChangeData;
+class UImage; // [추가]
 
 UCLASS()
 class EG_API UWBP_HUD : public UUserWidget
@@ -16,37 +16,38 @@ public:
 	UFUNCTION(BlueprintCallable, Category="HUD")
 	void InitWithASC(UAbilitySystemComponent* InASC);
 
+	UFUNCTION(BlueprintCallable, Category="HUD|Egg")
+	void OnEggLaid(); // [추가] 알 낳기 성공 시 즉시 FX OFF
+
 protected:
 	virtual void NativeDestruct() override;
 
-	// === 기존 스태미나 바 ===
 	UPROPERTY(meta=(BindWidget))
 	UProgressBar* StaminaBar = nullptr;
 
-	// === 새로 추가: 알(EggEnergy) 바 ===
-	// 위젯이 아직 없어도 크래시 안 나게 Optional 권장
 	UPROPERTY(meta=(BindWidgetOptional))
 	UProgressBar* EggEnergyBar = nullptr;
 
-	// UI 분모(팀 코드 수정 없이 0~100로 정규화)
+	UPROPERTY(meta=(BindWidgetOptional))
+	UImage* EggFX = nullptr; // [추가] 알 바 뒤의 FX 이미지(브러시에 MAT_UI_MaskRotate_Inst_01 지정)
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD|Egg")
 	float UI_MaxEggEnergy = 100.f;
 
-	// 내부
+private:
 	UPROPERTY() UAbilitySystemComponent* ASC = nullptr;
 
-	// 델리게이트 핸들
 	FDelegateHandle StaminaChangedHandle;
 	FDelegateHandle EggEnergyChangedHandle;
 
-	// 콜백 & 반영
+	bool bEggReady = false; // [추가]
+
 	void OnStaminaChanged(const FOnAttributeChangeData& Data);
 	void OnEggEnergyChanged(const FOnAttributeChangeData& Data);
 
 	void RefreshStamina(float NewValue);
 	void RefreshEggEnergy(float NewValue);
 
-// 한국인
+	void StartReadyFX(); // [추가]
+	void StopReadyFX();  // [추가]
 };
-
-
