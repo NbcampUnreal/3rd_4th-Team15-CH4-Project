@@ -1,0 +1,2 @@
+(()=>{var e={288:e=>{"use strict";e.exports=require("electron")}},r={};function o(n){var t=r[n];if(void 0!==t)return t.exports;var i=r[n]={exports:{}};return e[n](i,i.exports,o),i.exports}void 0!==o&&(o.ab="/native_modules/"),(()=>{const{contextBridge:e}=o(288),{ipcRenderer:r}=o(288);e.exposeInMainWorld("ipc",{sendAsync:(e,...o)=>r.invoke(e,...o),on:(e,o)=>{r.on(e,((e,...r)=>o(...r)))}})})()})();
+//# sourceMappingURL=preload.js.map
