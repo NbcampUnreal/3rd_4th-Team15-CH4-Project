@@ -24,8 +24,10 @@ void UUW_TitleLayout::OnPlayButtonClicked()
 	AEGTitlePlayerController* PlayerController = GetOwningPlayer<AEGTitlePlayerController>();
 	if (IsValid(PlayerController))
 	{
-		FText ServerIP = ServerIPEditableText->GetText();
-		PlayerController->JoinServer(ServerIP.ToString());
+		//FText ServerIP = ServerIPEditableText->GetText();
+		FString ServerIP = "43.203.30.199:7777";
+		//PlayerController->JoinServer(ServerIP.ToString());
+		PlayerController->JoinServer(ServerIP);
 	}
 }
 
