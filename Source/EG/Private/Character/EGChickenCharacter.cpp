@@ -13,6 +13,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
 #include "Components/PostProcessComponent.h"
+#include "GameFramework/EGPlayerState.h"
 
 
 AEGChickenCharacter::AEGChickenCharacter()
@@ -104,8 +105,6 @@ void AEGChickenCharacter::BeginPlay()
 	{
 		if (IsValid(AbilitySystemComponent))
 		{
-			AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
 			for (const auto& AbilityClass : StartupAbilities)
 			{
 				if (IsValid(AbilityClass))
@@ -544,3 +543,26 @@ UAbilitySystemComponent* AEGChickenCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }
+
+//kms
+void AEGChickenCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (APlayerState* PS = GetPlayerState())
+	{
+		// ASC의 OwnerActor = PlayerState, AvatarActor = 이 Character
+		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+	}
+}
+
+void AEGChickenCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	if (APlayerState* PS = GetPlayerState())
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+	}
+}
+//kms

@@ -131,6 +131,8 @@ public:
 
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	void PossessedBy(AController* NewController);
+	void OnRep_PlayerState();
 
 protected:
 	
