@@ -12,6 +12,7 @@
 #include "Public/Character/Components/EGChickenMovementComponent.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
+#include "Components/PostProcessComponent.h"
 
 
 AEGChickenCharacter::AEGChickenCharacter()
@@ -40,7 +41,11 @@ AEGChickenCharacter::AEGChickenCharacter()
 
 	// GAS 사용을 위한 ASC와 AttributeSet 생성 (작성자 : 김세훈)
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
 	AttributeSet = CreateDefaultSubobject<UEGCharacterAttributeSet>(TEXT("AttributeSet"));
+
+	// KH : 아웃라인 표시해주는 아이템을 위한 PostProcessComponent 생성
+	PostProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcessComponent"));
 }
 
 void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -56,15 +61,13 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EIC->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 	EIC->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-	EIC->BindAction(IA_Sprint, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleStartSprintInput);
-	// Start로 바꾸기 (작성자 : 김세훈)
+	EIC->BindAction(IA_Sprint, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleStartSprintInput); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_Sprint, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopSprintInput);
 	EIC->BindAction(IA_Dash, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleDash); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_FreeLook, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleStartFreeLook);
 	EIC->BindAction(IA_FreeLook, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopFreeLook);
-	EIC->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleAttack);
-	EIC->BindAction(IA_LayEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayEgg);
-	// Start로 바꾸기 (작성자 : 김세훈)
+	EIC->BindAction(IA_Attack, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleAttack); // Start로 바꾸기 (작성자 : 김세훈)
+	EIC->BindAction(IA_LayEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayEgg); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_Peck, ETriggerEvent::Started, this, &AEGChickenCharacter::HandlePeck); // Start로 바꾸기 (작성자 : 김세훈)
 }
 
@@ -106,12 +109,14 @@ void AEGChickenCharacter::BeginPlay()
 				{
 					AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0, this));
 					UE_LOG(LogTemp, Log, TEXT("Give Ability : %s"), *AbilityClass->GetName());
+					HandleStaminaRegen();
+					HandleEggEnergyRegen();
 				}
 			}
 
 			UE_LOG(LogTemp, Warning, TEXT("GAS Initialized"));
 		}
-	}
+	}	
 }
 
 void AEGChickenCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -122,6 +127,15 @@ void AEGChickenCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimePrope
 
 void AEGChickenCharacter::HandleMoveInput(const FInputActionValue& InValue)
 {
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
+	{
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
+	}
+	
 	if (!ChickenMovementComponent)
 	{
 		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
@@ -235,15 +249,15 @@ void AEGChickenCharacter::HandleLayEgg()
 	// LayEggAbility 실행 방식 수정(작성자 : 김세훈)
 	EG_LOG_ROLE(LogTemp, Log, TEXT("start"));
 
-	ExecuteLayEgg();
 
-	// if (HasAuthority())	// JM : 서버라면 바로 실행
-	// {
-	// }
-	// else				// JM : 클라라면 ServerRPC 요청
-	// {
-	// 	//ServerRPCHandleLayEgg();
-	// }
+	if (HasAuthority())	// JM : 서버라면 바로 실행
+	{
+		ExecuteLayEgg();
+	}
+	else				// JM : 클라라면 ServerRPC 요청
+	{
+		ServerRPCHandleLayEgg();
+	}
 
 	EG_LOG_ROLE(LogTemp, Log, TEXT("end"));
 }
@@ -296,6 +310,15 @@ void AEGChickenCharacter::ExecuteDash()
 	// }
 	// ChickenMovementComponent->PerformDash();
 
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
+	{
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
+	}
+
 	// Dash Ability 실행시키기 (작성자 : 김세훈)
 	if (IsValid(AbilitySystemComponent) && IsValid(DashAbilityClass))
 	{
@@ -343,12 +366,33 @@ void AEGChickenCharacter::ExecuteSprint(bool bNewIsSprint)
 
 void AEGChickenCharacter::ExecuteAttack()
 {
-	if (!ChickenMovementComponent)
+	EG_LOG_ROLE(LogTemp, Log, TEXT("start"));
+	
+	if (IsValid(AbilitySystemComponent) && IsValid(AttackAbilityClass))
 	{
-		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
-		return;
+		FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag("Ability.Cooldown.Attack");
+		if (!AbilitySystemComponent->HasMatchingGameplayTag(CooldownTag))
+		{
+			bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(AttackAbilityClass);
+			if (bSuccess)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Attack ability activated"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Attack ability failed (cooldown)"));
+			}
+		}
 	}
-	ChickenMovementComponent->PerformAttack();
+	
+	EG_LOG_ROLE(LogTemp, Log, TEXT("end"));
+	
+	// if (!ChickenMovementComponent)
+	// {
+	// 	EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
+	// 	return;
+	// }
+	// ChickenMovementComponent->PerformAttack();
 }
 
 void AEGChickenCharacter::ExecuteLayEgg()
@@ -402,6 +446,65 @@ void AEGChickenCharacter::ExecutePeck()
 		}
 	}
 }
+
+// 스킬 패시브 (작성자: 김효영)
+#pragma region Passive
+
+// 스태미나 회복
+void AEGChickenCharacter::HandleStaminaRegen()
+{
+	if (HasAuthority())	// JM : 서버라면 바로 실행
+	{
+		ExecuteStaminaRegen();
+	}
+	else				// JM : 클라라면 ServerRPC 요청
+	{
+		ServerRPCHandleStaminaRegen();
+	}
+}
+
+void AEGChickenCharacter::ServerRPCHandleStaminaRegen_Implementation()
+{
+	ExecuteStaminaRegen();
+}
+
+void AEGChickenCharacter::ExecuteStaminaRegen()
+{
+	if (AbilitySystemComponent && StaminaRegenAbilityClass)
+	{
+		const bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(StaminaRegenAbilityClass);
+		UE_LOG(LogTemp, Log, TEXT("StaminaRegen result: %s"), bSuccess ? TEXT("Success") : TEXT("Failed"));
+	}
+}
+
+// 알 에너지 회복
+void AEGChickenCharacter::HandleEggEnergyRegen()
+{
+	if (HasAuthority())	// JM : 서버라면 바로 실행
+	{
+		ExecuteEggEnergyRegen();
+	}
+	else				// JM : 클라라면 ServerRPC 요청
+	{
+		ServerRPCHandleEggEnergyRegen();
+	}
+}
+
+void AEGChickenCharacter::ServerRPCHandleEggEnergyRegen_Implementation()
+{
+	ExecuteEggEnergyRegen();
+}
+
+void AEGChickenCharacter::ExecuteEggEnergyRegen()
+{
+	if (AbilitySystemComponent && EggEnergyRegenAbilityClass)
+	{
+		const bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(EggEnergyRegenAbilityClass);
+		UE_LOG(LogTemp, Log, TEXT("EggEnergyRegen result: %s"), bSuccess ? TEXT("Success") : TEXT("Failed"));
+	}
+}
+
+#pragma endregion
 
 UAbilitySystemComponent* AEGChickenCharacter::GetAbilitySystemComponent() const
 {

@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "EGChickenCharacter.generated.h"
 
+class UPostProcessComponent;
 class UEGChickenMovementComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -47,6 +48,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AEGChickenCharacter|Components")
 	UEGChickenMovementComponent* ChickenMovementComponent;
+
+	// KH : PostProcessComponent For Item Of Outline Effect
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Components")	
+	TObjectPtr<UPostProcessComponent> PostProcess;
 #pragma endregion
 
 	
@@ -77,6 +82,8 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerRPCHandlePeck();
+
+	
 
 	void ExecuteDash();
 	void ExecuteSprint(bool bNewIsSprint);
@@ -152,7 +159,34 @@ protected:
 	TSubclassOf<UGameplayAbility> DashAbilityClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> StaminaRegenAbilityClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> EggEnergyRegenAbilityClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
 	TSubclassOf<UGameplayAbility> SprintAbilityClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> AttackAbilityClass;
+
+#pragma endregion
+
+// 스킬 패시브 (작성자: 김효영)
+#pragma region Passive
+
+private:
+	// 스태미나 회복
+	void HandleStaminaRegen();
+	UFUNCTION(Server, Reliable)
+	void ServerRPCHandleStaminaRegen();
+	void ExecuteStaminaRegen();
+
+	// 알 에너지 회복
+	void HandleEggEnergyRegen();
+	UFUNCTION(Server, Reliable)
+	void ServerRPCHandleEggEnergyRegen();
+	void ExecuteEggEnergyRegen();
 
 #pragma endregion
 };
