@@ -7,6 +7,7 @@
 #include "AbilitySystem/GameplayEffect/EGLayEggCooldownEffect.h"
 #include "AbilitySystem/GameplayEffect/EGLayEggCostEffect.h"
 #include "Character/Egg/EggActor.h"
+#include "GameFramework/EGPlayerState.h"
 
 UEGLayEggAbility::UEGLayEggAbility()
 {
@@ -57,10 +58,38 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 				FVector ActorLocation = ActorInfo->AvatarActor->GetActorLocation();
 				FVector BackwardVector = -ActorInfo->AvatarActor->GetActorForwardVector();
 				FVector SpawnLocation = ActorLocation + BackwardVector * SpawnDistance;
-
+				FActorSpawnParameters SpawnParams; // kms
+				SpawnParams.Owner = GetOwningActorFromActorInfo(); //kms
 				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, SpawnLocation,
-				                                                        ActorInfo->AvatarActor->GetActorRotation());
+				                                                        ActorInfo->AvatarActor->GetActorRotation(),
+				                                                         SpawnParams //kms
+				                                                         );
 
+				// add egg count for GameState (작성자 : KMS)
+				UE_LOG(LogTemp, Warning, TEXT("Ability Activated on %s (Owner: %s, Avatar: %s)"),
+					*GetNameSafe(this),
+					*GetNameSafe(GetOwningActorFromActorInfo()),
+					*GetNameSafe(GetAvatarActorFromActorInfo()));
+				
+				if (APlayerController* PC = ActorInfo->PlayerController.Get())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Ability found PC: %s"), *PC->GetName());
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Ability: PlayerController is NULL!"));
+				}
+				
+				if (APlayerController* PC = ActorInfo->PlayerController.Get())
+				{
+					UE_LOG(LogTemp, Log, TEXT("find PC"));
+					if (AEGPlayerState* EGPlayerState = Cast<AEGPlayerState>(PC->GetPlayerState<APlayerState>()))
+					{
+						UE_LOG(LogTemp, Log, TEXT("lay egg set"));
+						EGPlayerState->ServerAddEgg(1); 
+					}
+				}//여기까지 kms
+				
 				UE_LOG(LogTemp, Log, TEXT("Egg Spawned"));
 			}
 		}

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "GameFramework/EGGameStateBase.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "EGDelegateManager.generated.h"
 
@@ -11,6 +12,11 @@ class AEGItemBase;
 
 // Item
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemPickUp, AEGItemBase*, Item);
+//Gamstate
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountdownUpdated, int32, NewCountdown);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayTimeUpdated, int32, NewPlayTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLeaderboardUpdated, const TArray<FAward>&, NewLeaderboard);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAwardUpdated, const FAward&, NewAward);
 
 #pragma endregion
 
@@ -31,11 +37,25 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnItemPickUp OnItemPickUp;
 
+	//GameState
+	UPROPERTY(BlueprintAssignable, Category = "GameState|Events")
+	FOnCountdownUpdated OnCountdownUpdated;
+
+	UPROPERTY(BlueprintAssignable, Category = "GameState|Events")
+	FOnPlayTimeUpdated OnPlayTimeUpdated;
+
+	UPROPERTY(BlueprintAssignable, Category="GameState|Events")
+	FOnLeaderboardUpdated OnLeaderboardUpdated;
+
+	UPROPERTY(BlueprintAssignable, Category="GameState|Events")
+	FOnAwardUpdated OnAwardUpdated;
+	
 #pragma endregion 
 
 #pragma region BROADCAST
 	
 	void BroadcastItemPickUp(AEGItemBase* Item);
+	void BroadcastPlayerState(AEGGameStateBase* GameState);
 
 #pragma endregion 
 };

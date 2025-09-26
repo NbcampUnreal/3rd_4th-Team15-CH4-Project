@@ -1,8 +1,9 @@
 #include "GameFrameWork/EGStartingButton.h"
 #include "EGLog.h"
 #include "Character/EGChickenCharacter.h"
-#include "GameFramework/EGGameModeBase.h"
-#include "Kismet/GameplayStatics.h"
+#include "GameFramework/EGGameStateBase.h"
+#include "GameFramework/PlayerState.h"
+
 
 AEGStartingButton::AEGStartingButton()
 {
@@ -28,15 +29,21 @@ void AEGStartingButton::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 		AEGChickenCharacter* Character = Cast<AEGChickenCharacter>(OtherActor);
 		if (Character)
 		{
-
-			if (AGameModeBase* GameMode = UGameplayStatics::GetGameMode(GetWorld()))
+			UE_LOG(LogTemp, Log, TEXT("Cast Player"));
+			if (ACharacter* CharacterPtr = Cast<ACharacter>(Character))
 			{
-				if (AEGGameModeBase* EGGameMode = Cast<AEGGameModeBase>(GameMode))
+				if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(CharacterPtr->GetController()))
 				{
-					UE_LOG(LogMS, Log, TEXT("Game shoot"));
-					EGGameMode->GameStart();
+					UE_LOG(LogTemp, Log, TEXT("Start Countdown"));
+					int32 UniqueID = EGPC->PlayerIndex;
+					if (AEGGameStateBase* EGGS = Cast<AEGGameStateBase>(GetWorld()->GetGameState()))
+					{
+						UE_LOG(LogTemp, Log, TEXT("EGGS is not NULL"));
+						EGGS->CheckRoomLeader(UniqueID);
+					}
 				}
 			}
+
 		}
 	}	
 }

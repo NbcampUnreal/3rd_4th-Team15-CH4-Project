@@ -3,9 +3,35 @@
 #pragma once
 
 //#include "CoreMinimal.h"
+#include "EGPlayerController.h"
 #include "GameFramework/GameStateBase.h"
 #include "Delegates/DelegateCombinations.h"
 #include "EGGameStateBase.generated.h"
+
+// (작성자 : KMS)
+USTRUCT(BlueprintType)
+struct FAward
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 PlayerIndex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 PlayerEggScore;
+
+	FAward()
+	   : PlayerIndex(0)
+	   , PlayerEggScore(0)
+	{}
+
+	bool operator==(const FAward& Other) const
+	{
+		return PlayerIndex == Other.PlayerIndex
+			&& PlayerEggScore == Other.PlayerEggScore;
+	}
+};
+// 여기까지 KMS
 
 UENUM(BlueprintType)
 enum class EMatchState : uint8
@@ -18,12 +44,7 @@ enum class EMatchState : uint8
 	End
 };
 
-/**
- * 
- */
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountdownUpdated, int32, NewCountdown);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayTimeUpdated, int32, NewPlayTime);
 
 UCLASS()
 class EG_API AEGGameStateBase : public AGameStateBase
@@ -33,7 +54,8 @@ class EG_API AEGGameStateBase : public AGameStateBase
 public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	void BeginPlay();
+	void RemovePlayerState(APlayerState* PlayerState);
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
 	int32 AlivePlayerControllerCount = 0;
@@ -44,20 +66,41 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_RemainingCountdown, VisibleAnywhere, BlueprintReadOnly)
 	int32 RemainingCountdown = 100;
 
-	 UPROPERTY(ReplicatedUsing = OnRep_RemainingPlayTime, VisibleAnywhere, BlueprintReadOnly)
-	 int32 RemainingPlayTime = 100;
+	UPROPERTY(ReplicatedUsing = OnRep_RemainingPlayTime, VisibleAnywhere, BlueprintReadOnly)
+	int32 RemainingPlayTime = 100;
+	
+	UPROPERTY()
+	class UEGDelegateManager* DelegateManager;
+	
+	/// (작성자 : KMS)
+	FTimerHandle CountdownTimerHandle;
+	
+	UPROPERTY(ReplicatedUsing=OnRep_Leaderboard)
+	TArray<FAward> LeaderboardSnapshot;
+	
+	UPROPERTY(ReplicatedUsing=OnRep_Award)
+	FAward RoundAward;
 
-	 UPROPERTY(BlueprintAssignable, Category = "GameState|Events")
-	 FOnCountdownUpdated OnCountdownUpdated;
+protected:
+	UFUNCTION()
+	void OnRep_Leaderboard();
 
-	 UPROPERTY(BlueprintAssignable, Category = "GameState|Events")
-	 FOnPlayTimeUpdated OnPlayTimeUpdated;
+	UFUNCTION()
+	void OnRep_Award();
+public:
+	void CheckRoomLeader(int32 UniqueID);
+	void StartCountdown();
+	void DecrementCountdown();
+	void UpdateLeaderboard();
+	void FinalizeAward();
+	void SetFinalResults(const TArray<TPair<TWeakObjectPtr<AEGPlayerController>, int32>>& Scores);
 
+	///여기까지 KMS
+	
 protected:
 	UFUNCTION()
 	void OnRep_RemainingCountdown();
 
 	UFUNCTION()
 	void OnRep_RemainingPlayTime();
-
 };

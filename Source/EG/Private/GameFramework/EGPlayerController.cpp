@@ -16,6 +16,7 @@ void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	
 	DOREPLIFETIME(AEGPlayerController, PlayerIndex);
 }
 
@@ -26,7 +27,6 @@ void AEGPlayerController::BeginPlay()
 	{
 		return;
 	}
-
 	FInputModeGameOnly GameOnly;
 	SetInputMode(GameOnly);
 
