@@ -14,8 +14,7 @@
 void AEGGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
-
-    //StartCount();
+    
 }
 
 void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
@@ -35,30 +34,52 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
 
-    static int32 NextIndex = 0;
-
-    if (AEGPlayerController* PC = Cast<AEGPlayerController>(NewPlayer))
-    {
-        PC->SetPlayerIndex(NextIndex);
-        NextIndex++;
-    }
-    else
-    {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("player %d cant join here."), NextIndex);
-    }
-
+    // maxplayer check
     if (APlayingPlayerControllers.Num() > 6)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Too many players! Kicking..."));
+        UE_LOG(LogTemp, Warning, TEXT("Too many players! Kick that chick"));
 
         NewPlayer->Destroy();
     }
+    
+    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(NewPlayer))
+    {
+        APlayingPlayerControllers.Add(EGPC);
+        
+        if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(EGPC->PlayerState))
+        {
+            int32 UniqueId = EGPS->GetPlayerId();
+            EGPC->SetPlayerIndex(UniqueId);
+
+            if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
+            {
+                FAward Entry;
+                Entry.PlayerIndex    = UniqueId;
+                Entry.PlayerEggScore = 0;
+                EGGS->LeaderboardSnapshot.Add(Entry);
+            }
+        }
+    }
+    
+    SetRoomLeader();
 }
+
+void AEGGameModeBase::SetRoomLeader()
+{
+    if (APlayingPlayerControllers.Num() > 0)
+    {
+        if (APlayingPlayerControllers[0].IsValid())
+        {
+            LeaderNum = APlayingPlayerControllers[0]->PlayerIndex;
+        }
+    }
+}
+
 
 void AEGGameModeBase::Logout(AController* Exiting)
 {
     Super::Logout(Exiting);
-
+    
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(Exiting))
     {
         EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPC->PlayerIndex);
@@ -67,6 +88,7 @@ void AEGGameModeBase::Logout(AController* Exiting)
             return !P.IsValid() || P.Get() == EGPC;
         });
     }
+    SetRoomLeader();
 }
 
 void AEGGameModeBase::InitializeSpawnPoint()
@@ -94,114 +116,91 @@ AActor* AEGGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
     InitializeSpawnPoint();
     
-    int32 PlayerIndex = GetNumPlayers()-1;
+    int32 PlayerNum = GetNumPlayers()-1;
         
-        if (AEGPlayerStart** FoundStart = PlayerStartList.Find(PlayerIndex))
+        if (AEGPlayerStart** FoundStart = PlayerStartList.Find(PlayerNum))
         {
             return *FoundStart;
         }
         
-    EG_LOG_ROLE(LogMS, Warning, TEXT("No SpawnPoint found for index %d, using Super."), PlayerIndex);
+    EG_LOG_ROLE(LogMS, Warning, TEXT("No SpawnPoint found for index %d, using Super."), PlayerNum);
     return Super::ChoosePlayerStart_Implementation(Player);
 }
 
 
-void AEGGameModeBase::StartCount()
+void AEGGameModeBase::GameStart(int32 UniqueID)
 {
-    GetWorldTimerManager().SetTimer(
-    GameStartingTimerHandle,
-    this,
-    &AEGGameModeBase::GameStart, 
-    10.0f,
-    false 
-    );
-}
-
-void AEGGameModeBase::EndCount()
-{
-    AEGGameStateBase* GS = GetGameState<AEGGameStateBase>();
-    if (IsValid(GS))
+    if (UniqueID == LeaderNum)
     {
-        float RemainTime = GS->RemainingPlayTime;
-
-        GetWorldTimerManager().SetTimer(
-            GameEndTimerHandle,
-            this,
-            &AEGGameModeBase::GameOver,
-            RemainTime,
-            //10.0f,
-            false
-        );
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("GameState is not valid in BeginPlay!"));
-    }
-}
-
-
-void AEGGameModeBase::GameStart()
-{       
-    if (GetNumPlayers() > 1)
-    {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("Game Start"));
-        UWorld* World = GetWorld();
-        
-        AInGameSpawnPoints.Empty();
-        for (TActorIterator<AEGInGameSpawnPoints> It(World); It; ++It)
+        if (GetNumPlayers() > 1)
         {
-            AInGameSpawnPoints.Add(*It);
-        }
-
-        for (int32 i = 0; i < AInGameSpawnPoints.Num(); i++)
-        {
-            int32 SwapNum = FMath::RandRange(0, AInGameSpawnPoints.Num()-1);
-            AInGameSpawnPoints.Swap(i, SwapNum);
-        }
-
-        int32 SpawnNum = 0;
-        for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-        {
-            if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
+            if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
             {
-                if (ACharacter* EGPlayerChar = Cast<AEGChickenCharacter>(PC->GetPawn()))
+                EGGS->StartCountdown();
+            }
+            
+            EG_LOG_ROLE(LogMS, Warning, TEXT("Game Start"));
+            UWorld* World = GetWorld();
+            
+            AInGameSpawnPoints.Empty();
+            for (TActorIterator<AEGInGameSpawnPoints> It(World); It; ++It)
+            {
+                AInGameSpawnPoints.Add(*It);
+            }
+
+            for (int32 i = 0; i < AInGameSpawnPoints.Num(); i++)
+            {
+                int32 SwapNum = FMath::RandRange(0, AInGameSpawnPoints.Num()-1);
+                AInGameSpawnPoints.Swap(i, SwapNum);
+            }
+
+            int32 SpawnNum = 0;
+            for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+            {
+                if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
                 {
-                    if (AInGameSpawnPoints.IsValidIndex(SpawnNum))
+                    if (ACharacter* EGPlayerChar = Cast<AEGChickenCharacter>(PC->GetPawn()))
                     {
-                        FVector StartLocation = AInGameSpawnPoints[SpawnNum]->GetActorLocation();
-                        EGPlayerChar->SetActorLocation(StartLocation);
-                        SpawnNum++;
+                        if (AInGameSpawnPoints.IsValidIndex(SpawnNum))
+                        {
+                            FVector StartLocation = AInGameSpawnPoints[SpawnNum]->GetActorLocation();
+                            EGPlayerChar->SetActorLocation(StartLocation);
+                            SpawnNum++;
+                        }
                     }
                 }
             }
-        }
-        for (int k = SpawnNum; k < AInGameSpawnPoints.Num(); k++)
-        {
-            if (AInGameSpawnPoints[k].IsValid())
+            for (int k = SpawnNum; k < AInGameSpawnPoints.Num(); k++)
             {
-                FVector SpawnLocation = AInGameSpawnPoints[k]->GetActorLocation();
-                FRotator SpawnRotation(0.f, AInGameSpawnPoints[k]->GetActorRotation().Yaw, 0.f);
-
-                FActorSpawnParameters SpawnParams;
-                SpawnParams.Owner = this;
-                SpawnParams.Instigator = GetInstigator();
-                SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-                AEGAICharacter* SpawnedActor = GetWorld()->SpawnActor<AEGAICharacter>(AICharacter, SpawnLocation, SpawnRotation, SpawnParams);
-                if (SpawnedActor)
+                if (AInGameSpawnPoints[k].IsValid())
                 {
-                    EG_LOG_ROLE(LogMS, Warning, TEXT("ai Spawn"));
+                    FVector SpawnLocation = AInGameSpawnPoints[k]->GetActorLocation();
+                    FRotator SpawnRotation(0.f, AInGameSpawnPoints[k]->GetActorRotation().Yaw, 0.f);
+
+                    FActorSpawnParameters SpawnParams;
+                    SpawnParams.Owner = this;
+                    SpawnParams.Instigator = GetInstigator();
+                    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+                    AEGAICharacter* SpawnedActor = GetWorld()->SpawnActor<AEGAICharacter>(AICharacter, SpawnLocation, SpawnRotation, SpawnParams);
+                    if (SpawnedActor)
+                    {
+                        EG_LOG_ROLE(LogMS, Warning, TEXT("ai Spawn"));
+                    }
+                    else
+                    {
+                        EG_LOG_ROLE(LogMS, Warning, TEXT("ai Spawn fail"));
+                    }
+                    
                 }
-                else
-                {
-                    EG_LOG_ROLE(LogMS, Warning, TEXT("ai Spawn fail"));
-                }
-                
             }
+            EG_LOG_ROLE(LogMS, Warning, TEXT("-------------------------------------"));
         }
-        EG_LOG_ROLE(LogMS, Warning, TEXT("-------------------------------------"));
     }
-    EndCount();
+    else
+    {
+        EG_LOG_ROLE(LogMS, Warning, TEXT("Game Start Fail, you are not RoomLeader"));
+    }
 }
 
 
@@ -222,41 +221,14 @@ void AEGGameModeBase::GameOver()
         }
     }
 
-    // player score calculate
+    // player score sort
     FinalPlayerScores.Sort([](const auto& A, const auto& B)
   {
       if (A.Value != B.Value)
           return A.Value > B.Value;
       return A.Key.IsValid() && B.Key.IsValid() && A.Key->PlayerIndex < B.Key->PlayerIndex;
   });
-    /*
-    if (FinalPlayerScores.IsValidIndex(0))
-    {
-        int32 MaxScore = FinalPlayerScores[0].Value;
-
-        for (const auto& Pair : FinalPlayerScores)
-        {
-            if (Pair.Value == MaxScore)
-            {
-                auto Player = Pair.Key;
-                if (Player.IsValid())
-                {
-                    EG_LOG_ROLE(LogMS, Warning, TEXT("Player: %d is winner, Score: %d"),
-                        Player->PlayerIndex,
-                        Pair.Value);
-                }
-            }
-            else
-            {                               
-                break;
-            }
-        }
-        if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
-        {
-            EGGS->SetFinalResults(FinalPlayerScores);
-        }
-        
-    }*/
+   
     if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
     {
         EGGS->SetFinalResults(FinalPlayerScores);

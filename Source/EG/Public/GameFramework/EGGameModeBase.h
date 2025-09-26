@@ -24,13 +24,13 @@ public:
 						  FString& ErrorMessage) override;
 	
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+	void SetRoomLeader();
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
-	void StartCount();
-	void EndCount();
+	
 
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
-	void GameStart();
+	void GameStart(int32 UniqueID);
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
 	void GameOver();
 	void ClearStage();
@@ -46,6 +46,7 @@ public:
 	
 protected:
 	bool bGameStarted = false;
+	int32 LeaderNum = 0;
 
 	UPROPERTY(VisibleAnywhere, Category="Players")
 	TArray<TWeakObjectPtr<AEGPlayerController>> APlayingPlayerControllers;

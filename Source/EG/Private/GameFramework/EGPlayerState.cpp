@@ -2,6 +2,8 @@
 
 
 #include "GameFramework/EGPlayerState.h"
+
+#include "GameFramework/EGGameStateBase.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -45,6 +47,10 @@ void AEGPlayerState::AddEgg_Internal(int32 Amount)
 
 	UE_LOG(LogTemp, Warning, TEXT("AddEgg_Internal -> %s new egg count: %d"),
 		*GetName(), PlayerEggCount);
+	if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
+	{
+		GS->UpdateLeaderboard();
+	}
 }
 
 void AEGPlayerState::RemoveEgg_Internal(int32 Amount)
@@ -53,5 +59,15 @@ void AEGPlayerState::RemoveEgg_Internal(int32 Amount)
 
 	UE_LOG(LogTemp, Warning, TEXT("RemoveEgg_Internal -> %s new egg count: %d"),
 		*GetName(), PlayerEggCount);
+		if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
+		{
+			GS->UpdateLeaderboard();
+		}
 }
 
+void AEGGameStateBase::RemovePlayerState(APlayerState* PlayerState)
+{
+	Super::RemovePlayerState(PlayerState);
+
+	UpdateLeaderboard();
+}
