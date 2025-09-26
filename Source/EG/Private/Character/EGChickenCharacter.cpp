@@ -59,8 +59,8 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 	EIC->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleLookInput);
 
-	EIC->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-	EIC->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	EIC->BindAction(IA_Jump, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleJump); // Start로 바꾸기, Jump 함수 만들기(작성자 : 김세훈)
+	EIC->BindAction(IA_Jump, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopJump);
 
 	EIC->BindAction(IA_Sprint, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleStartSprintInput); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_Sprint, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopSprintInput);
@@ -70,6 +70,9 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EIC->BindAction(IA_Attack, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleAttack); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_LayEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayEgg); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_Peck, ETriggerEvent::Started, this, &AEGChickenCharacter::HandlePeck); // Start로 바꾸기 (작성자 : 김세훈)
+	EIC->BindAction(IA_LayBombEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayBombEgg); 
+	EIC->BindAction(IA_LayTrickEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayTrickEgg); 
+	
 }
 
 void AEGChickenCharacter::BeginPlay()
@@ -115,7 +118,7 @@ void AEGChickenCharacter::BeginPlay()
 
 			UE_LOG(LogTemp, Warning, TEXT("GAS Initialized"));
 		}
-	}	
+	}
 }
 
 void AEGChickenCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -134,7 +137,7 @@ void AEGChickenCharacter::HandleMoveInput(const FInputActionValue& InValue)
 			return;
 		}
 	}
-	
+
 	if (!ChickenMovementComponent)
 	{
 		EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
@@ -155,15 +158,15 @@ void AEGChickenCharacter::HandleLookInput(const FInputActionValue& InValue)
 
 void AEGChickenCharacter::HandleStartSprintInput()
 {
-	// if (HasAuthority())	// JM: 서버라면 바로 실행
-	// {
-	// 	ExecuteSprint(true);
-	// }
-	// else				// JM: 클라라면 ServerRPC 요청 (Server Correction 과정에서 끊겨 보임)
-	// {
-	// 	ServerRPCHandleSprint(true);	
-	// }
-	EG_LOG_ROLE(LogTemp, Log, TEXT("start"));
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
+	{
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
+	}
+	
 	if (IsValid(AbilitySystemComponent) && IsValid(SprintAbilityClass))
 	{
 		bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(SprintAbilityClass);
@@ -176,20 +179,19 @@ void AEGChickenCharacter::HandleStartSprintInput()
 			UE_LOG(LogTemp, Warning, TEXT("Sprint ability failed"));
 		}
 	}
-	EG_LOG_ROLE(LogTemp, Log, TEXT("end"));
 }
 
 void AEGChickenCharacter::HandleStopSprintInput()
 {
-	// if (HasAuthority())	// JM: 서버라면 바로 실행
-	// {
-	// 	ExecuteSprint(false);
-	// }
-	// else				// JM: 클라라면 ServerRPC 요청 (Server Correction 과정에서 끊겨 보임)
-	// {
-	// 	ServerRPCHandleSprint(false);	
-	// }
-	EG_LOG_ROLE(LogTemp, Log, TEXT("start"));
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
+	{
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
+	}
+	
 	if (IsValid(AbilitySystemComponent) && IsValid(SprintAbilityClass))
 	{
 		const FGameplayAbilitySpec* AbilitySpec = AbilitySystemComponent->FindAbilitySpecFromClass(SprintAbilityClass);
@@ -198,19 +200,48 @@ void AEGChickenCharacter::HandleStopSprintInput()
 			AbilitySystemComponent->CancelAbilityHandle(AbilitySpec->Handle);
 		}
 	}
-	EG_LOG_ROLE(LogTemp, Log, TEXT("end"));
+}
+
+void AEGChickenCharacter::HandleJump()
+{
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
+	{
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
+	}
+
+	Jump();
+}
+
+void AEGChickenCharacter::HandleStopJump()
+{
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
+	{
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
+	}
+
+	StopJumping();
 }
 
 void AEGChickenCharacter::HandleDash()
 {
-	if (HasAuthority()) // JM: 서버라면 바로 실행
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
 	{
-		ExecuteDash();
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
 	}
-	else // JM: 클라라면 ServerRPC 요청 (Server Correction 과정에서 끊겨 보임)
-	{
-		ServerRPCHandleDash();
-	}
+	
+	ExecuteDash();
 }
 
 void AEGChickenCharacter::HandleStartFreeLook()
@@ -233,82 +264,48 @@ void AEGChickenCharacter::HandleStopFreeLook()
 
 void AEGChickenCharacter::HandleAttack()
 {
-	if (HasAuthority()) // JM : 서버라면 바로 실행
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
 	{
-		ExecuteAttack();
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
 	}
-	else // JM : 클라라면 ServerRPC 요청
-	{
-		ServerRPCHandleAttack();
-	}
+	
+	ExecuteAttack();
 }
 
 void AEGChickenCharacter::HandleLayEgg()
 {
-	// LayEggAbility 실행 방식 수정(작성자 : 김세훈)
-	EG_LOG_ROLE(LogTemp, Log, TEXT("start"));
-
-
-	if (HasAuthority())	// JM : 서버라면 바로 실행
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
 	{
-		ExecuteLayEgg();
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
 	}
-	else				// JM : 클라라면 ServerRPC 요청
-	{
-		ServerRPCHandleLayEgg();
-	}
-
-	EG_LOG_ROLE(LogTemp, Log, TEXT("end"));
+	
+	ExecuteLayEgg();
 }
 
 void AEGChickenCharacter::HandlePeck()
 {
-	if (HasAuthority()) // JM : 서버라면 바로 실행
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
 	{
-		ExecutePeck();
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
 	}
-	else // JM : 클라라면 ServerRPC 요청
-	{
-		ServerRPCHandlePeck();
-	}
-}
-
-void AEGChickenCharacter::ServerRPCHandleDash_Implementation()
-{
-	ExecuteDash();
-}
-
-void AEGChickenCharacter::ServerRPCHandleSprint_Implementation(bool bNewIsSprint)
-{
-	ExecuteSprint(bNewIsSprint);
-}
-
-void AEGChickenCharacter::ServerRPCHandleAttack_Implementation()
-{
-	ExecuteAttack();
-}
-
-void AEGChickenCharacter::ServerRPCHandleLayEgg_Implementation()
-{
-	EG_LOG_ROLE(LogTemp, Log, TEXT("start"));
-	ExecuteLayEgg();
-	EG_LOG_ROLE(LogTemp, Log, TEXT("end"));
-}
-
-void AEGChickenCharacter::ServerRPCHandlePeck_Implementation()
-{
+	
 	ExecutePeck();
 }
 
-void AEGChickenCharacter::ExecuteDash()
+void AEGChickenCharacter::HandleLayBombEgg()
 {
-	// if (!ChickenMovementComponent)
-	// {
-	// 	EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
-	// 	return;
-	// }
-	// ChickenMovementComponent->PerformDash();
-
 	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
 	if (IsValid(AbilitySystemComponent))
 	{
@@ -318,6 +315,25 @@ void AEGChickenCharacter::ExecuteDash()
 		}
 	}
 
+	ExecuteLayBombEgg();
+}
+
+void AEGChickenCharacter::HandleLayTrickEgg()
+{
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
+	{
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
+	}
+
+	ExecuteLayTrickEgg();
+}
+
+void AEGChickenCharacter::ExecuteDash()
+{
 	// Dash Ability 실행시키기 (작성자 : 김세훈)
 	if (IsValid(AbilitySystemComponent) && IsValid(DashAbilityClass))
 	{
@@ -341,32 +357,9 @@ void AEGChickenCharacter::ExecuteDash()
 	}
 }
 
-void AEGChickenCharacter::ExecuteSprint(bool bNewIsSprint)
-{
-	bIsSprinting = bNewIsSprint;
-
-	if (bNewIsSprint == true) // 스프린트 시작
-	{
-		if (!ChickenMovementComponent)
-		{
-			EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
-		}
-		ChickenMovementComponent->PerformStartSprint();
-	}
-	else // 스프린트 종료
-	{
-		if (!ChickenMovementComponent)
-		{
-			EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
-		}
-		ChickenMovementComponent->PerformStopSprint();
-	}
-}
-
 void AEGChickenCharacter::ExecuteAttack()
 {
-	EG_LOG_ROLE(LogTemp, Log, TEXT("start"));
-	
+	// Attack Ability 실행시키기 (작성자 : 김세훈)
 	if (IsValid(AbilitySystemComponent) && IsValid(AttackAbilityClass))
 	{
 		FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag("Ability.Cooldown.Attack");
@@ -382,22 +375,16 @@ void AEGChickenCharacter::ExecuteAttack()
 				UE_LOG(LogTemp, Warning, TEXT("Attack ability failed (cooldown)"));
 			}
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Attack Ability failed - cooldownTag having"));
+		}
 	}
-	
-	EG_LOG_ROLE(LogTemp, Log, TEXT("end"));
-	
-	// if (!ChickenMovementComponent)
-	// {
-	// 	EG_LOG_ROLE(LogJM, Warning, TEXT("No ChickenMovementComponent"));
-	// 	return;
-	// }
-	// ChickenMovementComponent->PerformAttack();
 }
 
 void AEGChickenCharacter::ExecuteLayEgg()
 {
 	// LayEgg Ability 실행시키기 (작성자 : 김세훈)
-	EG_LOG_ROLE(LogTemp, Log, TEXT("start"));
 	if (IsValid(AbilitySystemComponent) && IsValid(LayEggAbilityClass))
 	{
 		FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag("Ability.Cooldown.LayEgg");
@@ -418,7 +405,6 @@ void AEGChickenCharacter::ExecuteLayEgg()
 			UE_LOG(LogTemp, Warning, TEXT("LayEgg Ability failed - cooldownTag having"));
 		}
 	}
-	EG_LOG_ROLE(LogTemp, Log, TEXT("end"));
 }
 
 void AEGChickenCharacter::ExecutePeck()
@@ -446,17 +432,65 @@ void AEGChickenCharacter::ExecutePeck()
 	}
 }
 
+void AEGChickenCharacter::ExecuteLayBombEgg()
+{
+	if (IsValid(AbilitySystemComponent) && IsValid(LayBombEggAbilityClass))
+	{
+		FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag("Ability.Cooldown.LayBombEgg");
+		if (!AbilitySystemComponent->HasMatchingGameplayTag(CooldownTag))
+		{
+			bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(LayBombEggAbilityClass);
+			if (bSuccess)
+			{
+				UE_LOG(LogTemp, Log, TEXT("LayBombEgg ability activated"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("LayBombEgg ability failed (cooldown)"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("LayBombEgg Ability failed - cooldownTag having"));
+		}
+	}
+}
+
+void AEGChickenCharacter::ExecuteLayTrickEgg()
+{
+	if (IsValid(AbilitySystemComponent) && IsValid(LayTrickEggAbilityClass))
+	{
+		FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag("Ability.Cooldown.LayTrickEgg");
+		if (!AbilitySystemComponent->HasMatchingGameplayTag(CooldownTag))
+		{
+			bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(LayTrickEggAbilityClass);
+			if (bSuccess)
+			{
+				UE_LOG(LogTemp, Log, TEXT("LayTrickEgg ability activated"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("LayTrickEgg ability failed (cooldown)"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("LayTrickEgg Ability failed - cooldownTag having"));
+		}
+	}
+}
+
 // 스킬 패시브 (작성자: 김효영)
 #pragma region Passive
 
 // 스태미나 회복
 void AEGChickenCharacter::HandleStaminaRegen()
 {
-	if (HasAuthority())	// JM : 서버라면 바로 실행
+	if (HasAuthority()) // JM : 서버라면 바로 실행
 	{
 		ExecuteStaminaRegen();
 	}
-	else				// JM : 클라라면 ServerRPC 요청
+	else // JM : 클라라면 ServerRPC 요청
 	{
 		ServerRPCHandleStaminaRegen();
 	}
@@ -479,11 +513,11 @@ void AEGChickenCharacter::ExecuteStaminaRegen()
 // 알 에너지 회복
 void AEGChickenCharacter::HandleEggEnergyRegen()
 {
-	if (HasAuthority())	// JM : 서버라면 바로 실행
+	if (HasAuthority()) // JM : 서버라면 바로 실행
 	{
 		ExecuteEggEnergyRegen();
 	}
-	else				// JM : 클라라면 ServerRPC 요청
+	else // JM : 클라라면 ServerRPC 요청
 	{
 		ServerRPCHandleEggEnergyRegen();
 	}

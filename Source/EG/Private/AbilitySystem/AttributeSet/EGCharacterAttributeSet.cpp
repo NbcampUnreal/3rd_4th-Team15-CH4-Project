@@ -7,7 +7,7 @@
 UEGCharacterAttributeSet::UEGCharacterAttributeSet()
 {
 	InitMaxEggEnergy(100.0f);
-	InitEggEnergy(100.0f);
+	InitEggEnergy(0.0f);
 	InitMaxStamina(100.0f);
 	InitStamina(100.0f);
 	InitMoveSpeed(400.f);

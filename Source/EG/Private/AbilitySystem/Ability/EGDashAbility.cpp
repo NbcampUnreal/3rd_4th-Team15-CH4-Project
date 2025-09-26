@@ -10,6 +10,8 @@
 
 UEGDashAbility::UEGDashAbility()
 {
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+	
 	CostGameplayEffectClass = UEGDashCostEffect::StaticClass();
 	CooldownGameplayEffectClass = UEGDashCooldownEffect::StaticClass();
 }
