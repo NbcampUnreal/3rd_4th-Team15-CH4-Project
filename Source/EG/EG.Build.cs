@@ -21,7 +21,7 @@ public class EG : ModuleRules
 			"GameplayAbilities", "GameplayTags", "GameplayTasks",
 
 			// UI
-			"UMG",
+			"UMG", "Slate", "SlateCore",
 			
 			// Niagara
 			"Niagara",

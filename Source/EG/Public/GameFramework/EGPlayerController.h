@@ -7,7 +7,9 @@
 #include "EGPlayerController.generated.h"
 
 class UAbilitySystemComponent;               // ★ 추가
-class UWBP_HUD;          
+class UWBP_HUD;    
+
+class AEGHUD;                        // 김효영
 /**
  * 
  */
@@ -24,6 +26,30 @@ public:
     
     void SetPlayerIndex(int32 NewIndex);
 
+// 레벨 변경 (작성자 : 김효영)
+#pragma region LevelChange
+	UFUNCTION(Server, Reliable)
+	void ServerRequestLevelChange(const FString& MapName);
+
+#pragma endregion
+
+// 채팅 (작성자 : 김효영)
+#pragma region Chatting
+	
+
+	UFUNCTION()
+	void ActivateChatBox();
+
+	UFUNCTION(Server, Reliable)
+	void ServerSendChatMessage(const FString& Message);
+
+	UFUNCTION(Client, Reliable)
+	void ClientAddChatMessage(const FString& Message);
+
+private:
+	UPROPERTY()
+	AEGHUD* EGHUD;
+#pragma endregion
 	
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

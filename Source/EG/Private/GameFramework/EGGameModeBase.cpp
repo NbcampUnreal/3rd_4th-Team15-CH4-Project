@@ -286,3 +286,34 @@ void AEGGameModeBase::ClearStage()
         }
     }
 }
+
+
+// ���� ���� (�ۼ��� : ��ȿ��)
+#pragma region LevelChange
+void AEGGameModeBase::ChangeLevel(const FString& MapName)
+{
+    if (HasAuthority()) // ����������
+    {
+        FString Command = FString::Printf(TEXT("/Game/UI/Map/%s?listen"), *MapName);
+        GetWorld()->ServerTravel(Command);
+    }
+}
+
+#pragma endregion
+
+// ä�� (�ۼ��� : ��ȿ��)
+#pragma region Chatting
+void AEGGameModeBase::SendChatMessage(const FString& Message)
+{
+    // ��� �÷��̾� ��Ʈ�ѷ��� ���� Iterator�� �̿�
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        AEGPlayerController* EGPC = Cast<AEGPlayerController>(*It);
+        if (EGPC)
+        {
+            EGPC->ClientAddChatMessage(Message);
+        }
+    }
+}
+
+#pragma endregion

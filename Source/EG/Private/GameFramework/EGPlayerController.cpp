@@ -12,6 +12,11 @@
 #include "TimerManager.h"
 // =================================
 
+// 김효영
+#include "GameFramework/EGGameModeBase.h"
+#include "UI/EGHUD.h"
+#include "UI/EGChatting.h" 
+
 void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -103,3 +108,52 @@ void AEGPlayerController::TryInitHUD_ASC()
 }
 
 // 한국인
+
+
+// 레벨 변경 (작성자 : 김효영)
+#pragma region LevelChange
+void AEGPlayerController::ServerRequestLevelChange_Implementation(const FString& MapName)
+{
+	if (HasAuthority())
+	{
+		AEGGameModeBase* GM = Cast<AEGGameModeBase>(GetWorld()->GetAuthGameMode());
+		if (GM)
+		{
+			GM->ChangeLevel(MapName);
+		}
+	}
+}
+
+#pragma endregion
+
+// 채팅 (작성자 : 김효영)
+#pragma region Chatting
+void AEGPlayerController::ActivateChatBox()
+{
+	EGHUD = EGHUD == nullptr ? Cast<AEGHUD>(GetHUD()) : EGHUD;
+
+	if (EGHUD && EGHUD->Chatting)
+	{
+		EGHUD->Chatting->ActivateChatText();
+	}
+}
+
+void AEGPlayerController::ClientAddChatMessage_Implementation(const FString& Message)
+{
+	EGHUD = EGHUD == nullptr ? Cast<AEGHUD>(GetHUD()) : EGHUD;
+	if (EGHUD)
+	{
+		EGHUD->AddChatMessage(Message);
+	}
+}
+
+void AEGPlayerController::ServerSendChatMessage_Implementation(const FString& Message)
+{
+	AEGGameModeBase* GM = GetWorld()->GetAuthGameMode<AEGGameModeBase>();
+	if (GM)
+	{
+		GM->SendChatMessage(Message);
+	}	
+}
+
+#pragma endregion

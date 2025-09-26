@@ -17,7 +17,7 @@ class EG_API AEGGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	
+
 	 virtual void PreLogin(const FString& Options,
 						  const FString& Address,
 						  const FUniqueNetIdRepl& UniqueId,
@@ -38,6 +38,19 @@ public:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
 
+// ���� ���� (�ۼ��� : ��ȿ��)
+#pragma region LevelChange
+	UFUNCTION(BlueprintCallable)
+	void ChangeLevel(const FString& MapName);
+
+#pragma endregion
+
+// ä�� (�ۼ��� : ��ȿ��)
+#pragma region Chatting
+	void SendChatMessage(const FString& Message);
+
+#pragma endregion
+
 	FTimerHandle GameStartingTimerHandle;
 	FTimerHandle GameEndTimerHandle;
 	
@@ -54,4 +67,6 @@ protected:
 	TMap<int32, AEGPlayerStart*> PlayerStartList;
 	UPROPERTY(VisibleAnywhere, Category="Spawn")
 	TArray<TWeakObjectPtr<AEGInGameSpawnPoints>> AInGameSpawnPoints;
+	
+	
 };

@@ -15,6 +15,8 @@
 #include "Components/PostProcessComponent.h"
 #include "GameFramework/EGPlayerState.h"
 
+#include "GameFramework/EGPlayerController.h"
+
 
 AEGChickenCharacter::AEGChickenCharacter()
 {
@@ -70,9 +72,13 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EIC->BindAction(IA_Attack, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleAttack); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_LayEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayEgg); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_Peck, ETriggerEvent::Started, this, &AEGChickenCharacter::HandlePeck); // Start로 바꾸기 (작성자 : 김세훈)
+
+
+	EIC->BindAction(IA_Chatting, ETriggerEvent::Triggered, this, &AEGChickenCharacter::ChatButtonPressed);	// (작성자: 김효영)
+
 	EIC->BindAction(IA_LayBombEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayBombEgg); 
 	EIC->BindAction(IA_LayTrickEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayTrickEgg); 
-	
+
 }
 
 void AEGChickenCharacter::BeginPlay()
@@ -534,6 +540,19 @@ void AEGChickenCharacter::ExecuteEggEnergyRegen()
 	{
 		const bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(EggEnergyRegenAbilityClass);
 		UE_LOG(LogTemp, Log, TEXT("EggEnergyRegen result: %s"), bSuccess ? TEXT("Success") : TEXT("Failed"));
+	}
+}
+
+#pragma endregion
+
+// 채팅 (작성자 : 김효영)
+#pragma region Chatting
+void AEGChickenCharacter::ChatButtonPressed(const FInputActionValue& Value)
+{	
+	AEGPlayerController* PC = Cast<AEGPlayerController>(GetController());
+	if (PC)
+	{
+		PC->ActivateChatBox();
 	}
 }
 
