@@ -99,6 +99,31 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 						int32 Health = Egg->GetHealth() - 1;
 						Egg->SetHealth(Health);
 						Egg->CheckHealthAndDestroy(ActorInfo->AvatarActor.Get());
+						//kms
+						AActor* Avatar = GetAvatarActorFromActorInfo();
+						if (APawn* Pawn = Cast<APawn>(Avatar))
+						{
+							if (AController* Controller = Pawn->GetController())
+							{
+								if (AEGPlayerState* PS = Cast<AEGPlayerState>(Controller->PlayerState))
+								{
+									PS->RemoveEgg_Internal(1);
+								}
+								else
+								{
+									UE_LOG(LogTemp, Warning, TEXT("PlayerState 캐스팅 실패"));
+								}
+							}
+							else
+							{
+								UE_LOG(LogTemp, Warning, TEXT("Controller가 없음"));
+							}
+						}
+						else
+						{
+							UE_LOG(LogTemp, Warning, TEXT("AvatarActor가 Pawn이 아님"));
+						}
+						//kms
 					}
 					else
 					{
@@ -114,31 +139,6 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 							TargetASC->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
 							TargetASC->ApplyGameplayEffectSpecToSelf(*ResetEnergySpec.Data.Get());
 
-							//kms
-							AActor* Avatar = GetAvatarActorFromActorInfo();
-							if (APawn* Pawn = Cast<APawn>(Avatar))
-							{
-								if (AController* Controller = Pawn->GetController())
-								{
-									if (AEGPlayerState* PS = Cast<AEGPlayerState>(Controller->PlayerState))
-									{
-										PS->RemoveEgg_Internal(1);
-									}
-									else
-									{
-										UE_LOG(LogTemp, Warning, TEXT("PlayerState 캐스팅 실패"));
-									}
-								}
-								else
-								{
-									UE_LOG(LogTemp, Warning, TEXT("Controller가 없음"));
-								}
-							}
-							else
-							{
-								UE_LOG(LogTemp, Warning, TEXT("AvatarActor가 Pawn이 아님"));
-							}
-							//kms
 						}
 						else if (AEGAICharacter* AICharacter = Cast<AEGAICharacter>(HitActor))
 						{
