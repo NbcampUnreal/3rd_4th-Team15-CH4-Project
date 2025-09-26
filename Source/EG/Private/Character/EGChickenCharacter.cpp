@@ -69,6 +69,9 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EIC->BindAction(IA_Attack, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleAttack); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_LayEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayEgg); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_Peck, ETriggerEvent::Started, this, &AEGChickenCharacter::HandlePeck); // Start로 바꾸기 (작성자 : 김세훈)
+	EIC->BindAction(IA_LayBombEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayBombEgg); 
+	EIC->BindAction(IA_LayTrickEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayTrickEgg); 
+	
 }
 
 void AEGChickenCharacter::BeginPlay()
@@ -302,6 +305,34 @@ void AEGChickenCharacter::HandlePeck()
 	ExecutePeck();
 }
 
+void AEGChickenCharacter::HandleLayBombEgg()
+{
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
+	{
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
+	}
+
+	ExecuteLayBombEgg();
+}
+
+void AEGChickenCharacter::HandleLayTrickEgg()
+{
+	// Stun 태그가 있으면 움직임 불가(작성자 : 김세훈)
+	if (IsValid(AbilitySystemComponent))
+	{
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Status.Stunned")))
+		{
+			return;
+		}
+	}
+
+	ExecuteLayTrickEgg();
+}
+
 void AEGChickenCharacter::ExecuteDash()
 {
 	// Dash Ability 실행시키기 (작성자 : 김세훈)
@@ -398,6 +429,54 @@ void AEGChickenCharacter::ExecutePeck()
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Peck Ability failed - cooldownTag having"));
+		}
+	}
+}
+
+void AEGChickenCharacter::ExecuteLayBombEgg()
+{
+	if (IsValid(AbilitySystemComponent) && IsValid(LayBombEggAbilityClass))
+	{
+		FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag("Ability.Cooldown.LayBombEgg");
+		if (!AbilitySystemComponent->HasMatchingGameplayTag(CooldownTag))
+		{
+			bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(LayBombEggAbilityClass);
+			if (bSuccess)
+			{
+				UE_LOG(LogTemp, Log, TEXT("LayBombEgg ability activated"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("LayBombEgg ability failed (cooldown)"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("LayBombEgg Ability failed - cooldownTag having"));
+		}
+	}
+}
+
+void AEGChickenCharacter::ExecuteLayTrickEgg()
+{
+	if (IsValid(AbilitySystemComponent) && IsValid(LayTrickEggAbilityClass))
+	{
+		FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag("Ability.Cooldown.LayTrickEgg");
+		if (!AbilitySystemComponent->HasMatchingGameplayTag(CooldownTag))
+		{
+			bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(LayTrickEggAbilityClass);
+			if (bSuccess)
+			{
+				UE_LOG(LogTemp, Log, TEXT("LayTrickEgg ability activated"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("LayTrickEgg ability failed (cooldown)"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("LayTrickEgg Ability failed - cooldownTag having"));
 		}
 	}
 }

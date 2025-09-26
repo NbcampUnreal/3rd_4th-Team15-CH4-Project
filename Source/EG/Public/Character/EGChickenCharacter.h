@@ -69,11 +69,15 @@ private:
 	void HandleAttack();
 	void HandleLayEgg();
 	void HandlePeck();
+	void HandleLayBombEgg();
+	void HandleLayTrickEgg();
 	
 	void ExecuteDash();
 	void ExecuteAttack();
 	void ExecuteLayEgg();
 	void ExecutePeck();
+	void ExecuteLayBombEgg();
+	void ExecuteLayTrickEgg();
 
 
 protected:
@@ -107,6 +111,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
 	TObjectPtr<UInputAction> IA_Peck;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_LayBombEgg;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_LayTrickEgg;
+	
 	UPROPERTY(Replicated)
 	uint8 bIsSprinting:1;
 
@@ -153,6 +163,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
 	TSubclassOf<UGameplayAbility> AttackAbilityClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> LayBombEggAbilityClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> LayTrickEggAbilityClass;
+
 
 #pragma endregion
 

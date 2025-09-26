@@ -37,7 +37,6 @@ protected:
 	
 	void OnEggEnergyChanged(const FOnAttributeChangeData& Data);
 
-
 	UFUNCTION()
 	void OnMontageFinished();
 

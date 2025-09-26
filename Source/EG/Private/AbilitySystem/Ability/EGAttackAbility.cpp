@@ -97,7 +97,7 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 					{
 						int32 Health = Egg->GetHealth() - 1;
 						Egg->SetHealth(Health);
-						Egg->CheckHealthAndDestroy();
+						Egg->CheckHealthAndDestroy(ActorInfo->AvatarActor.Get());
 					}
 					else
 					{

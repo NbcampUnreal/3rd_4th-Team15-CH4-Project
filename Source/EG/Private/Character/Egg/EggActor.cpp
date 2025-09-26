@@ -1,7 +1,10 @@
 //EggActor.cpp
 
 #include "Character/Egg/EggActor.h"
+
+#include "AbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 AEggActor::AEggActor()
 {
@@ -13,8 +16,10 @@ AEggActor::AEggActor()
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(RootScene);
-
 	StaticMesh->SetIsReplicated(true);
+	
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
 }
 
 int32 AEggActor::GetHealth() const
@@ -27,10 +32,27 @@ void AEggActor::SetHealth(int32 NewHealth)
 	Health = NewHealth;
 }
 
-void AEggActor::CheckHealthAndDestroy()
+void AEggActor::CheckHealthAndDestroy(AActor* Actor)
 {
 	if (Health <= 0)
 	{
+		if (IsValid(AbilitySystemComponent) && IsValid(AbilityClass))
+		{
+			if (bIsTrickEgg == true)
+			{
+				FGameplayEventData EventData;
+				EventData.EventTag = FGameplayTag::RequestGameplayTag("Event.EggBroken");
+				EventData.Instigator = Actor;
+				EventData.Target = this;
+
+				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+					this,
+					EventData.EventTag,
+					EventData);
+
+				//AbilitySystemComponent->TryActivateAbilityByClass(AbilityClass);
+			}
+		}
 		Destroy();
 	}
 }
@@ -39,6 +61,16 @@ void AEggActor::MulticastUpdateGroundState_Implementation(bool bNewIsOnGround)
 {
 	bIsOnGround = bNewIsOnGround;
 	SetActorTickEnabled(!bIsOnGround);
+}
+
+UAbilitySystemComponent* AEggActor::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+void AEggActor::PlayAbility()
+{
+	AbilitySystemComponent->TryActivateAbilityByClass(AbilityClass);
 }
 
 void AEggActor::Tick(float DeltaTime)
@@ -69,6 +101,32 @@ void AEggActor::BeginPlay()
 	Super::BeginPlay();
 
 	SetReplicateMovement(true);
+	bIsOnGround = CheckGroundContact();
+
+	if (HasAuthority())
+	{
+		if (IsValid(AbilitySystemComponent))
+		{
+			AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+			if (IsValid(AbilityClass))
+			{
+				AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0, this));
+
+				if (bIsBombEgg == true)
+				{
+					FTimerHandle ExplosionTimer;
+					GetWorldTimerManager().SetTimer(
+						ExplosionTimer,
+						this,
+						&AEggActor::PlayAbility,
+						ExplosionDelay,
+						false
+					);
+				}
+			}
+		}
+	}
 }
 
 void AEggActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -57,6 +57,7 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, SpawnLocation,
 				                                                        ActorInfo->AvatarActor->GetActorRotation());
+				EggActor->SetOwner(ActorInfo->AvatarActor.Get());
 
 				UE_LOG(LogTemp, Log, TEXT("Egg Spawned"));
 			}
