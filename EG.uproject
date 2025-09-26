@@ -12,8 +12,7 @@
 				"GameplayAbilities",
 				"AIModule",
 				"Engine",
-				"UMG",
-				"UMGEditor"
+				"UMG"
 			]
 		}
 	],
