@@ -27,7 +27,6 @@ void AEGHUD::AddChatting()
 {
 	if (Chatting)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("2"));
 		Chatting->AddToViewport(2);
 	}
 }

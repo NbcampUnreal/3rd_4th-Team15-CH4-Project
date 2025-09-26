@@ -37,30 +37,29 @@ void UEGChatting::OnTextCommitted(const FText& Text, ETextCommit::Type CommitMet
 	{
 		if (ChatText)
 		{
-			// 좌우 공백 제거
-			FText InputText = ChatText->GetText();
-			FString TrimmedText = InputText.ToString().TrimStartAndEnd();
-
-			if (!TrimmedText.IsEmpty())
+			AEGPlayerController* PC = Cast<AEGPlayerController>(GetWorld()->GetFirstPlayerController());
+			if (PC)
 			{
-				AEGPlayerController* PC = Cast<AEGPlayerController>(GetWorld()->GetFirstPlayerController());
-				if (PC)
+				// 좌우 공백 제거
+				FText InputText = ChatText->GetText();
+				FString TrimmedText = InputText.ToString().TrimStartAndEnd();
+				if (!TrimmedText.IsEmpty())
 				{
 					// TrimmedText 앞에 UserName을 붙여 최종 Message 생성
 					APlayerState* PlayerState = PC->GetPlayerState<APlayerState>();
 					FString Message = FString::Printf(TEXT("%s : %s"), *PlayerState->GetPlayerName(), *TrimmedText);
 					// 채팅 메시지를 보내기 위한 Server RPC 호출
 					PC->ServerSendChatMessage(Message);
-
-					// 다시 FInputModeGameOnly로 인풋모드 변경
-					FInputModeGameOnly InputMode;
-					PC->SetInputMode(InputMode);
-
-					// 채팅창 비우고 비활성화
-					ChatText->SetText(FText::GetEmpty());
-					ChatText->SetIsEnabled(false);
-					Chatting(false);
 				}
+				
+				// 다시 FInputModeGameOnly로 인풋모드 변경
+				FInputModeGameOnly InputMode;
+				PC->SetInputMode(InputMode);
+
+				// 채팅창 비우고 비활성화
+				ChatText->SetText(FText::GetEmpty());
+				ChatText->SetIsEnabled(false);
+				Chatting(false);
 			}
 		}
 	}
