@@ -1,0 +1,4 @@
+﻿# CS8981: 소문자만 포함된 형식 이름에 대한 경고 억제
+# JM : Unreal 엔진 ThirdParty 모듈(Build.cs)에서 경고가 다수 발생하므로 무시 설정 (EIK Plugins)
+[*.cs]
+dotnet_diagnostic.CS8981.severity = none

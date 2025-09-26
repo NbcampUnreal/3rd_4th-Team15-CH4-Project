@@ -1,0 +1,40 @@
+{
+  "name": "devauthtool",
+  "productName": "EOS_DevAuthTool",
+  "version": "1.2.1",
+  "description": "Developer authentication tool for EOS SDK",
+  "main": ".webpack/main",
+  "scripts": {
+    "start": "electron-forge start",
+    "make-win": "electron-forge package --platform win32 && npm run delete-node-modules && electron-forge make --platform win32 --skip-package",
+    "make-mac": "electron-forge make --platform darwin --arch x64",
+    "delete-node-modules": "node -e \"require('fs').rmdirSync('out/EOS_DevAuthTool-win32-x64/resources/app/node_modules')\"",
+    "lint": "eslint src --color"
+  },
+  "keywords": [],
+  "author": "Epic Games",
+  "license": "MIT",
+  "config": {},
+  "devDependencies": {
+    "@babel/core": "^7.17.10",
+    "electron-devtools-installer": "^3.2.0",
+    "@babel/preset-react": "^7.16.7",
+    "@electron-forge/cli": "^6.0.0-beta.63",
+    "@electron-forge/maker-deb": "^6.0.0-beta.63",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.63",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
+    "@electron-forge/maker-zip": "^6.0.0-beta.63",
+    "@electron-forge/plugin-webpack": "^6.0.0-beta.63",
+    "@vercel/webpack-asset-relocator-loader": "^1.7.2",
+    "babel-loader": "^8.2.5",
+    "css-loader": "^6.7.1",
+    "electron": "18.3.15",
+    "node-loader": "^2.0.0",
+    "style-loader": "^3.3.1"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0"
+  }
+}
