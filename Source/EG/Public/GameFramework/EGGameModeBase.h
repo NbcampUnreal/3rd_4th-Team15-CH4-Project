@@ -24,27 +24,28 @@ public:
 						  FString& ErrorMessage) override;
 	
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+	void SetRoomLeader();
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
-	void StartCount();
-	void EndCount();
+	
 
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
-	void GameStart();
+	void GameStart(int32 UniqueID);
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
 	void GameOver();
+	void ClearStage();
 
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
 
-// ·¹º§ º¯°æ (ÀÛ¼ºÀÚ : ±èÈ¿¿µ)
+// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½Û¼ï¿½ï¿½ï¿½ : ï¿½ï¿½È¿ï¿½ï¿½)
 #pragma region LevelChange
 	UFUNCTION(BlueprintCallable)
 	void ChangeLevel(const FString& MapName);
 
 #pragma endregion
 
-// Ã¤ÆÃ (ÀÛ¼ºÀÚ : ±èÈ¿¿µ)
+// Ã¤ï¿½ï¿½ (ï¿½Û¼ï¿½ï¿½ï¿½ : ï¿½ï¿½È¿ï¿½ï¿½)
 #pragma region Chatting
 	void SendChatMessage(const FString& Message);
 
@@ -58,6 +59,7 @@ public:
 	
 protected:
 	bool bGameStarted = false;
+	int32 LeaderNum = 0;
 
 	UPROPERTY(VisibleAnywhere, Category="Players")
 	TArray<TWeakObjectPtr<AEGPlayerController>> APlayingPlayerControllers;

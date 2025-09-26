@@ -24,9 +24,7 @@ void UEGSprintAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("Sprint Ability start"));
-
+	
 	AEGChickenCharacter* Character = CastChecked<AEGChickenCharacter>(ActorInfo->AvatarActor.Get());
 	UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent();
 	FGameplayTag SprintTag = FGameplayTag::RequestGameplayTag(TEXT("Status.Sprint"));
@@ -66,11 +64,11 @@ void UEGSprintAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		UAbilityTask_WaitAttributeChangeThreshold::WaitForAttributeChangeThreshold(
 			this,
 			UEGCharacterAttributeSet::GetStaminaAttribute(),
-			EWaitAttributeChangeComparison::LessThan,
-			20.0f,
+			EWaitAttributeChangeComparison::LessThanOrEqualTo,
+			0.0f,
 			false
 		);
-
+	
 	if (WaitStamina)
 	{
 		WaitStamina->OnChange.AddDynamic(this, &UEGSprintAbility::OnStaminaTooLow);
@@ -134,7 +132,7 @@ bool UEGSprintAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handl
         }
 
 	const float CurrentStamina = AttributeSet->GetStamina();
-	if (CurrentStamina < 20.0f)
+	if (CurrentStamina <= 0.0f)
 	{
 		return false;
 	}

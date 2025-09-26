@@ -19,14 +19,16 @@ public:
 protected:
 	UPROPERTY(ReplicatedUsing=OnRep_PlayerEggCount, BlueprintReadOnly, Category="Score")
 	int32 PlayerEggCount = 0;
-
+	
 	UFUNCTION()
 	void OnRep_PlayerEggCount();
 
+	FString PlayerName;
+	
 public:
 	UFUNCTION(BlueprintPure, Category="Score")
 	int32 GetPlayerEggCount() const { return PlayerEggCount; }
-	
+
 	UFUNCTION(Server, Reliable)
 	void ServerAddEgg(int32 Amount = 1);
 

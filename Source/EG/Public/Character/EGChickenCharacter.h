@@ -61,35 +61,23 @@ private:
 	void HandleLookInput(const FInputActionValue& InValue);
 	void HandleStartSprintInput();
 	void HandleStopSprintInput();
+	void HandleJump();
+	void HandleStopJump();
 	void HandleDash();
 	void HandleStartFreeLook();
 	void HandleStopFreeLook();
 	void HandleAttack();
 	void HandleLayEgg();
 	void HandlePeck();
+	void HandleLayBombEgg();
+	void HandleLayTrickEgg();
 	
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandleDash();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandleSprint(bool bNewIsSprint);
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandleAttack();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandleLayEgg();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandlePeck();
-
-	
-
 	void ExecuteDash();
-	void ExecuteSprint(bool bNewIsSprint);
 	void ExecuteAttack();
 	void ExecuteLayEgg();
 	void ExecutePeck();
+	void ExecuteLayBombEgg();
+	void ExecuteLayTrickEgg();
 
 
 protected:
@@ -126,6 +114,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
 	TObjectPtr<UInputAction> IA_Chatting;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_LayBombEgg;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_LayTrickEgg;
+	
 	UPROPERTY(Replicated)
 	uint8 bIsSprinting:1;
 
@@ -140,6 +134,8 @@ public:
 
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	void PossessedBy(AController* NewController);
+	void OnRep_PlayerState();
 
 protected:
 	
@@ -172,6 +168,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
 	TSubclassOf<UGameplayAbility> AttackAbilityClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> LayBombEggAbilityClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> LayTrickEggAbilityClass;
+
 
 #pragma endregion
 
