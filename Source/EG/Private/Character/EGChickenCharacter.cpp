@@ -102,13 +102,6 @@ void AEGChickenCharacter::BeginPlay()
 	{
 		if (IsValid(AbilitySystemComponent))
 		{
-			/* kms 
-			if (APlayerState* PS = GetPlayerState())
-			{
-				AbilitySystemComponent->InitAbilityActorInfo(PS, this);
-			}
-			 여기까지 kms*/
-
 			for (const auto& AbilityClass : StartupAbilities)
 			{
 				if (IsValid(AbilityClass))
