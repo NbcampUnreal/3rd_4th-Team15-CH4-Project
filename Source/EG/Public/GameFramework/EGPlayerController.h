@@ -29,7 +29,10 @@ public:
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange
 	UFUNCTION(Server, Reliable)
-	void ServerRequestLevelChange(const FString& MapName);
+	void ServerRequestLevelChange();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRequestLevelRecordChange(const FString& MapName);
 
 #pragma endregion
 

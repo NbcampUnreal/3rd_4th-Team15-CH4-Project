@@ -14,6 +14,7 @@
 
 // 김효영
 #include "GameFramework/EGGameModeBase.h"
+#include "GameFramework/EGGameInstance.h"
 #include "UI/EGHUD.h"
 #include "UI/EGChatting.h" 
 
@@ -112,14 +113,25 @@ void AEGPlayerController::TryInitHUD_ASC()
 
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange
-void AEGPlayerController::ServerRequestLevelChange_Implementation(const FString& MapName)
+
+void AEGPlayerController::ServerRequestLevelRecordChange_Implementation(const FString& MapName)
 {
 	if (HasAuthority())
 	{
-		AEGGameModeBase* GM = Cast<AEGGameModeBase>(GetWorld()->GetAuthGameMode());
-		if (GM)
+		if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
 		{
-			GM->ChangeLevel(MapName);
+			GI->RecordLevel(MapName);
+		}
+	}
+}
+
+void AEGPlayerController::ServerRequestLevelChange_Implementation()
+{
+	if (HasAuthority())
+	{
+		if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
+		{
+			GI->ChangeLevel();
 		}
 	}
 }
