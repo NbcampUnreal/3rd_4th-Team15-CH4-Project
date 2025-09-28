@@ -17,6 +17,8 @@
 #include "GameFramework/EGGameInstance.h"
 #include "UI/EGHUD.h"
 #include "UI/EGChatting.h" 
+#include "EnhancedInputComponent.h"
+
 
 void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -54,6 +56,8 @@ void AEGPlayerController::SetPlayerIndex(int32 NewIndex)
 		EG_LOG_ROLE(LogMS, Warning, TEXT("Player %d is online."), PlayerIndex);
 	}
 }
+
+
 
 
 // ====== 내가 추가한 구현 ======
@@ -136,10 +140,27 @@ void AEGPlayerController::ServerRequestLevelChange_Implementation()
 	}
 }
 
+void AEGPlayerController::ToggleMouseCursor()
+{
+	bMouseVisible = !bMouseVisible;
+
+	if (bMouseVisible)
+	{
+		bShowMouseCursor = true;
+		SetInputMode(FInputModeGameAndUI()); // 게임+UI 모두 입력
+	}
+	else
+	{
+		bShowMouseCursor = false;
+		SetInputMode(FInputModeGameOnly());  // 다시 게임 전용 입력
+	}
+}
+
 #pragma endregion
 
 // 채팅 (작성자 : 김효영)
 #pragma region Chatting
+
 void AEGPlayerController::ActivateChatBox()
 {
 	EGHUD = EGHUD == nullptr ? Cast<AEGHUD>(GetHUD()) : EGHUD;

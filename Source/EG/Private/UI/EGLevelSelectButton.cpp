@@ -27,8 +27,6 @@ void UEGLevelSelectButton::HandleClicked()
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(PC))
         {
-            int32 UniqueID = EGPC->PlayerIndex;
-
             if (bRightMove && !MapName.IsEmpty())
             {
                 EGPC->ServerRequestLevelRecordChange(MapName);

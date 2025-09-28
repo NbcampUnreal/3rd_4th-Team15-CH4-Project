@@ -40,9 +40,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "GameFlow")
 	void GameStart(int32 UniqueID);
-	UFUNCTION(BlueprintCallable, Category = "GameFlow")
-
-
+	UFUNCTION(BlueprintCallable, Category = "GameFlow")	
 
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
