@@ -6,7 +6,7 @@
 
 class UAbilitySystemComponent;
 struct FOnAttributeChangeData;
-class UImage; // [추가]
+class UImage;
 
 UCLASS()
 class EG_API UWBP_HUD : public UUserWidget
@@ -17,10 +17,11 @@ public:
 	void InitWithASC(UAbilitySystemComponent* InASC);
 
 	UFUNCTION(BlueprintCallable, Category="HUD|Egg")
-	void OnEggLaid(); // [추가] 알 낳기 성공 시 즉시 FX OFF
+	void OnEggLaid(); // [추가]
 
 protected:
 	virtual void NativeDestruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override; // [추가]
 
 	UPROPERTY(meta=(BindWidget))
 	UProgressBar* StaminaBar = nullptr;
@@ -29,7 +30,11 @@ protected:
 	UProgressBar* EggEnergyBar = nullptr;
 
 	UPROPERTY(meta=(BindWidgetOptional))
-	UImage* EggFX = nullptr; // [추가] 알 바 뒤의 FX 이미지(브러시에 MAT_UI_MaskRotate_Inst_01 지정)
+	UImage* EggFX = nullptr; // [추가]
+
+	// [수정] 이름 통일: BombEgg (UMG의 ProgressBar 변수명도 동일해야 함)
+	UPROPERTY(meta=(BindWidgetOptional))
+	UProgressBar* BombEgg = nullptr; // 폭탄알 쿨타임 바
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD|Egg")
 	float UI_MaxEggEnergy = 100.f;
@@ -40,7 +45,11 @@ private:
 	FDelegateHandle StaminaChangedHandle;
 	FDelegateHandle EggEnergyChangedHandle;
 
-	bool bEggReady = false; // [추가]
+	bool bEggFXVisible = false; // [수정]
+
+	// 표시용 캐시
+	float BombCooldownRemaining = 0.f; // [추가]
+	float BombCooldownDuration  = 1.f; // [추가]
 
 	void OnStaminaChanged(const FOnAttributeChangeData& Data);
 	void OnEggEnergyChanged(const FOnAttributeChangeData& Data);
@@ -50,4 +59,6 @@ private:
 
 	void StartReadyFX(); // [추가]
 	void StopReadyFX();  // [추가]
+
+	void UpdateBombCooldown(); // [추가]
 };
