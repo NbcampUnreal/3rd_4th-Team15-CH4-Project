@@ -38,13 +38,6 @@ public:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
 
-// ���� ���� (�ۼ��� : ��ȿ��)
-#pragma region LevelChange
-	UFUNCTION(BlueprintCallable)
-	void ChangeLevel(const FString& MapName);
-
-#pragma endregion
-
 // ä�� (�ۼ��� : ��ȿ��)
 #pragma region Chatting
 	void SendChatMessage(const FString& Message);

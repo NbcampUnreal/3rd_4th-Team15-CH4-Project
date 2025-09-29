@@ -74,7 +74,8 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EIC->BindAction(IA_Peck, ETriggerEvent::Started, this, &AEGChickenCharacter::HandlePeck); // Start로 바꾸기 (작성자 : 김세훈)
 
 
-	EIC->BindAction(IA_Chatting, ETriggerEvent::Triggered, this, &AEGChickenCharacter::ChatButtonPressed);	// (작성자: 김효영)
+	EIC->BindAction(IA_Chatting, ETriggerEvent::Started, this, &AEGChickenCharacter::ChatButtonPressed);	// (작성자: 김효영)
+	EIC->BindAction(IA_ToggleMouse, ETriggerEvent::Started, this, &AEGChickenCharacter::ToggleMouse);	// (작성자: 김효영)
 
 	EIC->BindAction(IA_LayBombEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayBombEgg); 
 	EIC->BindAction(IA_LayTrickEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayTrickEgg); 
@@ -553,6 +554,15 @@ void AEGChickenCharacter::ChatButtonPressed(const FInputActionValue& Value)
 	if (PC)
 	{
 		PC->ActivateChatBox();
+	}
+}
+
+void AEGChickenCharacter::ToggleMouse()
+{
+	AEGPlayerController* PC = Cast<AEGPlayerController>(GetController());
+	if (PC)
+	{
+		PC->ToggleMouseCursor();
 	}
 }
 

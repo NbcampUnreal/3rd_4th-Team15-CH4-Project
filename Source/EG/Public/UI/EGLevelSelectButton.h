@@ -26,8 +26,13 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
     FString MapName = "";
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
+    bool bRightMove = false;
+
 protected:
     UFUNCTION()
     void HandleClicked();
 	
+
+
 };
