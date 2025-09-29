@@ -96,9 +96,7 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 				{
 					if (AEggActor* Egg = Cast<AEggActor>(HitActor))
 					{
-						int32 Health = Egg->GetHealth() - 1;
-						Egg->SetHealth(Health);
-						Egg->CheckHealthAndDestroy(ActorInfo->AvatarActor.Get());
+						Egg->ApplyDamageAndCheckDestroy(1, ActorInfo->AvatarActor.Get());
 						//kms
 						AActor* Avatar = GetAvatarActorFromActorInfo();
 						if (APawn* Pawn = Cast<APawn>(Avatar))
