@@ -289,19 +289,3 @@ void AEGGameModeBase::ClearStage()
     }
 }
 
-// ä�� (�ۼ��� : ��ȿ��)
-#pragma region Chatting
-void AEGGameModeBase::SendChatMessage(const FString& Message)
-{
-    // ��� �÷��̾� ��Ʈ�ѷ��� ���� Iterator�� �̿�
-    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-    {
-        AEGPlayerController* EGPC = Cast<AEGPlayerController>(*It);
-        if (EGPC)
-        {
-            EGPC->ClientAddChatMessage(Message);
-        }
-    }
-}
-
-#pragma endregion

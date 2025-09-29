@@ -38,11 +38,6 @@ public:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
 
-// ä�� (�ۼ��� : ��ȿ��)
-#pragma region Chatting
-	void SendChatMessage(const FString& Message);
-
-#pragma endregion
 
 	FTimerHandle GameStartingTimerHandle;
 	FTimerHandle GameEndTimerHandle;

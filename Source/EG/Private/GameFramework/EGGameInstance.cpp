@@ -3,7 +3,27 @@
 
 #include "GameFramework/EGGameInstance.h"
 
+#include "GameFramework/EGPlayerController.h"
+
+
 // 작성자: 김효영
+
+#pragma region Chatting
+void UEGGameInstance::SendChatMessage(const FString& Message)
+{
+    // ��� �÷��̾� ��Ʈ�ѷ��� ���� Iterator�� �̿�
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        AEGPlayerController* EGPC = Cast<AEGPlayerController>(*It);
+        if (EGPC)
+        {
+            EGPC->ClientAddChatMessage(Message);
+        }
+    }
+}
+
+#pragma endregion
+
 #pragma region LevelChange
 void UEGGameInstance::RecordLevel(const FString& MapName)
 {

@@ -16,6 +16,12 @@ class EG_API UEGGameInstance : public UGameInstance
 
 public:
 	// 작성자: 김효영
+
+#pragma region Chatting
+	void SendChatMessage(const FString& Message);
+
+#pragma endregion
+
 #pragma region LevelChange
 	
 	UFUNCTION(BlueprintCallable)
