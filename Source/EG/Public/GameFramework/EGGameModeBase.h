@@ -1,11 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EGInGameSpawnPoints.h"
 #include "GameFramework/GameModeBase.h"
-#include "AI/EGAICharacter.h"
 #include "GameFramework/EGPlayerController.h"
-
 #include "EGGameModeBase.generated.h"
 
 class AEGPlayerStart;
@@ -17,6 +14,8 @@ class EG_API AEGGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+
+	int32 CurrentPlayerIndex = 0;
 	
 	 virtual void PreLogin(const FString& Options,
 						  const FString& Address,
@@ -31,27 +30,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
 	void GameStart(int32 UniqueID);
-	UFUNCTION(BlueprintCallable, Category="GameFlow")
-	void GameOver();
-	void ClearStage();
-
+	
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
-
-	FTimerHandle GameStartingTimerHandle;
-	FTimerHandle GameEndTimerHandle;
-	
-	UPROPERTY(EditAnywhere, Category="Spawn")
-	TSubclassOf<AEGAICharacter> AICharacter;
 	
 protected:
-	bool bGameStarted = false;
 	int32 LeaderNum = 0;
 
 	UPROPERTY(VisibleAnywhere, Category="Players")
 	TArray<TWeakObjectPtr<AEGPlayerController>> APlayingPlayerControllers;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spawn")
 	TMap<int32, AEGPlayerStart*> PlayerStartList;
-	UPROPERTY(VisibleAnywhere, Category="Spawn")
-	TArray<TWeakObjectPtr<AEGInGameSpawnPoints>> AInGameSpawnPoints;
 };
