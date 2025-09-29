@@ -12,6 +12,14 @@
 #include "TimerManager.h"
 // =================================
 
+// 김효영
+#include "GameFramework/EGGameModeBase.h"
+#include "GameFramework/EGGameInstance.h"
+#include "UI/EGHUD.h"
+#include "UI/EGChatting.h" 
+#include "EnhancedInputComponent.h"
+
+
 void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -48,6 +56,8 @@ void AEGPlayerController::SetPlayerIndex(int32 NewIndex)
 		EG_LOG_ROLE(LogMS, Warning, TEXT("Player %d is online."), PlayerIndex);
 	}
 }
+
+
 
 
 // ====== 내가 추가한 구현 ======
@@ -103,3 +113,80 @@ void AEGPlayerController::TryInitHUD_ASC()
 }
 
 // 한국인
+
+
+// 레벨 변경 (작성자 : 김효영)
+#pragma region LevelChange
+
+void AEGPlayerController::ServerRequestLevelRecordChange_Implementation(const FString& MapName)
+{
+	if (HasAuthority())
+	{
+		if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
+		{
+			GI->RecordLevel(MapName);
+		}
+	}
+}
+
+void AEGPlayerController::ServerRequestLevelChange_Implementation()
+{
+	if (HasAuthority())
+	{
+		if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
+		{
+			GI->ChangeLevel();
+		}
+	}
+}
+
+void AEGPlayerController::ToggleMouseCursor()
+{
+	bMouseVisible = !bMouseVisible;
+
+	if (bMouseVisible)
+	{
+		bShowMouseCursor = true;
+		SetInputMode(FInputModeGameAndUI()); // 게임+UI 모두 입력
+	}
+	else
+	{
+		bShowMouseCursor = false;
+		SetInputMode(FInputModeGameOnly());  // 다시 게임 전용 입력
+	}
+}
+
+#pragma endregion
+
+// 채팅 (작성자 : 김효영)
+#pragma region Chatting
+
+void AEGPlayerController::ActivateChatBox()
+{
+	EGHUD = EGHUD == nullptr ? Cast<AEGHUD>(GetHUD()) : EGHUD;
+
+	if (EGHUD && EGHUD->Chatting)
+	{
+		EGHUD->Chatting->ActivateChatText();
+	}
+}
+
+void AEGPlayerController::ClientAddChatMessage_Implementation(const FString& Message)
+{
+	EGHUD = EGHUD == nullptr ? Cast<AEGHUD>(GetHUD()) : EGHUD;
+	if (EGHUD)
+	{
+		EGHUD->AddChatMessage(Message);
+	}
+}
+
+void AEGPlayerController::ServerSendChatMessage_Implementation(const FString& Message)
+{
+	AEGGameModeBase* GM = GetWorld()->GetAuthGameMode<AEGGameModeBase>();
+	if (GM)
+	{
+		GM->SendChatMessage(Message);
+	}	
+}
+
+#pragma endregion

@@ -26,7 +26,6 @@ void UEGPeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Peck failed: Cooldown check failed"));
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}

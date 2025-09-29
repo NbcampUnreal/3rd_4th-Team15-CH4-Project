@@ -8,6 +8,9 @@ UEGStunEffect::UEGStunEffect()
 	DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	DurationMagnitude = FScalableFloat(5.0f);
 
+	StackLimitCount = 1;
+	StackingType = EGameplayEffectStackingType::AggregateByTarget;
+
 	UTargetTagsGameplayEffectComponent* TargetTags = CreateDefaultSubobject<UTargetTagsGameplayEffectComponent>(TEXT("TargetTags"));
 	if (TargetTags)
 	{

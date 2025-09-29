@@ -30,7 +30,6 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
-		UE_LOG(LogTemp, Log, TEXT("CommitAbility : Ability Failed(Cooldown)"));
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
@@ -66,7 +65,7 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 				OverlapResults,
 				SpawnLocation,
 				FQuat::Identity,
-				ECC_Pawn,
+				ECC_WorldDynamic,
 				FCollisionShape::MakeSphere(SphereRadius),
 				QueryParams);
 
@@ -80,68 +79,71 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 				3.0f, // 표시 지속 시간 (초)
 				0, // 우선순위
 				1.0f);
-
+			
 			if (bHit)
 			{
+				TSet<AActor*> UniqueActors;
+				
 				for (const FOverlapResult& Result : OverlapResults)
 				{
 					if (AActor* HitActor = Result.GetActor())
 					{
-						if (AEggActor* Egg = Cast<AEggActor>(HitActor))
-						{
-							int32 Health = Egg->GetHealth() - 1;
-							Egg->SetHealth(Health);
-							Egg->CheckHealthAndDestroy();
+						UniqueActors.Add(HitActor);
+					}
+				}
 
-							//kms
-							AActor* Avatar = GetAvatarActorFromActorInfo();
-							if (APawn* Pawn = Cast<APawn>(Avatar))
+				for (AActor* HitActor : UniqueActors)
+				{
+					if (AEggActor* Egg = Cast<AEggActor>(HitActor))
+					{
+						Egg->ApplyDamageAndCheckDestroy(1, ActorInfo->AvatarActor.Get());
+						//kms
+						AActor* Avatar = GetAvatarActorFromActorInfo();
+						if (APawn* Pawn = Cast<APawn>(Avatar))
+						{
+							if (AController* Controller = Pawn->GetController())
 							{
-								if (AController* Controller = Pawn->GetController())
+								if (AEGPlayerState* PS = Cast<AEGPlayerState>(Controller->PlayerState))
 								{
-									if (AEGPlayerState* PS = Cast<AEGPlayerState>(Controller->PlayerState))
-									{
-										PS->RemoveEgg_Internal(1);
-									}
-									else
-									{
-										UE_LOG(LogTemp, Warning, TEXT("PlayerState 캐스팅 실패"));
-									}
+									PS->RemoveEgg_Internal(1);
 								}
 								else
 								{
-									UE_LOG(LogTemp, Warning, TEXT("Controller가 없음"));
+									UE_LOG(LogTemp, Warning, TEXT("PlayerState 캐스팅 실패"));
 								}
 							}
 							else
 							{
-								UE_LOG(LogTemp, Warning, TEXT("AvatarActor가 Pawn이 아님"));
+								UE_LOG(LogTemp, Warning, TEXT("Controller가 없음"));
 							}
-							//kms
 						}
 						else
 						{
-							// FGameplayEffectContextHandle EffectContext = MakeEffectContext(
-							// 	GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
-							FGameplayEffectSpecHandle StunSpec = MakeOutgoingGameplayEffectSpec(
-								UEGStunEffect::StaticClass(), 1.0f);
+							UE_LOG(LogTemp, Warning, TEXT("AvatarActor가 Pawn이 아님"));
+						}
+						//kms
+					}
+					else
+					{
+						FGameplayEffectSpecHandle StunSpec = MakeOutgoingGameplayEffectSpec(
+							UEGStunEffect::StaticClass(), 1.0f);
 
-							FGameplayEffectSpecHandle ResetEnergySpec = MakeOutgoingGameplayEffectSpec(
-								UEGResetEggEnergyEffect::StaticClass(), 1.0f);
+						FGameplayEffectSpecHandle ResetEnergySpec = MakeOutgoingGameplayEffectSpec(
+							UEGResetEggEnergyEffect::StaticClass(), 1.0f);
 
-							if (AEGChickenCharacter* Character = Cast<AEGChickenCharacter>(HitActor))
-							{
-								UAbilitySystemComponent* TargetASC = Character->GetAbilitySystemComponent();
-								TargetASC->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
-								TargetASC->ApplyGameplayEffectSpecToSelf(*ResetEnergySpec.Data.Get());
-							}
-							else if (AEGAICharacter* AICharacter = Cast<AEGAICharacter>(HitActor))
-							{
-								AICharacter->OnAngryMode();
-								ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
-								ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(
-									*ResetEnergySpec.Data.Get());
-							}
+						if (AEGChickenCharacter* Character = Cast<AEGChickenCharacter>(HitActor))
+						{
+							UAbilitySystemComponent* TargetASC = Character->GetAbilitySystemComponent();
+							TargetASC->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
+							TargetASC->ApplyGameplayEffectSpecToSelf(*ResetEnergySpec.Data.Get());
+
+						}
+						else if (AEGAICharacter* AICharacter = Cast<AEGAICharacter>(HitActor))
+						{
+							AICharacter->OnAngryMode();
+							ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
+							ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(
+								*ResetEnergySpec.Data.Get());
 						}
 					}
 				}
