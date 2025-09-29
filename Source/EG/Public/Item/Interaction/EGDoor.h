@@ -7,6 +7,7 @@
 #include "Components/TimelineComponent.h"
 #include "EGDoor.generated.h"
 
+class UNavModifierComponent;
 class UBoxComponent;
 
 UCLASS()
@@ -33,6 +34,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Door|Components")
 	UBoxComponent* CollisionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Door|Components")
+	UNavModifierComponent* NavModifier;
 
 	UPROPERTY()
 	UTimelineComponent* DoorTimeline;
