@@ -14,54 +14,38 @@
 void AEGGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
-    
 }
 
-void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
-    FString& ErrorMessage)
+void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
     Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 
-    if (APlayingPlayerControllers.Num() >= 6)
+    if (GameState && GameState->PlayerArray.Num() >= 6)
     {
         ErrorMessage = TEXT("ServerError_MaxPlayersReached");
         return;
     }
 }
 
-
 void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
 
-    // maxplayer check
-    if (APlayingPlayerControllers.Num() > 6)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Too many players! Kick that chick"));
-
-        NewPlayer->Destroy();
-    }
-    
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(NewPlayer))
     {
         APlayingPlayerControllers.Add(EGPC);
-        
-        if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(EGPC->PlayerState))
-        {
-            int32 UniqueId = EGPS->GetPlayerId();
-            EGPC->SetPlayerIndex(UniqueId);
+        int32 UniqueId = ++CurrentPlayerIndex;
+        EGPC->SetPlayerIndex(UniqueId);
+        SetRoomLeader();
 
-            if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
-            {
-                FAward Entry;
-                Entry.PlayerIndex    = UniqueId;
-                Entry.PlayerEggScore = 0;
-                EGGS->LeaderboardSnapshot.Add(Entry);
-            }
+        if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
+        {
+            FAward Entry;
+            Entry.PlayerIndex = UniqueId;
+            Entry.PlayerEggScore = 0;
+            EGGS->LeaderboardSnapshot.Add(Entry);
         }
     }
-    
-    SetRoomLeader();
 }
 
 void AEGGameModeBase::SetRoomLeader()
@@ -234,58 +218,7 @@ void AEGGameModeBase::GameOver()
         EGGS->SetFinalResults(FinalPlayerScores);
         EGGS->FinalizeAward();
     }
-    ClearStage();
 
-	GetWorld()->ServerTravel("/Game/UI/Map/Lobby?listen");  // 작성자: 김효영
-}
-
-void AEGGameModeBase::ClearStage()
-{
-    UWorld* World = GetWorld();
-    if (!IsValid(World))
-    {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("[why] World is invalid."));
-    }
-
-    //destroy all AI
-    for (TActorIterator<AEGAICharacter> It(World); It; ++It)
-    {
-        AEGAICharacter* EGAI = *It;
-        if (IsValid(EGAI))
-        {
-            EGAI->Destroy();
-        }
-    }
-
-    for (TActorIterator<AEggActor> It(World); It; ++It)
-    {
-        AEggActor* EGG = *It;
-        if (IsValid(EGG))
-        {
-            EGG->Destroy();
-        }
-    }
-    
-    //player goback playerstart
-    int32 SpawnNum = 0;
-    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-    {
-        if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
-        {
-            if (AEGPlayerState* PS =  Cast<AEGPlayerState>(PC->PlayerState))
-            {
-                PS->RemoveEgg_Internal(PS->GetPlayerEggCount());
-            }
-            if (ACharacter* EGPlayerChar = Cast<AEGChickenCharacter>(PC->GetPawn()))
-            {
-                if (AEGPlayerStart** FoundStart = PlayerStartList.Find(SpawnNum))
-                {
-                    FVector StartLocation = (*FoundStart)->GetActorLocation();
-                    EGPlayerChar->SetActorLocation(StartLocation);
-                    SpawnNum++;
-                }
-            }
-        }
-    }
+	GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
 }
 

@@ -11,8 +11,7 @@
 #include "EGLog.h"
 #include "GameFramework/EGGameStateBase.h"
 #include "GameFramework/EGPlayerState.h"
-#include "AI/EGAICharacter.h"
-#include "GameFramework/EGInGameSpawnPoints.h"
+
 
 
 void AEGLobbyGameModeBase::SendChatMessage(const FString& Message)
@@ -30,54 +29,38 @@ void AEGLobbyGameModeBase::SendChatMessage(const FString& Message)
 void AEGLobbyGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
-
 }
 
-void AEGLobbyGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
-    FString& ErrorMessage)
+void AEGLobbyGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
     Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 
-    if (APlayingPlayerControllers.Num() >= 6)
+    if (GameState && GameState->PlayerArray.Num() >= 6)
     {
         ErrorMessage = TEXT("ServerError_MaxPlayersReached");
         return;
     }
 }
 
-
 void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
 
-    // maxplayer check
-    if (APlayingPlayerControllers.Num() > 6)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("Too many players! Kick that chick"));
-
-        NewPlayer->Destroy();
-    }
-
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(NewPlayer))
     {
         APlayingPlayerControllers.Add(EGPC);
+        int32 UniqueId = ++CurrentPlayerIndex;
+        EGPC->SetPlayerIndex(UniqueId);
+        SetRoomLeader();
 
-        if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(EGPC->PlayerState))
+        if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
         {
-            int32 UniqueId = EGPS->GetPlayerId();
-            EGPC->SetPlayerIndex(UniqueId);
-
-            if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
-            {
-                FAward Entry;
-                Entry.PlayerIndex = UniqueId;
-                Entry.PlayerEggScore = 0;
-                EGGS->LeaderboardSnapshot.Add(Entry);
-            }
+            FAward Entry;
+            Entry.PlayerIndex = UniqueId;
+            Entry.PlayerEggScore = 0;
+            EGGS->LeaderboardSnapshot.Add(Entry);
         }
     }
-
-    SetRoomLeader();
 }
 
 void AEGLobbyGameModeBase::SetRoomLeader()
@@ -143,18 +126,17 @@ AActor* AEGLobbyGameModeBase::ChoosePlayerStart_Implementation(AController* Play
     return Super::ChoosePlayerStart_Implementation(Player);
 }
 
-// 굳이 필요한가? 어차피 레벨 이동은 버튼을 통해서 이동하는데. 버튼을 방장한테만 보이게 하면 되지 않을까? 위에 코드는 로그인과 로그아웃할 때마다 방장 설정하는 코드이니까
-void AEGLobbyGameModeBase::GameStart(int32 UniqueID)
-{
-    if (UniqueID == LeaderNum)
-    {
-        if (GetNumPlayers() > 1)
-        {
-            if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
-            {
-                GI->ChangeLevel();
-            }
-            
-        }
-    }
-}
+//void AEGLobbyGameModeBase::GameStart(int32 UniqueID)
+//{
+//    if (UniqueID == LeaderNum)
+//    {
+//        if (GetNumPlayers() > 1)
+//        {
+//            if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
+//            {
+//                GI->ChangeLevel();
+//            }
+//            
+//        }
+//    }
+//}

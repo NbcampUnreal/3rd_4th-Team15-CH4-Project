@@ -18,22 +18,22 @@ class EG_API AEGGameModeBase : public AGameModeBase
 
 public:
 
-	 virtual void PreLogin(const FString& Options,
-						  const FString& Address,
-						  const FUniqueNetIdRepl& UniqueId,
-						  FString& ErrorMessage) override;
-	
+	int32 CurrentPlayerIndex = 0;
+
+	virtual void PreLogin(const FString& Options,
+		const FString& Address,
+		const FUniqueNetIdRepl& UniqueId,
+		FString& ErrorMessage) override;
+
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	void SetRoomLeader();
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
-	
 
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
 	void GameStart(int32 UniqueID);
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
 	void GameOver();
-	void ClearStage();
 
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
