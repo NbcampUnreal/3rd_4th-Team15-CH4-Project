@@ -8,10 +8,16 @@
 #include "AbilitySystem/GameplayEffect/EGStunEffect.h"
 #include "Character/EGChickenCharacter.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
+#include "Character/Egg/EggActor.h"
 
 UEGTrickAbility::UEGTrickAbility()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+
+	FAbilityTriggerData TriggerData;
+	TriggerData.TriggerTag = FGameplayTag::RequestGameplayTag("Event.TrickEggBroken");
+	TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+	AbilityTriggers.Add(TriggerData);
 }
 
 void UEGTrickAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -19,9 +25,7 @@ void UEGTrickAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	UE_LOG(LogTemp, Log, TEXT("Trick Ability activate"));
-
+	
 	if (IsValid(TrickParticle))
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
@@ -31,37 +35,37 @@ void UEGTrickAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 			ActorInfo->AvatarActor->GetActorRotation());
 	}
 
-	UAbilityTask_WaitGameplayEvent* WaitEvent =
-		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this,
-			FGameplayTag::RequestGameplayTag("Event.EggBroken"));
+	if (TriggerEventData && IsValid(TriggerEventData->Instigator))
+	{
+		if (const AEGChickenCharacter* Breaker = Cast<AEGChickenCharacter>(TriggerEventData->Instigator))
+		{
+			if (UAbilitySystemComponent* TargetASC = Breaker->GetAbilitySystemComponent())
+			{
+				FGameplayEffectSpecHandle StunSpec = MakeOutgoingGameplayEffectSpec(
+					UEGStunEffect::StaticClass(), 1.0f);
 
-	WaitEvent->EventReceived.AddDynamic(this, &UEGTrickAbility::OnEggBroken);
-	WaitEvent->ReadyForActivation();
-	
+				FGameplayEffectSpecHandle ResetEnergySpec = MakeOutgoingGameplayEffectSpec(
+					UEGResetEggEnergyEffect::StaticClass(), 1.0f);
+
+				if (StunSpec.IsValid() && ResetEnergySpec.IsValid())
+				{
+					TargetASC->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
+					TargetASC->ApplyGameplayEffectSpecToSelf(*ResetEnergySpec.Data.Get());
+				}
+			}
+		}
+	}
+
+	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+
+	if (AEggActor* OwnerEgg = Cast<AEggActor>(ActorInfo->AvatarActor.Get()))
+	{
+		OwnerEgg->Destroy(); // 함정 알은 여기서 파괴
+	}
 }
 
 void UEGTrickAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-}
-
-void UEGTrickAbility::OnEggBroken(FGameplayEventData EventData)
-{
-	if (const AActor* Instigator = EventData.Instigator.Get())
-	{
-		if (const AEGChickenCharacter* Character = Cast<AEGChickenCharacter>(Instigator))
-		{
-			if (UAbilitySystemComponent* TargetASC = Character->GetAbilitySystemComponent())
-			{
-				FGameplayEffectSpecHandle StunSpec = MakeOutgoingGameplayEffectSpec(UEGStunEffect::StaticClass(), 1.0f);
-				FGameplayEffectSpecHandle ResetEnergySpec = MakeOutgoingGameplayEffectSpec(UEGResetEggEnergyEffect::StaticClass(), 1.0f);
-				
-				TargetASC->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
-				TargetASC->ApplyGameplayEffectSpecToSelf(*ResetEnergySpec.Data.Get());
-			}
-		}
-	}
-
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }

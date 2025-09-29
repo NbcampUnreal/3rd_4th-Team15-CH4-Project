@@ -30,8 +30,4 @@ protected:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Particle)
 	TObjectPtr<UNiagaraSystem> TrickParticle;
-
-private:
-	UFUNCTION()
-	void OnEggBroken(FGameplayEventData EventData);
 };

@@ -54,11 +54,14 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		{
 			if (GetOwningActorFromActorInfo()->HasAuthority())
 			{
-				FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
+				FVector ActorLocation = ActorInfo->AvatarActor->GetActorLocation();
+				FVector BackWardVector = -ActorInfo->AvatarActor->GetActorForwardVector();
+				float SpawnDistance = 100.0f;
+				FVector SpawnLocation = ActorLocation + BackWardVector * SpawnDistance;
 
 				FActorSpawnParameters SpawnParams; // kms
 				SpawnParams.Owner = GetOwningActorFromActorInfo(); //kms
-				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, SpawnLocation,
+				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, ActorLocation,
 				                                                        ActorInfo->AvatarActor->GetActorRotation(),
 				                                                         SpawnParams //kms
 				                                                         );
@@ -102,7 +105,6 @@ void UEGLayEggAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
                                   bool bReplicateEndAbility,
                                   bool bWasCancelled)
 {
-	UE_LOG(LogTemp, Log, TEXT("LayEgg Ability end"));
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 

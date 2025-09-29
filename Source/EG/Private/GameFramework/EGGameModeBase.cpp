@@ -5,11 +5,7 @@
 #include "EG/Public/GameFramework/EGPlayerStart.h"
 #include "EGLog.h"
 #include "EG/Public/GameFramework/EGGameStateBase.h"
-#include "Character/EGChickenCharacter.h"
-#include "Character/Egg/EggActor.h"
-#include "GameFramework/EGInGameSpawnPoints.h"
 #include "GameFramework/EGPlayerState.h"
-
 
 void AEGGameModeBase::BeginPlay()
 {
@@ -59,11 +55,10 @@ void AEGGameModeBase::SetRoomLeader()
     }
 }
 
-
 void AEGGameModeBase::Logout(AController* Exiting)
 {
     Super::Logout(Exiting);
-    
+
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(Exiting))
     {
         EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPC->PlayerIndex);
@@ -78,16 +73,17 @@ void AEGGameModeBase::Logout(AController* Exiting)
 void AEGGameModeBase::InitializeSpawnPoint()
 {
     PlayerStartList.Empty();
-
     UWorld* World = GetWorld();
+
     if (!IsValid(World))
     {
         EG_LOG_ROLE(LogMS, Warning, TEXT("[why] World is invalid. Abort building PlayerStartList."));
     }
-	
+
     for (TActorIterator<AEGPlayerStart> It(World); It; ++It)
     {
         AEGPlayerStart* PS = *It;
+
         if (!IsValid(PS))
         {
             continue;
@@ -99,18 +95,14 @@ void AEGGameModeBase::InitializeSpawnPoint()
 AActor* AEGGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
     InitializeSpawnPoint();
-    
     int32 PlayerNum = GetNumPlayers()-1;
-        
         if (AEGPlayerStart** FoundStart = PlayerStartList.Find(PlayerNum))
         {
             return *FoundStart;
         }
-        
     EG_LOG_ROLE(LogMS, Warning, TEXT("No SpawnPoint found for index %d, using Super."), PlayerNum);
     return Super::ChoosePlayerStart_Implementation(Player);
 }
-
 
 void AEGGameModeBase::GameStart(int32 UniqueID)
 {
@@ -118,100 +110,17 @@ void AEGGameModeBase::GameStart(int32 UniqueID)
     {
         if (GetNumPlayers() > 1)
         {
-            if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
-            {
-                EGGS->StartCountdown();
-            }
             
-            EG_LOG_ROLE(LogMS, Warning, TEXT("Game Start"));
-            UWorld* World = GetWorld();
-            
-            AInGameSpawnPoints.Empty();
-            for (TActorIterator<AEGInGameSpawnPoints> It(World); It; ++It)
-            {
-                AInGameSpawnPoints.Add(*It);
-            }
-
-            for (int32 i = 0; i < AInGameSpawnPoints.Num(); i++)
-            {
-                int32 SwapNum = FMath::RandRange(0, AInGameSpawnPoints.Num()-1);
-                AInGameSpawnPoints.Swap(i, SwapNum);
-            }
-
-            int32 SpawnNum = 0;
-            for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-            {
-                if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
-                {
-                    if (ACharacter* EGPlayerChar = Cast<AEGChickenCharacter>(PC->GetPawn()))
-                    {
-                        if (AInGameSpawnPoints.IsValidIndex(SpawnNum))
-                        {
-                            FVector StartLocation = AInGameSpawnPoints[SpawnNum]->GetActorLocation();
-                            EGPlayerChar->SetActorLocation(StartLocation);
-                            SpawnNum++;
-                        }
-                    }
-                }
-            }
-            for (int k = SpawnNum; k < AInGameSpawnPoints.Num(); k++)
-            {
-                if (AInGameSpawnPoints[k].IsValid())
-                {
-                    FVector SpawnLocation = AInGameSpawnPoints[k]->GetActorLocation();
-                    FRotator SpawnRotation(0.f, AInGameSpawnPoints[k]->GetActorRotation().Yaw, 0.f);
-
-                    FActorSpawnParameters SpawnParams;
-                    SpawnParams.Owner = this;
-                    SpawnParams.Instigator = GetInstigator();
-                    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-                    AEGAICharacter* SpawnedActor = GetWorld()->SpawnActor<AEGAICharacter>(AICharacter, SpawnLocation, SpawnRotation, SpawnParams);
-                    if (SpawnedActor)
-                    {
-                        EG_LOG_ROLE(LogMS, Warning, TEXT("ai Spawn"));
-                    }
-                    else
-                    {
-                        EG_LOG_ROLE(LogMS, Warning, TEXT("ai Spawn fail"));
-                    }
-                    
-                }
-            }
-            EG_LOG_ROLE(LogMS, Warning, TEXT("-------------------------------------"));
-        }
-    }
-    else
-    {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("Game Start Fail, you are not RoomLeader"));
-    }
-}
-
-
-void AEGGameModeBase::GameOver()
-{
-    EG_LOG_ROLE(LogMS, Warning, TEXT("Game Over"));
-    
-    TArray<TPair<TWeakObjectPtr<AEGPlayerController>, int32>> FinalPlayerScores;
-    
-    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-    {
-        if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
-        {
-            if (AEGPlayerState* PS = Cast<AEGPlayerState>(PC->PlayerState))
-            {
-                FinalPlayerScores.Add(TPair<TWeakObjectPtr<AEGPlayerController>, int32>(PC, PS->GetPlayerEggCount()));
-            }
         }
     }
 
     // player score sort
     FinalPlayerScores.Sort([](const auto& A, const auto& B)
-  {
-      if (A.Value != B.Value)
-          return A.Value > B.Value;
-      return A.Key.IsValid() && B.Key.IsValid() && A.Key->PlayerIndex < B.Key->PlayerIndex;
-  });
+    {
+        if (A.Value != B.Value)
+            return A.Value > B.Value;
+        return A.Key.IsValid() && B.Key.IsValid() && A.Key->PlayerIndex < B.Key->PlayerIndex;
+    });
    
     if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
     {
@@ -219,6 +128,6 @@ void AEGGameModeBase::GameOver()
         EGGS->FinalizeAward();
     }
 
-	GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
+	  GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
 }
 
