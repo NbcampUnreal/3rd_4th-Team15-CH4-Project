@@ -235,6 +235,8 @@ void AEGGameModeBase::GameOver()
         EGGS->FinalizeAward();
     }
     ClearStage();
+
+	GetWorld()->ServerTravel("/Game/UI/Map/Lobby?listen");  // 작성자: 김효영
 }
 
 void AEGGameModeBase::ClearStage()
@@ -286,20 +288,6 @@ void AEGGameModeBase::ClearStage()
         }
     }
 }
-
-
-// ���� ���� (�ۼ��� : ��ȿ��)
-#pragma region LevelChange
-void AEGGameModeBase::ChangeLevel(const FString& MapName)
-{
-    if (HasAuthority()) // ����������
-    {
-        FString Command = FString::Printf(TEXT("/Game/UI/Map/%s?listen"), *MapName);
-        GetWorld()->ServerTravel(Command);
-    }
-}
-
-#pragma endregion
 
 // ä�� (�ۼ��� : ��ȿ��)
 #pragma region Chatting
