@@ -99,7 +99,7 @@ void AEGGameStateBase::DecrementCountdown()
 			
 			if (AEGGameModeBase* EGGM = Cast<AEGGameModeBase>(GetWorld()->GetAuthGameMode()))
 			{
-				//EGGM->GameOver();
+				EGGM->GameOver();
 			}
 		}
 	}

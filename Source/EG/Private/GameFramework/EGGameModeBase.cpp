@@ -175,11 +175,11 @@ void AEGGameModeBase::GameOver()
     }
     // player score sort
     FinalPlayerScores.Sort([](const auto& A, const auto& B)
-  {
+    {
       if (A.Value != B.Value)
           return A.Value > B.Value;
       return A.Key.IsValid() && B.Key.IsValid() && A.Key->PlayerIndex < B.Key->PlayerIndex;
-  });
+    });
     if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
     {
         EGGS->SetFinalResults(FinalPlayerScores);
