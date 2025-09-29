@@ -47,9 +47,12 @@ void UEGLayBombEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 		{
 			if (GetOwningActorFromActorInfo()->HasAuthority())
 			{
-				FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
+				FVector ActorLocation = ActorInfo->AvatarActor->GetActorLocation();
+				FVector BackWardVector = -ActorInfo->AvatarActor->GetActorForwardVector();
+				float SpawnDistance = 100.0f;
+				FVector SpawnLocation = ActorLocation + BackWardVector * SpawnDistance;
 
-				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, SpawnLocation,
+				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, ActorLocation,
 																		ActorInfo->AvatarActor->GetActorRotation());
 				EggActor->SetOwner(ActorInfo->AvatarActor.Get());
 			}

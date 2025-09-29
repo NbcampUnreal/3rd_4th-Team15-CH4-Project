@@ -72,9 +72,7 @@ void UEGBombAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		{
 			if (AEggActor* Egg = Cast<AEggActor>(HitActor))
 			{
-				int32 Health = Egg->GetHealth() - 1;
-				Egg->SetHealth(Health);
-				Egg->CheckHealthAndDestroy(Egg);
+				Egg->ApplyDamageAndCheckDestroy(1, ActorInfo->AvatarActor.Get());
 			}
 			else if (AEGChickenCharacter* Character = Cast<AEGChickenCharacter>(HitActor))
 			{
@@ -91,7 +89,7 @@ void UEGBombAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 	if (AEggActor* OwnerEgg = Cast<AEggActor>(ActorInfo->AvatarActor.Get()))
 	{
-		OwnerEgg->Destroy();
+		OwnerEgg->Destroy(); // 폭탄 알은 여기서 파괴
 	}
 }
 
