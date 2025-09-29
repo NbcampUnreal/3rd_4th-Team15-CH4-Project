@@ -29,6 +29,11 @@ void AEGLobbyGameModeBase::SendChatMessage(const FString& Message)
 void AEGLobbyGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
+
+    if(UEGGameInstance * GI = GetGameInstance<UEGGameInstance>())
+    {
+        GI->PlayerIndexReset();
+    }
 }
 
 void AEGLobbyGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
@@ -53,12 +58,9 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
         EGPC->SetPlayerIndex(UniqueId);
         SetRoomLeader();
 
-        if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
+        if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
         {
-            FAward Entry;
-            Entry.PlayerIndex = UniqueId;
-            Entry.PlayerEggScore = 0;
-            EGGS->LeaderboardSnapshot.Add(Entry);
+            GI->SetPlayerIndex(1);
         }
     }
 }
