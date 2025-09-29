@@ -7,10 +7,8 @@
 #include "EGLobbyGameModeBase.generated.h"
 
 
-class AEGAICharacter;
 class AEGPlayerController;
 class AEGPlayerStart;
-class AEGInGameSpawnPoints;
 
 /**
  * 
@@ -26,6 +24,7 @@ public:
 	void SendChatMessage(const FString& Message);
 
 #pragma endregion
+	 int32 CurrentPlayerIndex = 0;
 
 	virtual void PreLogin(const FString& Options,
 		const FString& Address,
@@ -38,9 +37,8 @@ public:
 	virtual void BeginPlay() override;
 
 
-	UFUNCTION(BlueprintCallable, Category = "GameFlow")
-	void GameStart(int32 UniqueID);
-	UFUNCTION(BlueprintCallable, Category = "GameFlow")	
+	/*UFUNCTION(BlueprintCallable, Category = "GameFlow")
+	void GameStart(int32 UniqueID);*/
 
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
@@ -48,17 +46,13 @@ public:
 	FTimerHandle GameStartingTimerHandle;
 	FTimerHandle GameEndTimerHandle;
 
-	UPROPERTY(EditAnywhere, Category = "Spawn")
-	TSubclassOf<AEGAICharacter> AICharacter;
-
 protected:
 	bool bGameStarted = false;
 	int32 LeaderNum = 0;
+
 
 	UPROPERTY(VisibleAnywhere, Category = "Players")
 	TArray<TWeakObjectPtr<AEGPlayerController>> APlayingPlayerControllers;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TMap<int32, AEGPlayerStart*> PlayerStartList;
-	UPROPERTY(VisibleAnywhere, Category = "Spawn")
-	TArray<TWeakObjectPtr<AEGInGameSpawnPoints>> AInGameSpawnPoints;
 };

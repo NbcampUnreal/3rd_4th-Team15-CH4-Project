@@ -16,23 +16,32 @@ class EG_API AEGGameModeBase : public AGameModeBase
 public:
 
 	int32 CurrentPlayerIndex = 0;
-	
-	 virtual void PreLogin(const FString& Options,
-						  const FString& Address,
-						  const FUniqueNetIdRepl& UniqueId,
-						  FString& ErrorMessage) override;
-	
+
+	virtual void PreLogin(const FString& Options,
+		const FString& Address,
+		const FUniqueNetIdRepl& UniqueId,
+		FString& ErrorMessage) override;
+
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	void SetRoomLeader();
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
-	
 
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
 	void GameStart(int32 UniqueID);
-	
+  
+	UFUNCTION(BlueprintCallable, Category="GameFlow")
+	void GameOver();
+
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
+
+	FTimerHandle GameStartingTimerHandle;
+	FTimerHandle GameEndTimerHandle;
+	
+	UPROPERTY(EditAnywhere, Category="Spawn")
+	TSubclassOf<AEGAICharacter> AICharacter;
+
 	
 protected:
 	int32 LeaderNum = 0;

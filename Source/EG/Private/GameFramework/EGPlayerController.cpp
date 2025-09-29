@@ -182,11 +182,16 @@ void AEGPlayerController::ClientAddChatMessage_Implementation(const FString& Mes
 
 void AEGPlayerController::ServerSendChatMessage_Implementation(const FString& Message)
 {
-	AEGGameModeBase* GM = GetWorld()->GetAuthGameMode<AEGGameModeBase>();
+	if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
+	{
+		GI->SendChatMessage(Message);
+	}
+
+	/*AEGGameModeBase* GM = GetWorld()->GetAuthGameMode<AEGGameModeBase>();
 	if (GM)
 	{
 		GM->SendChatMessage(Message);
-	}	
+	}	*/
 }
 
 #pragma endregion
