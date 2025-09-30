@@ -59,7 +59,15 @@ private:
 	UPROPERTY()
 	AEGHUD* EGHUD;
 #pragma endregion
+
+// 방장 기능(작성자: 김효영)
 	
+#pragma region ChiefPlayer 
+public:
+	UFUNCTION(Client, Reliable)
+	void ShowChiefPlayerUI();
+#pragma endregion
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	

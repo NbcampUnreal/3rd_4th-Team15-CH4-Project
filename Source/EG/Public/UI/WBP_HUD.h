@@ -39,6 +39,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="HUD|Egg")
 	float UI_MaxEggEnergy = 100.f;
 
+	// [추가] 함정알(TrickEgg) 쿨타임 바
+	UPROPERTY(meta=(BindWidgetOptional)) // WBP에 존재하면 자동 바인딩
+	UProgressBar* TrickEgg = nullptr;   // [추가]
+
 private:
 	UPROPERTY() UAbilitySystemComponent* ASC = nullptr;
 
@@ -51,6 +55,10 @@ private:
 	float BombCooldownRemaining = 0.f; // [추가]
 	float BombCooldownDuration  = 1.f; // [추가]
 
+	// [추가] 함정알 캐시
+	float TrickCooldownRemaining = 0.f; // [추가]
+	float TrickCooldownDuration  = 1.f; // [추가]
+
 	void OnStaminaChanged(const FOnAttributeChangeData& Data);
 	void OnEggEnergyChanged(const FOnAttributeChangeData& Data);
 
@@ -60,5 +68,12 @@ private:
 	void StartReadyFX(); // [추가]
 	void StopReadyFX();  // [추가]
 
-	void UpdateBombCooldown(); // [추가]
+	// [추가] 공통 쿨타임 업데이트(태그 → 바 갱신)
+	void UpdateCooldownBarForTag(class UProgressBar* Bar,
+		const struct FGameplayTag& CooldownTag,
+		float& OutRemaining, float& OutDuration);
+
+	// [추가] 편의 래퍼
+	void UpdateBombCooldown();
+	void UpdateTrickCooldown();
 };
