@@ -28,14 +28,23 @@ public:
 
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange
+public:
 	UFUNCTION(Server, Reliable)
-	void ServerRequestLevelChange(const FString& MapName);
+	void ServerRequestLevelChange();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRequestLevelRecordChange(const FString& MapName);
+
+	void ToggleMouseCursor();
+
+private:
+	bool bMouseVisible = false;	
 
 #pragma endregion
 
 // 채팅 (작성자 : 김효영)
 #pragma region Chatting
-	
+public:
 
 	UFUNCTION()
 	void ActivateChatBox();

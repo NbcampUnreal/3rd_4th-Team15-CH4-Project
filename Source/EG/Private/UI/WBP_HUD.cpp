@@ -2,7 +2,10 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
 #include "Components/ProgressBar.h"
-#include "Components/Image.h" // [추가]
+#include "Components/Image.h"
+#include "GameplayTagContainer.h"
+#include "GameplayEffectTypes.h"
+#include "GameplayEffect.h"
 
 void UWBP_HUD::InitWithASC(UAbilitySystemComponent* InASC)
 {
@@ -25,15 +28,20 @@ void UWBP_HUD::InitWithASC(UAbilitySystemComponent* InASC)
 	}
 
 	ASC = InASC;
+
+	StopReadyFX();
+	bEggFXVisible = false;
+
+	// [수정] 시작 시 스킬 ‘사용 가능’ 느낌으로 100% 표시
+	if (BombEgg) BombEgg->SetPercent(1.f);
+
 	if (!ASC) return;
 
 	{
-		const float CurSta =
-			ASC->GetNumericAttribute(UEGCharacterAttributeSet::GetStaminaAttribute());
+		const float CurSta = ASC->GetNumericAttribute(UEGCharacterAttributeSet::GetStaminaAttribute());
 		RefreshStamina(CurSta);
 
-		const float CurEgg =
-			ASC->GetNumericAttribute(UEGCharacterAttributeSet::GetEggEnergyAttribute());
+		const float CurEgg = ASC->GetNumericAttribute(UEGCharacterAttributeSet::GetEggEnergyAttribute());
 		RefreshEggEnergy(CurEgg);
 	}
 
@@ -68,9 +76,9 @@ void UWBP_HUD::NativeDestruct()
 	StaminaChangedHandle.Reset();
 	EggEnergyChangedHandle.Reset();
 
-	StopReadyFX(); // [추가]
-
+	StopReadyFX();
 	ASC = nullptr;
+
 	Super::NativeDestruct();
 }
 
@@ -98,29 +106,30 @@ void UWBP_HUD::RefreshEggEnergy(float NewValue)
 	const float Pct = FMath::Clamp(NewValue / Den, 0.f, 1.f);
 	EggEnergyBar->SetPercent(Pct);
 
-	const bool bNowReady = (Pct >= 1.f - KINDA_SMALL_NUMBER);
-	if (bNowReady && !bEggReady) // [수정] Ready 진입 시 FX ON
+	const bool bNowShowFX = (Pct >= 0.7f);
+
+	if (bNowShowFX && !bEggFXVisible)
 	{
-		bEggReady = true;
+		bEggFXVisible = true;
 		StartReadyFX();
 	}
-	else if (!bNowReady && bEggReady) // [수정] Ready 해제 시 FX OFF
+	else if (!bNowShowFX && bEggFXVisible)
 	{
-		bEggReady = false;
+		bEggFXVisible = false;
 		StopReadyFX();
 	}
 }
 
-void UWBP_HUD::OnEggLaid() // [추가]
+void UWBP_HUD::OnEggLaid()
 {
-	if (bEggReady)
+	if (bEggFXVisible)
 	{
-		bEggReady = false;
+		bEggFXVisible = false;
 		StopReadyFX();
 	}
 }
 
-void UWBP_HUD::StartReadyFX() // [추가]
+void UWBP_HUD::StartReadyFX()
 {
 	if (EggFX)
 	{
@@ -128,10 +137,65 @@ void UWBP_HUD::StartReadyFX() // [추가]
 	}
 }
 
-void UWBP_HUD::StopReadyFX() // [추가]
+void UWBP_HUD::StopReadyFX()
 {
 	if (EggFX)
 	{
 		EggFX->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void UWBP_HUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	UpdateBombCooldown();
+}
+
+void UWBP_HUD::UpdateBombCooldown()
+{
+	if (!ASC || !BombEgg) return;
+
+	static const FGameplayTag CooldownTag =
+		FGameplayTag::RequestGameplayTag(TEXT("Ability.Cooldown.LayBombEgg"));
+
+	FGameplayTagContainer OwningTags;
+	OwningTags.AddTag(CooldownTag);
+	const FGameplayEffectQuery Query = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(OwningTags);
+
+	TArray<FActiveGameplayEffectHandle> Handles = ASC->GetActiveEffects(Query);
+
+	float MaxRemaining = -1.f;
+	float MatchedDuration = 0.f;
+
+	const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.f;
+
+	for (const FActiveGameplayEffectHandle& H : Handles)
+	{
+		const FActiveGameplayEffect* AGE = ASC->GetActiveGameplayEffect(H);
+		if (!AGE) continue;
+
+		const float Rem = AGE->GetTimeRemaining(Now);
+		const float Dur = AGE->Spec.GetDuration();
+
+		if (Rem >= 0.f && Dur > 0.f && Rem > MaxRemaining)
+		{
+			MaxRemaining   = Rem;
+			MatchedDuration = Dur;
+		}
+	}
+
+	if (MaxRemaining >= 0.f && MatchedDuration > 0.f)
+	{
+		BombCooldownRemaining = MaxRemaining;
+		BombCooldownDuration  = MatchedDuration;
+
+		// 쿨타임 시작 시 0 → 끝날 때 1 로 ‘차오르는’ 표시
+		const float Pct = 1.f - (MaxRemaining / MatchedDuration);
+		BombEgg->SetPercent(Pct);
+	}
+	else
+	{
+		// [수정] 쿨타임이 없으면 ‘사용 가능’ 상태이므로 100%로 표시
+		BombEgg->SetPercent(1.f);
 	}
 }

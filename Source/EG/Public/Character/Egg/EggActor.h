@@ -18,50 +18,39 @@ class EG_API AEggActor : public AActor, public IAbilitySystemInterface
 public:
 	AEggActor();
 
-	int32 GetHealth() const;
-	void SetHealth(int32 NewHealth);
-	void CheckHealthAndDestroy(AActor* Actor);
+#pragma region Default
 
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastUpdateGroundState(bool bNewIsOnGround);
-
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
-	void PlayAbility();
+public:
+	virtual void ApplyDamageAndCheckDestroy(int32 Damage, AActor* DamagedActor);
 
 protected:
-	virtual void Tick(float DeltaTime) override;
-	virtual void BeginPlay() override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Root")
-	TObjectPtr<USceneComponent> RootScene;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mesh")
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
 
+	virtual void BeginPlay() override;
+
+	int32 Health = 1;
+
+	UFUNCTION()
+	void OnPawnOverlap(UPrimitiveComponent* OverlappedComp,
+	                   AActor* OtherActor,
+	                   UPrimitiveComponent* OtherComp,
+	                   int32 OtherBodyIndex,
+	                   bool bFromSweep,
+	                   const FHitResult& SweepResult);
+
+#pragma endregion
+
+#pragma region GAS
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
 	TSubclassOf<UGameplayAbility> AbilityClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GAS")
-	float ExplosionDelay = 3.0f;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Egg")
-	bool bIsBombEgg = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Egg")
-	bool bIsTrickEgg = false;
-	
-private:
-	void ApplyGravity(float DeltaTime);
-	bool CheckGroundContact();
-	
-	int32 Health = 1;
-	float GravityScale = 980.0f;
-	
-	UPROPERTY(Replicated)
-	bool bIsOnGround = false;
-
+#pragma endregion
 };

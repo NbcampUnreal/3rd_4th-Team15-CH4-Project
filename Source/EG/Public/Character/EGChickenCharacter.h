@@ -119,6 +119,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
 	TObjectPtr<UInputAction> IA_LayTrickEgg;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_ToggleMouse;
 	
 	UPROPERTY(Replicated)
 	uint8 bIsSprinting:1;
@@ -200,6 +203,7 @@ private:
 #pragma region Chatting
 	protected:
 		void ChatButtonPressed(const FInputActionValue& Value);
+		void ToggleMouse();
 
 #pragma endregion
 };

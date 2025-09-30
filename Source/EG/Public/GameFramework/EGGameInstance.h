@@ -13,4 +13,25 @@ UCLASS()
 class EG_API UEGGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+
+public:
+	// 작성자: 김효영
+
+#pragma region Chatting
+	void SendChatMessage(const FString& Message);
+
+#pragma endregion
+
+#pragma region LevelChange
+	
+	UFUNCTION(BlueprintCallable)
+	void RecordLevel(const FString& MapName);
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeLevel();
+
+private:
+	UPROPERTY()
+	FString CurrentLevelName = "Level_1";
+#pragma endregion
 };
