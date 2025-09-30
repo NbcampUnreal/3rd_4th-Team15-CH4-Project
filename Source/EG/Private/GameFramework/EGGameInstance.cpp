@@ -11,15 +11,18 @@
 #pragma region Chatting
 void UEGGameInstance::SendChatMessage(const FString& Message)
 {
-    // ��� �÷��̾� ��Ʈ�ѷ��� ���� Iterator�� �̿�
-    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    if (GetWorld()->GetNetMode() == NM_DedicatedServer)
     {
-        AEGPlayerController* EGPC = Cast<AEGPlayerController>(*It);
-        if (EGPC)
+        for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
         {
-            EGPC->ClientAddChatMessage(Message);
+            AEGPlayerController* EGPC = Cast<AEGPlayerController>(*It);
+            if (EGPC)
+            {
+                EGPC->ClientAddChatMessage(Message);
+            }
         }
     }
+    
 }
 
 #pragma endregion

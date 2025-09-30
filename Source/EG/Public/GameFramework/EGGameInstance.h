@@ -33,5 +33,31 @@ public:
 private:
 	UPROPERTY()
 	FString CurrentLevelName = "Level_1";
+
 #pragma endregion
+
+public:
+	int32 GetPlayerIndex()
+	{
+		return PlayerIndex;
+	}
+
+	void PlayerIndexReset()
+	{
+		if (GetWorld()->GetNetMode() == NM_DedicatedServer)
+		{
+			PlayerIndex = 0;
+		}
+	}
+
+	void SetPlayerIndex(int32 Index)
+	{
+		if (GetWorld()->GetNetMode() == NM_DedicatedServer)
+		{
+			PlayerIndex += Index;
+		}
+	}
+
+	UPROPERTY();
+	int32 PlayerIndex = 0;
 };

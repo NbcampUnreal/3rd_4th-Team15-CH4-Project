@@ -20,6 +20,8 @@
 #include "EnhancedInputComponent.h"
 
 
+
+
 void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -192,6 +194,20 @@ void AEGPlayerController::ServerSendChatMessage_Implementation(const FString& Me
 	{
 		GM->SendChatMessage(Message);
 	}	*/
+}
+
+#pragma endregion
+
+// 방장 기능(작성자: 김효영)
+#pragma region ChiefPlayer 
+void AEGPlayerController::ShowChiefPlayerUI_Implementation()
+{
+	EGHUD = EGHUD == nullptr ? Cast<AEGHUD>(GetHUD()) : EGHUD;
+
+	if (EGHUD)
+	{
+		EGHUD->ChiefPlayerSetting();
+	}
 }
 
 #pragma endregion
