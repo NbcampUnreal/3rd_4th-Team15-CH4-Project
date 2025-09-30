@@ -15,6 +15,8 @@ UBTTask_ActivateAbility::UBTTask_ActivateAbility()
 
 EBTNodeResult::Type UBTTask_ActivateAbility::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	CachedOwnerComp = &OwnerComp;
+	
 	if (AAIController* AIController = OwnerComp.GetAIOwner())
 	{
 		if (AEGAICharacter* AICharacter = Cast<AEGAICharacter>(AIController->GetPawn()))
@@ -23,10 +25,16 @@ EBTNodeResult::Type UBTTask_ActivateAbility::ExecuteTask(UBehaviorTreeComponent&
 			{
 				if (AbilityToActivate)
 				{
-					bool bActivated = ASC->TryActivateAbilityByClass(AbilityToActivate);
-					if (bActivated)
+					FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(AbilityToActivate);
+					if (Spec)
 					{
-						return EBTNodeResult::Succeeded;
+						ASC->AbilityEndedCallbacks.AddUObject(this, &ThisClass::OnAbilityEnded);
+						
+						bool bActivated = ASC->TryActivateAbilityByClass(AbilityToActivate);
+						if (bActivated)
+						{
+							return EBTNodeResult::InProgress;
+						}
 					}
 				}
 			}
@@ -34,4 +42,15 @@ EBTNodeResult::Type UBTTask_ActivateAbility::ExecuteTask(UBehaviorTreeComponent&
 	}
 	
 	return EBTNodeResult::Failed;
+}
+
+void UBTTask_ActivateAbility::OnAbilityEnded(UGameplayAbility* Ability)
+{
+	if (Ability && Ability->GetClass() == AbilityToActivate)
+	{
+		if (CachedOwnerComp.IsValid())
+		{
+			FinishLatentTask(*CachedOwnerComp.Get(), EBTNodeResult::Succeeded);
+		}
+	}
 }
