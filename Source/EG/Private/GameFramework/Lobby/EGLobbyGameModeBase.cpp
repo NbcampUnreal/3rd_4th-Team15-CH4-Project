@@ -53,6 +53,18 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
 
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(NewPlayer))
     {
+
+		// 김효영 : 처음 접속한 플레이어에게만 레벨변경 위젯 보이기
+        if (!bChiefPlayer) // 처음 접속한 플레이어만
+        {
+            bChiefPlayer = true;
+
+            // 레벨변경 위젯 보이기
+            EGPC->ShowChiefPlayerUI();
+        }
+
+        // =================================
+
         APlayingPlayerControllers.Add(EGPC);
         int32 UniqueId = ++CurrentPlayerIndex;
         EGPC->SetPlayerIndex(UniqueId);
