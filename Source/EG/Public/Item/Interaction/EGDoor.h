@@ -38,6 +38,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Door|Components")
 	UNavModifierComponent* NavModifier;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Door|Rotation")
+	FRotator OpenRotation_Default;
+	
 	UPROPERTY()
 	UTimelineComponent* DoorTimeline;
 
