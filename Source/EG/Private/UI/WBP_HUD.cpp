@@ -33,7 +33,8 @@ void UWBP_HUD::InitWithASC(UAbilitySystemComponent* InASC)
 	bEggFXVisible = false;
 
 	// [수정] 시작 시 스킬 ‘사용 가능’ 느낌으로 100% 표시
-	if (BombEgg) BombEgg->SetPercent(1.f);
+	if (BombEgg)  BombEgg->SetPercent(1.f);
+	if (TrickEgg) TrickEgg->SetPercent(1.f); // [추가]
 
 	if (!ASC) return;
 
@@ -148,15 +149,16 @@ void UWBP_HUD::StopReadyFX()
 void UWBP_HUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-	UpdateBombCooldown();
+	UpdateBombCooldown();   // [추가]
+	UpdateTrickCooldown();  // [추가]
 }
 
-void UWBP_HUD::UpdateBombCooldown()
+// [추가] 공통 쿨타임 처리: 태그가 활성화되어 있으면 0→1로 차오르게, 없으면 1.0 유지
+void UWBP_HUD::UpdateCooldownBarForTag(UProgressBar* Bar,
+	const FGameplayTag& CooldownTag,
+	float& OutRemaining, float& OutDuration)
 {
-	if (!ASC || !BombEgg) return;
-
-	static const FGameplayTag CooldownTag =
-		FGameplayTag::RequestGameplayTag(TEXT("Ability.Cooldown.LayBombEgg"));
+	if (!ASC || !Bar) return;
 
 	FGameplayTagContainer OwningTags;
 	OwningTags.AddTag(CooldownTag);
@@ -186,16 +188,32 @@ void UWBP_HUD::UpdateBombCooldown()
 
 	if (MaxRemaining >= 0.f && MatchedDuration > 0.f)
 	{
-		BombCooldownRemaining = MaxRemaining;
-		BombCooldownDuration  = MatchedDuration;
+		OutRemaining = MaxRemaining;
+		OutDuration  = MatchedDuration;
 
-		// 쿨타임 시작 시 0 → 끝날 때 1 로 ‘차오르는’ 표시
-		const float Pct = 1.f - (MaxRemaining / MatchedDuration);
-		BombEgg->SetPercent(Pct);
+		const float Pct = 1.f - (MaxRemaining / MatchedDuration); // 0→1로 차오름
+		Bar->SetPercent(Pct);
 	}
 	else
 	{
-		// [수정] 쿨타임이 없으면 ‘사용 가능’ 상태이므로 100%로 표시
-		BombEgg->SetPercent(1.f);
+		Bar->SetPercent(1.f); // 쿨 없음 → 사용 가능
 	}
+}
+
+void UWBP_HUD::UpdateBombCooldown()
+{
+	// 기존 폭탄알 태그
+	static const FGameplayTag BombCooldownTag =
+		FGameplayTag::RequestGameplayTag(TEXT("Ability.Cooldown.LayBombEgg"));
+
+	UpdateCooldownBarForTag(BombEgg, BombCooldownTag, BombCooldownRemaining, BombCooldownDuration); // [추가]
+}
+
+void UWBP_HUD::UpdateTrickCooldown()
+{
+	// [추가] 함정알(팀원 Ability) 태그 — 프로젝트 GameplayTags에 등록되어 있어야 함
+	static const FGameplayTag TrickCooldownTag =
+		FGameplayTag::RequestGameplayTag(TEXT("Ability.Cooldown.LayTrickEgg"));
+
+	UpdateCooldownBarForTag(TrickEgg, TrickCooldownTag, TrickCooldownRemaining, TrickCooldownDuration); // [추가]
 }
