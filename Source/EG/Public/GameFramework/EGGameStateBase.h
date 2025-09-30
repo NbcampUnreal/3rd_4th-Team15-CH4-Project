@@ -67,7 +67,7 @@ public:
 	int32 RemainingCountdown = 100;
 
 	UPROPERTY(ReplicatedUsing = OnRep_RemainingPlayTime, VisibleAnywhere, BlueprintReadOnly)
-	int32 RemainingPlayTime = 100;
+	int32 RemainingPlayTime = 300;
 	
 	UPROPERTY()
 	class UEGDelegateManager* DelegateManager;
@@ -88,7 +88,7 @@ protected:
 	UFUNCTION()
 	void OnRep_Award();
 public:
-	void CheckRoomLeader(int32 UniqueID);
+	void CheckRoomLeader();
 	void StartCountdown();
 	void DecrementCountdown();
 	void UpdateLeaderboard();

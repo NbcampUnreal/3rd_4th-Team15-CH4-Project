@@ -33,7 +33,7 @@ void AEGStartingButton::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 					int32 UniqueID = EGPC->PlayerIndex;
 					if (AEGGameStateBase* EGGS = Cast<AEGGameStateBase>(GetWorld()->GetGameState()))
 					{
-						EGGS->CheckRoomLeader(UniqueID);
+						EGGS->CheckRoomLeader();
 					}
 				}
 			}

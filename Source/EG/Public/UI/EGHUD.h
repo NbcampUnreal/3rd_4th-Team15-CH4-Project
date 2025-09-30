@@ -23,11 +23,15 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> ChatMessageClass;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> ChiefPlayerClass;
+
 	UPROPERTY()
 	class UEGChatting* Chatting;
 
 	virtual void PostInitializeComponents() override;
 
+	void ChiefPlayerSetting();
 	void AddChatting();
 	void AddChatMessage(const FString& Message);
 };
