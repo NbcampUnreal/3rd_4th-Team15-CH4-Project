@@ -14,9 +14,3 @@ void UEGDelegateManager::Deinitialize()
 	EG_LOG(LogKH, Log, TEXT("Delegate Manager Deinitialized"));
 	Super::Deinitialize();
 }
-
-void UEGDelegateManager::BroadcastItemPickUp(AEGItemBase* Item)
-{
-	OnItemPickUp.Broadcast(Item);
-	EG_LOG(LogKH, Log, TEXT("OnItemPickUp Broadcasted"));
-}
