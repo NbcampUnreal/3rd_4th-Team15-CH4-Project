@@ -21,4 +21,10 @@ public:
 	TSubclassOf<UGameplayAbility> AbilityToActivate;
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+	UFUNCTION()
+	void OnAbilityEnded(UGameplayAbility* Ability);
+
+private:
+	TWeakObjectPtr<UBehaviorTreeComponent> CachedOwnerComp;
 };
