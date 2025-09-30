@@ -6,6 +6,7 @@
 #include "Character/EGChickenCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Abilities/Tasks/AbilityTask_WaitAttributeChangeThreshold.h"
+#include "Abilities/Tasks/AbilityTask_WaitGameplayTag.h"
 #include "AbilitySystem/GameplayEffect/EGStaminaRegenEffect.h"
 
 UEGSprintAbility::UEGSprintAbility()
@@ -76,10 +77,23 @@ void UEGSprintAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 			false
 		);
 
-	if (WaitStamina)
+	if (IsValid(WaitStamina))
 	{
 		WaitStamina->OnChange.AddDynamic(this, &UEGSprintAbility::OnStaminaTooLow);
 		WaitStamina->ReadyForActivation();
+	}
+
+	UAbilityTask_WaitGameplayTagAdded* WaitStun =
+		UAbilityTask_WaitGameplayTagAdded::WaitGameplayTagAdd(
+			this,
+			FGameplayTag::RequestGameplayTag(FName("Status.Stunned")),
+			nullptr,
+			false);
+
+	if (IsValid(WaitStun))
+	{
+		WaitStun->Added.AddDynamic(this, &UEGSprintAbility::OnApplyStun);
+		WaitStun->ReadyForActivation();
 	}
 }
 
@@ -149,4 +163,9 @@ void UEGSprintAbility::OnStaminaTooLow(bool bMatchesComparison, float CurrentVal
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 	}
+}
+
+void UEGSprintAbility::OnApplyStun()
+{
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }
