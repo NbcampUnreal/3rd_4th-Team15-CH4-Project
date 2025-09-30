@@ -97,31 +97,6 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 					if (AEggActor* Egg = Cast<AEggActor>(HitActor))
 					{
 						Egg->ApplyDamageAndCheckDestroy(1, ActorInfo->AvatarActor.Get());
-						//kms
-						AActor* Avatar = GetAvatarActorFromActorInfo();
-						if (APawn* Pawn = Cast<APawn>(Avatar))
-						{
-							if (AController* Controller = Pawn->GetController())
-							{
-								if (AEGPlayerState* PS = Cast<AEGPlayerState>(Controller->PlayerState))
-								{
-									PS->RemoveEgg_Internal(1);
-								}
-								else
-								{
-									UE_LOG(LogTemp, Warning, TEXT("PlayerState 캐스팅 실패"));
-								}
-							}
-							else
-							{
-								UE_LOG(LogTemp, Warning, TEXT("Controller가 없음"));
-							}
-						}
-						else
-						{
-							UE_LOG(LogTemp, Warning, TEXT("AvatarActor가 Pawn이 아님"));
-						}
-						//kms
 					}
 					else
 					{

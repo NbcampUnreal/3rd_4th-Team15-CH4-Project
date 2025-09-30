@@ -60,7 +60,7 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 				FVector SpawnLocation = ActorLocation + BackWardVector * SpawnDistance;
 
 				FActorSpawnParameters SpawnParams; // kms
-				SpawnParams.Owner = GetOwningActorFromActorInfo(); //kms
+				SpawnParams.Owner = ActorInfo->AvatarActor.Get(); //kms
 				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, ActorLocation,
 				                                                        ActorInfo->AvatarActor->GetActorRotation(),
 				                                                         SpawnParams //kms

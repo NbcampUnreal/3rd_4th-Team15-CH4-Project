@@ -5,9 +5,9 @@
 #include "EGLog.h"
 #include "EG/Public/GameFramework/EGGameStateBase.h"
 #include "Character/EGChickenCharacter.h"
-#include "Character/Egg/EggActor.h"
 #include "GameFramework/EGInGameSpawnPoints.h"
 #include "GameFramework/EGPlayerState.h"
+
 void AEGGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
@@ -84,13 +84,16 @@ void AEGGameModeBase::InitializeSpawnPoint()
 AActor* AEGGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
     InitializeSpawnPoint();
-    int32 PlayerNum = GetNumPlayers()-1;
+    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(Player))
+    {
+        int32 PlayerNum = EGPC->PlayerIndex;
         if (AEGPlayerStart** FoundStart = PlayerStartList.Find(PlayerNum))
         {
             return *FoundStart;
         }
-    EG_LOG_ROLE(LogMS, Warning, TEXT("No SpawnPoint found for index %d, using Super."), PlayerNum);
-    return Super::ChoosePlayerStart_Implementation(Player);
+        EG_LOG_ROLE(LogMS, Warning, TEXT("No SpawnPoint found for index %d, using Super."), PlayerNum);
+    }
+        return Super::ChoosePlayerStart_Implementation(Player);
 }
 void AEGGameModeBase::GameStart(int32 UniqueID)
 {
@@ -141,22 +144,9 @@ void AEGGameModeBase::GameStart(int32 UniqueID)
                     SpawnParams.Instigator = GetInstigator();
                     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
                     AEGAICharacter* SpawnedActor = GetWorld()->SpawnActor<AEGAICharacter>(AICharacter, SpawnLocation, SpawnRotation, SpawnParams);
-                    if (SpawnedActor)
-                    {
-                        EG_LOG_ROLE(LogMS, Warning, TEXT("ai Spawn"));
-                    }
-                    else
-                    {
-                        EG_LOG_ROLE(LogMS, Warning, TEXT("ai Spawn fail"));
-                    }
                 }
             }
-            EG_LOG_ROLE(LogMS, Warning, TEXT("-------------------------------------"));
         }
-    }
-    else
-    {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("Game Start Fail, you are not RoomLeader"));
     }
 }
 void AEGGameModeBase::GameOver()

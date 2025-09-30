@@ -3,6 +3,7 @@
 #include "Character/Egg/EggActor.h"
 
 #include "AbilitySystemComponent.h"
+#include "GameFramework/EGPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
 AEggActor::AEggActor()
@@ -41,6 +42,19 @@ void AEggActor::ApplyDamageAndCheckDestroy(int32 Damage, AActor* DamagedActor)
 	{
 		if (!IsValid(AbilityClass))
 		{
+			if (HasAuthority())
+			{
+				if (APawn* OwnerPawn = Cast<APawn>(GetOwner()))
+				{
+					if (AController* OwnerController = OwnerPawn->GetController())
+					{
+						if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(OwnerController->PlayerState))
+						{
+							EGPS->RemoveEgg_Internal(1); 
+						}
+					}
+				}
+			}
 			Destroy();
 		}
 	}
