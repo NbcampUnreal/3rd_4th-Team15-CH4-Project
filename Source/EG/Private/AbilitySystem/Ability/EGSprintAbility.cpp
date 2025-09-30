@@ -29,6 +29,14 @@ void UEGSprintAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 	if (AEGChickenCharacter* Character = CastChecked<AEGChickenCharacter>(ActorInfo->AvatarActor.Get()))
 	{
+		const FVector Velocity = Character->GetVelocity();
+
+		if (Velocity.SizeSquared() < KINDA_SMALL_NUMBER)
+		{
+			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+			return;
+		}
+		
 		if (UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent())
 		{
 			if (IsValid(SprintEffectClass))
@@ -110,9 +118,10 @@ void UEGSprintAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 			ASC->RemoveActiveGameplayEffect(SprintEffectHandle);
 			ASC->RemoveActiveGameplayEffect(SprintCostEffectHandle);
 			
-			FGameplayEffectSpecHandle RegenSpec = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(
-				UEGStaminaRegenEffect::StaticClass(), 1.0f, ActorInfo->AbilitySystemComponent->MakeEffectContext());
-			if (RegenSpec.IsValid())
+			FGameplayEffectSpecHandle RegenSpec = ASC->MakeOutgoingSpec(
+				UEGStaminaRegenEffect::StaticClass(), 1.0f, ASC->MakeEffectContext());
+			
+			if (RegenSpec.IsValid() && !ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Ability.Passive.StaminaRegen"))))
 			{
 				ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*RegenSpec.Data.Get());
 			}
