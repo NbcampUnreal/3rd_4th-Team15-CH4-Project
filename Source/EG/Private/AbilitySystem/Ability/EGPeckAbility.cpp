@@ -3,7 +3,6 @@
 #include "AbilitySystem/Ability/EGPeckAbility.h"
 
 #include "AbilitySystemComponent.h"
-#include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
 #include "AbilitySystem/GameplayEffect/EGPeckCooldownEffect.h"
 #include "AbilitySystem/GameplayEffect/EGPeckEffect.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
@@ -14,7 +13,8 @@ UEGPeckAbility::UEGPeckAbility()
 
 	CostGameplayEffectClass = nullptr;
 	CooldownGameplayEffectClass = UEGPeckCooldownEffect::StaticClass();
-	PeckEffectClass = UEGPeckEffect::StaticClass();
+
+	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("Ability.Cooldown.Peck"));
 }
 
 void UEGPeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -48,23 +48,7 @@ void UEGPeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		}
 	}
 
-	if (IsValid(PeckEffectClass) && ActorInfo->AbilitySystemComponent.IsValid())
-	{
-		FGameplayEffectContextHandle ContextHandle = ActorInfo->AbilitySystemComponent->MakeEffectContext();
-		ContextHandle.AddSourceObject(this);
-
-		FGameplayEffectSpecHandle SpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(
-			PeckEffectClass, 1, ContextHandle);
-
-		if (SpecHandle.IsValid())
-		{
-			ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-
-			float CurrentEnergy = ActorInfo->AbilitySystemComponent->
-			                                 GetNumericAttribute(UEGCharacterAttributeSet::GetEggEnergyAttribute());
-		}
-	}
-
+	AbilitySystemComponent = ActorInfo->AbilitySystemComponent.Get();
 }
 
 void UEGPeckAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
@@ -78,10 +62,20 @@ void UEGPeckAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 
 void UEGPeckAbility::OnMontageFinished()
 {
+	if (IsValid(AbilitySystemComponent))
+	{
+		FGameplayEffectSpecHandle PeckSpec = MakeOutgoingGameplayEffectSpec(
+			UEGPeckEffect::StaticClass(), 1.0f);
+
+		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*PeckSpec.Data.Get());
+		UE_LOG(LogTemp, Warning, TEXT("Peck Ability GO"));
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Montage Finished"));
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
 void UEGPeckAbility::OnMontageCancelled()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Montage Cancelled"));
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }

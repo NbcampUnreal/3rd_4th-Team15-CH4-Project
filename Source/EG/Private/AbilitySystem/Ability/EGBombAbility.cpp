@@ -8,6 +8,7 @@
 #include "Character/Egg/EggActor.h"
 #include "Engine/OverlapResult.h"
 #include "NiagaraFunctionLibrary.h"
+#include "AbilitySystem/GameplayEffect/EGResetEggEnergyEffect.h"
 
 UEGBombAbility::UEGBombAbility()
 {
@@ -76,11 +77,16 @@ void UEGBombAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 			}
 			else if (AEGChickenCharacter* Character = Cast<AEGChickenCharacter>(HitActor))
 			{
-				FGameplayEffectSpecHandle StunSpec = MakeOutgoingGameplayEffectSpec(
-							UEGStunEffect::StaticClass(), 1.0f);
+				if (UAbilitySystemComponent* TargetASC = Character->GetAbilitySystemComponent())
+				{
+					FGameplayEffectSpecHandle StunSpec = MakeOutgoingGameplayEffectSpec(
+						UEGStunEffect::StaticClass(), 1.0f);
+					FGameplayEffectSpecHandle ResetEnergySpec = MakeOutgoingGameplayEffectSpec(
+						UEGResetEggEnergyEffect::StaticClass(), 1.0f);
 
-				UAbilitySystemComponent* TargetASC = Character->GetAbilitySystemComponent();
-				TargetASC->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
+					TargetASC->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
+					TargetASC->ApplyGameplayEffectSpecToSelf(*ResetEnergySpec.Data.Get());
+				}
 			}
 		}
 	}
