@@ -47,7 +47,7 @@ public:
 	FTimerHandle GameEndTimerHandle;
 
 protected:
-	bool bGameStarted = false;
+	bool bChiefPlayer = false;
 	int32 LeaderNum = 0;
 
 
