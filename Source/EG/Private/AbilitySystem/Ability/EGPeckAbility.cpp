@@ -57,25 +57,26 @@ void UEGPeckAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
                                 bool bReplicateEndAbility,
                                 bool bWasCancelled)
 {
+	if (!bWasCancelled)
+	{
+		if (IsValid(AbilitySystemComponent))
+		{
+			FGameplayEffectSpecHandle PeckSpec = MakeOutgoingGameplayEffectSpec(
+				UEGPeckEffect::StaticClass(), 1.0f);
+
+			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*PeckSpec.Data.Get());
+		}
+	}
+	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UEGPeckAbility::OnMontageFinished()
 {
-	if (IsValid(AbilitySystemComponent))
-	{
-		FGameplayEffectSpecHandle PeckSpec = MakeOutgoingGameplayEffectSpec(
-			UEGPeckEffect::StaticClass(), 1.0f);
-
-		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*PeckSpec.Data.Get());
-		UE_LOG(LogTemp, Warning, TEXT("Peck Ability GO"));
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Montage Finished"));
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
 void UEGPeckAbility::OnMontageCancelled()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Montage Cancelled"));
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }
