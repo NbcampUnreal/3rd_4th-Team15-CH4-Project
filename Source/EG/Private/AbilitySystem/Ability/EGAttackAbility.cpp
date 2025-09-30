@@ -115,7 +115,7 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 						}
 						else if (AEGAICharacter* AICharacter = Cast<AEGAICharacter>(HitActor))
 						{
-							AICharacter->OnAngryMode();
+							AICharacter->OnAngryMode(SpawnLocation);
 							ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
 							ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(
 								*ResetEnergySpec.Data.Get());

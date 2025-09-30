@@ -17,11 +17,10 @@ public:
 		const FUniqueNetIdRepl& UniqueId,
 		FString& ErrorMessage) override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-	void SetRoomLeader();
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
-	void GameStart(int32 UniqueID);
+	void GameStart();
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
 	void GameOver();
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
@@ -33,8 +32,6 @@ public:
 	TSubclassOf<AEGAICharacter> AICharacter;
 	
 protected:
-	bool bGameStarted = false;
-	int32 LeaderNum = 0;
 	UPROPERTY(VisibleAnywhere, Category="Players")
 	TArray<TWeakObjectPtr<AEGPlayerController>> APlayingPlayerControllers;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spawn")
@@ -42,5 +39,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category="Spawn")
 	TArray<TWeakObjectPtr<AEGInGameSpawnPoints>> AInGameSpawnPoints;
 	
-	
+private:
+	int32 playerCount = 0;
 };

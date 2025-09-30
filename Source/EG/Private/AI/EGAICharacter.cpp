@@ -8,6 +8,7 @@
 #include "AI/EGAIState.h"
 #include "AI/AbilitySystem/AttributeSet/EGAI_AttributeSet.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AEGAICharacter::AEGAICharacter()
 {
@@ -55,7 +56,7 @@ void AEGAICharacter::GiveAbilities()
 	}
 }
 
-void AEGAICharacter::OnAngryMode()
+void AEGAICharacter::OnAngryMode(FVector AttackLocation)
 {
 	if (HasAuthority())
 	{
@@ -66,6 +67,14 @@ void AEGAICharacter::OnAngryMode()
 				EG_LOG(LogKH, Log, TEXT("%s : Angry"), *this->GetName());
 				
 				Blackboard->SetValueAsEnum("ActionState", static_cast<uint8>(EAIState::Angry));
+
+				FVector curLocation = GetActorLocation();
+				FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(curLocation, AttackLocation);
+
+				LookAtRotation.Pitch = 0.f;
+				LookAtRotation.Roll = 0.f;
+
+				SetActorRotation(LookAtRotation);
 			}
 		}
 	}

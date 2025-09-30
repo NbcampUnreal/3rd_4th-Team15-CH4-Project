@@ -3,7 +3,10 @@
 #include "Item/Interaction/EGDoor.h"
 
 #include "EGLog.h"
+#include "NavModifierComponent.h"
 #include "Components/BoxComponent.h"
+#include "NavAreas/NavArea_Default.h"
+#include "NavAreas/NavArea_Null.h"
 #include "Net/UnrealNetwork.h"
 
 AEGDoor::AEGDoor()
@@ -13,18 +16,23 @@ AEGDoor::AEGDoor()
 
 	Pivot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	SetRootComponent(Pivot);
-
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DoorMesh"));
-	StaticMesh->SetupAttachment(Pivot);
-
+	
 	CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->SetupAttachment(Pivot);
 	CollisionComponent->SetCollisionProfileName(TEXT("IgnoreOnlyPawn"));
 	CollisionComponent->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
-	DoorTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DoorTimeline"));
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DoorMesh"));
+	StaticMesh->SetupAttachment(CollisionComponent);
 
+	DoorTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DoorTimeline"));
+	NavModifier = CreateDefaultSubobject<UNavModifierComponent>(TEXT("NavModifier"));
+	NavModifier->SetAreaClass(UNavArea_Null::StaticClass());
+
+	StaticMesh->SetCanEverAffectNavigation(false);
+	
 	bIsOpen = false;
+	OpenRotation_Default = FRotator(0, 90.f, 0);
 }
 
 void AEGDoor::BeginPlay()
@@ -32,7 +40,7 @@ void AEGDoor::BeginPlay()
 	Super::BeginPlay();
 
 	ClosedRotation = Pivot->GetRelativeRotation();
-	OpenRotation = ClosedRotation + FRotator(0, 90.f, 0);
+	OpenRotation = ClosedRotation + OpenRotation_Default;
 
 	if (DoorCurve)
 	{
@@ -55,19 +63,24 @@ void AEGDoor::Interact_Implementation()
 {
 	if (HasAuthority())
 	{
-		EG_LOG_NET(LogKH, Log, TEXT("Door Interact Start"));
 		if (!DoorTimeline->IsPlaying())
 		{
 			bIsOpen = !bIsOpen;
 			OnRep_DoorState();
+
+			// if (bIsOpen)
+			// {
+			// 	NavModifier->SetAreaClass(UNavArea_Default::StaticClass());
+			// }
+			// else
+			// {
+			// 	NavModifier->SetAreaClass(UNavArea_Null::StaticClass());
+			// }
 		}
-		EG_LOG_NET(LogKH, Log, TEXT("Door Interact End"));
 	}
 	else
 	{
-		EG_LOG_NET(LogKH, Log, TEXT("Door Interact Start"));
-		//ServerRPC_SetDoorState(bNewState);
-		EG_LOG_NET(LogKH, Log, TEXT("Door Interact End"));
+		// If needed, implement client-side logic
 	}
 }
 

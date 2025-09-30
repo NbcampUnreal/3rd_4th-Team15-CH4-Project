@@ -61,13 +61,13 @@ void AEGGameStateBase::OnRep_Award()
 
 }
 
-void AEGGameStateBase::CheckRoomLeader(int32 UniqueID)
+void AEGGameStateBase::CheckRoomLeader()
 {
-	UE_LOG(LogTemp, Log, TEXT("StartCountdown called with UniqueID: %d"), UniqueID);
+	//UE_LOG(LogTemp, Log, TEXT("StartCountdown called with UniqueID: %d"), UniqueID);
 	if (AEGGameModeBase* EGGM = Cast<AEGGameModeBase>(GetWorld()->GetAuthGameMode()))
 	{
-		EGGM->GameStart(UniqueID);
-		UE_LOG(LogTemp, Log, TEXT("Try to Game Start player : %d"), UniqueID);
+		EGGM->GameStart();
+		//UE_LOG(LogTemp, Log, TEXT("Try to Game Start player : %d"), UniqueID);
 	}
 }
 
