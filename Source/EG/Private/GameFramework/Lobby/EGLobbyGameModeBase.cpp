@@ -29,6 +29,11 @@ void AEGLobbyGameModeBase::SendChatMessage(const FString& Message)
 void AEGLobbyGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
+
+    if(UEGGameInstance * GI = GetGameInstance<UEGGameInstance>())
+    {
+        GI->PlayerIndexReset();
+    }
 }
 
 void AEGLobbyGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
@@ -48,17 +53,26 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
 
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(NewPlayer))
     {
+
+		// 김효영 : 처음 접속한 플레이어에게만 레벨변경 위젯 보이기
+        if (!bChiefPlayer) // 처음 접속한 플레이어만
+        {
+            bChiefPlayer = true;
+
+            // 레벨변경 위젯 보이기
+            EGPC->ShowChiefPlayerUI();
+        }
+
+        // =================================
+
         APlayingPlayerControllers.Add(EGPC);
         int32 UniqueId = ++CurrentPlayerIndex;
         EGPC->SetPlayerIndex(UniqueId);
         SetRoomLeader();
 
-        if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
+        if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
         {
-            FAward Entry;
-            Entry.PlayerIndex = UniqueId;
-            Entry.PlayerEggScore = 0;
-            EGGS->LeaderboardSnapshot.Add(Entry);
+            GI->SetPlayerIndex(1);
         }
     }
 }

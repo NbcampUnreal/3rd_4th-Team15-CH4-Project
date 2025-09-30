@@ -23,6 +23,22 @@ void AEGHUD::PostInitializeComponents()
 	}
 }
 
+void AEGHUD::ChiefPlayerSetting()
+{
+	if (ChiefPlayerClass)
+	{
+		APlayerController* PlayerController = GetOwningPlayerController();
+		if (PlayerController)
+		{
+			UUserWidget* ChiefPlayerWidget = CreateWidget<UUserWidget>(PlayerController, ChiefPlayerClass);
+			if (ChiefPlayerWidget)
+			{
+				ChiefPlayerWidget->AddToViewport(1);
+			}
+		}
+	}
+}
+
 void AEGHUD::AddChatting()
 {
 	if (Chatting)
