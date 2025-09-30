@@ -62,7 +62,6 @@ void UEGPeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 			float CurrentEnergy = ActorInfo->AbilitySystemComponent->
 			                                 GetNumericAttribute(UEGCharacterAttributeSet::GetEggEnergyAttribute());
-			UE_LOG(LogTemp, Log, TEXT("CurrentEnergy: %0.1f"), CurrentEnergy);
 		}
 	}
 
@@ -74,7 +73,6 @@ void UEGPeckAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
                                 bool bReplicateEndAbility,
                                 bool bWasCancelled)
 {
-	UE_LOG(LogTemp, Log, TEXT("Peck Ability end"));
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
