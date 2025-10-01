@@ -53,6 +53,7 @@ void AEGPlayerController::BeginPlay()
 
 void AEGPlayerController::SetPlayerIndex(int32 NewIndex)
 {
+	/*
 	if (HasAuthority())
 	{
 		if (UEGGameInstance* EGGI = GetGameInstance<UEGGameInstance>())
@@ -62,6 +63,7 @@ void AEGPlayerController::SetPlayerIndex(int32 NewIndex)
 			EG_LOG_ROLE(LogMS, Warning, TEXT("Player %d is online."), PlayerIndex);    
 		}
 	}
+	*/
 }
 
 
