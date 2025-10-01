@@ -1,6 +1,8 @@
 //EGStunEffect.cpp
 
 #include "AbilitySystem/GameplayEffect/EGStunEffect.h"
+#include "AbilitySystemComponent.h"
+#include "GameplayCueInterface.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 
 UEGStunEffect::UEGStunEffect()
@@ -21,5 +23,9 @@ UEGStunEffect::UEGStunEffect()
         
 		this->GEComponents.Add(TargetTags);
 	}
-
+	
+	// JM : GameplayCue_Actor : Stun 연결
+	FGameplayEffectCue StunCue;
+	StunCue.GameplayCueTags.AddTag(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.Stun")));
+	GameplayCues.Add(StunCue);
 }
