@@ -10,8 +10,6 @@ class AEGItemBase;
 
 #pragma region DECLARE_DELEGATE
 
-// Item
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemPickUp, AEGItemBase*, Item);
 //Gamstate
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountdownUpdated, int32, NewCountdown);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayTimeUpdated, int32, NewPlayTime);
@@ -33,9 +31,6 @@ public:
 	virtual void Deinitialize() override;
 
 #pragma region DELEGATE
-	
-	UPROPERTY(BlueprintAssignable)
-	FOnItemPickUp OnItemPickUp;
 
 	//GameState
 	UPROPERTY(BlueprintAssignable, Category = "GameState|Events")
@@ -54,7 +49,6 @@ public:
 
 #pragma region BROADCAST
 	
-	void BroadcastItemPickUp(AEGItemBase* Item);
 	void BroadcastPlayerState(AEGGameStateBase* GameState);
 
 #pragma endregion 

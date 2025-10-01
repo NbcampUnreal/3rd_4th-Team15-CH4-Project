@@ -55,17 +55,20 @@ void AEGItem_Spawner::SpawnItem()
 
 		if (SpawnedItem)
 		{
-			auto* DelegateManager = GetGameInstance()->GetSubsystem<UEGDelegateManager>();
-			DelegateManager->OnItemPickUp.AddDynamic(this, &ThisClass::HandleItemPickUp);
+			SpawnedItem->OnItemPickUp.AddDynamic(this, &ThisClass::HandleItemPickUp);
 		}
 	}
 }
 
-void AEGItem_Spawner::HandleItemPickUp(AEGItemBase* PickedUpItem)
+void AEGItem_Spawner::HandleItemPickUp()
 {
-	SpawnedItem = nullptr;
+	UE_LOG(LogTemp, Log, TEXT("Item Picked Up"));
+	if (HasAuthority())
+	{
+		SpawnedItem = nullptr;
 
-	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &ThisClass::SpawnItem, ItemConfigData->SpawnInterval, false);
+		GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &ThisClass::SpawnItem, ItemConfigData->SpawnInterval, false);
+	}
 }
 
 TSubclassOf<AEGItemBase> AEGItem_Spawner::GetRandomItemClass()

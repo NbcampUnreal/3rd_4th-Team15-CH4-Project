@@ -33,7 +33,7 @@ private:
 	FTimerHandle SpawnTimerHandle;
 
 	UFUNCTION()
-	void HandleItemPickUp(AEGItemBase* PickedUpItem);
+	void HandleItemPickUp();
 	
 	void SpawnItem();
 	

@@ -45,5 +45,5 @@ public:
 
 	// Set AI State -> Angry
 	UFUNCTION(BlueprintCallable)
-	void OnAngryMode();
+	void OnAngryMode(FVector AttackLocation);
 };

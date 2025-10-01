@@ -33,8 +33,7 @@ void AEGItemBase::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 {
 	if (OtherActor && OtherActor != this && OtherActor->IsA(AEGChickenCharacter::StaticClass()))
 	{
-		auto* DelegateManager = GetGameInstance()->GetSubsystem<UEGDelegateManager>();
-		DelegateManager->BroadcastItemPickUp(this);
+		OnItemPickUp.Broadcast();
 		
 		Execute_OnPickUp(this, OtherActor);
 	}
