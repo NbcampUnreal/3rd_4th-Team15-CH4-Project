@@ -48,12 +48,9 @@ void UEGLayTrickEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 		{
 			if (GetOwningActorFromActorInfo()->HasAuthority())
 			{
-				FVector ActorLocation = ActorInfo->AvatarActor->GetActorLocation();
-				FVector BackWardVector = -ActorInfo->AvatarActor->GetActorForwardVector();
-				float SpawnDistance = 100.0f;
-				FVector SpawnLocation = ActorLocation + BackWardVector * SpawnDistance;
+				FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
 
-				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, ActorLocation,
+				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, SpawnLocation,
 				                                                        ActorInfo->AvatarActor->GetActorRotation());
 				EggActor->SetOwner(ActorInfo->AvatarActor.Get());
 			}

@@ -27,10 +27,6 @@ AEggActor::AEggActor()
 	StaticMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	StaticMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
-	StaticMesh->SetMassOverrideInKg(NAME_None, 20.0f, true); // 알 무게 20kg
-	StaticMesh->SetLinearDamping(1.5f); // 공기 저항 크게
-	StaticMesh->SetAngularDamping(1.5f); // 회전 저항 크게
-
 	StaticMesh->OnComponentBeginOverlap.AddDynamic(this, &AEggActor::OnPawnOverlap);
 }
 

@@ -10,6 +10,7 @@ UEGStunEffect::UEGStunEffect()
 
 	StackLimitCount = 1;
 	StackingType = EGameplayEffectStackingType::AggregateByTarget;
+	StackDurationRefreshPolicy = EGameplayEffectStackingDurationPolicy::NeverRefresh;
 
 	UTargetTagsGameplayEffectComponent* TargetTags = CreateDefaultSubobject<UTargetTagsGameplayEffectComponent>(TEXT("TargetTags"));
 	if (TargetTags)
