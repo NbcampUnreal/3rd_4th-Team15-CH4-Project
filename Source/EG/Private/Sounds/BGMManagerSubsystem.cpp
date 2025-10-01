@@ -165,5 +165,6 @@ USoundBase* UBGMManagerSubsystem::ResolveBGMSound(EBGMType InLevelName, const UB
 
 	EG_LOG(LogJM, Log, TEXT("End"));
 	// 소프트 참조를 동기 로드
-	return Info->BGMSound.LoadSynchronous();
+	return Info->BGMSound;
+	// return Info->BGMSound.LoadSynchronous();
 }
