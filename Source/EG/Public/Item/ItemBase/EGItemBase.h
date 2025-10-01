@@ -9,6 +9,8 @@
 class USphereComponent;
 class UNiagaraComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnItemPickUpDelegate);
+
 UCLASS()
 class EG_API AEGItemBase : public AActor, public IEGItemInterface
 {
@@ -16,6 +18,9 @@ class EG_API AEGItemBase : public AActor, public IEGItemInterface
 
 public:
 	AEGItemBase();
+
+	UPROPERTY()
+	FOnItemPickUpDelegate OnItemPickUp;
 
 protected:
 	virtual void BeginPlay() override;

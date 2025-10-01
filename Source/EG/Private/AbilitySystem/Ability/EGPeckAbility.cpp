@@ -2,11 +2,14 @@
 
 #include "AbilitySystem/Ability/EGPeckAbility.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
 #include "AbilitySystem/GameplayEffect/EGPeckCooldownEffect.h"
 #include "AbilitySystem/GameplayEffect/EGPeckEffect.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UEGPeckAbility::UEGPeckAbility()
 {
@@ -16,6 +19,37 @@ UEGPeckAbility::UEGPeckAbility()
 	CooldownGameplayEffectClass = UEGPeckCooldownEffect::StaticClass();
 	PeckEffectClass = UEGPeckEffect::StaticClass();
 }
+
+bool UEGPeckAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle,
+										const FGameplayAbilityActorInfo* ActorInfo,
+										const FGameplayTagContainer* SourceTags,
+										const FGameplayTagContainer* TargetTags,
+										FGameplayTagContainer* OptionalRelevantTags) const
+{
+	if (!Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
+	{
+		return false;
+	}
+
+	// Character Jump Check
+	ACharacter* Character = Cast<ACharacter>(ActorInfo->AvatarActor.Get());
+	if (Character && Character->GetCharacterMovement()->IsFalling())
+	{
+		return false;
+	}
+
+	// Force Jump Item Check
+	if (UAbilitySystemComponent* ASC = ActorInfo->AbilitySystemComponent.Get())
+	{
+		if (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Debuff.ForceJump"))))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 
 void UEGPeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                      const FGameplayAbilityActorInfo* ActorInfo,
@@ -64,6 +98,13 @@ void UEGPeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 			                                 GetNumericAttribute(UEGCharacterAttributeSet::GetEggEnergyAttribute());
 			UE_LOG(LogTemp, Log, TEXT("CurrentEnergy: %0.1f"), CurrentEnergy);
 		}
+
+		// JM : GameplayCue_Peck SFX
+		FGameplayCueParameters CueParams;
+		CueParams.Location = ActorInfo->AvatarActor->GetActorLocation();
+		ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.Peck")), CueParams);
+
+		
 	}
 
 }
