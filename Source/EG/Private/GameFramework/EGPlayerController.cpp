@@ -18,8 +18,7 @@
 #include "UI/EGHUD.h"
 #include "UI/EGChatting.h" 
 #include "EnhancedInputComponent.h"
-
-
+#include "Kismet/GameplayStatics.h"
 
 
 void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -40,6 +39,8 @@ void AEGPlayerController::BeginPlay()
 	FInputModeGameOnly GameOnly;
 	SetInputMode(GameOnly);
 
+	
+	
 	// ===== 내가 추가한 부분 =====
 	CreateAndShowHUD();
 	BindHUDToASC();
@@ -54,8 +55,12 @@ void AEGPlayerController::SetPlayerIndex(int32 NewIndex)
 {
 	if (HasAuthority())
 	{
-		PlayerIndex = NewIndex;
-		EG_LOG_ROLE(LogMS, Warning, TEXT("Player %d is online."), PlayerIndex);
+		if (UEGGameInstance* EGGI = GetGameInstance<UEGGameInstance>())
+		{
+			int32 Index = EGGI->GetOwnPlayerIndex();
+			PlayerIndex = Index;
+			EG_LOG_ROLE(LogMS, Warning, TEXT("Player %d is online."), PlayerIndex);    
+		}
 	}
 }
 

@@ -5,6 +5,7 @@
 #include "EGLog.h"
 #include "EG/Public/GameFramework/EGGameStateBase.h"
 #include "Character/EGChickenCharacter.h"
+#include "Character/Egg/EggActor.h"
 #include "GameFramework/EGInGameSpawnPoints.h"
 #include "GameFramework/EGPlayerState.h"
 #include "GameFramework/EGGameInstance.h"
@@ -46,19 +47,10 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
             {
                 GameStart();
             }
-        }
+        }        
     }
 }
-void AEGGameModeBase::SetRoomLeader()
-{
-    if (APlayingPlayerControllers.Num() > 0)
-    {
-        if (APlayingPlayerControllers[0].IsValid())
-        {
-            LeaderNum = APlayingPlayerControllers[0]->PlayerIndex;
-        }
-    }
-}
+
 void AEGGameModeBase::Logout(AController* Exiting)
 {
     Super::Logout(Exiting);
@@ -94,9 +86,7 @@ void AEGGameModeBase::InitializeSpawnPoint()
 AActor* AEGGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
     InitializeSpawnPoint();
-    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(Player))
-    {
-        int32 PlayerNum = EGPC->PlayerIndex;
+    int32 PlayerNum = GetNumPlayers()-1;
         if (AEGPlayerStart** FoundStart = PlayerStartList.Find(PlayerNum))
         {
             return *FoundStart;
