@@ -218,6 +218,11 @@ void AEGChickenCharacter::HandleJump()
 		{
 			return;
 		}
+
+		FGameplayTagContainer CancelTags;
+		CancelTags.AddTag(FGameplayTag::RequestGameplayTag("Ability.Active.Peck"));
+
+		AbilitySystemComponent->CancelAbilities(&CancelTags);
 	}
 
 	Jump();
