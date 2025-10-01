@@ -163,7 +163,6 @@ void UEGAttackAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
                                   bool bReplicateEndAbility,
                                   bool bWasCancelled)
 {
-	UE_LOG(LogTemp, Log, TEXT("EndAbility : Attack Ability End"));
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 

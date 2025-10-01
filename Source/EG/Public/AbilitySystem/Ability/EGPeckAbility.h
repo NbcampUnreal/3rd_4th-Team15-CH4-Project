@@ -39,8 +39,9 @@ protected:
 	void OnMontageCancelled();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Peck")
-	TSubclassOf<UGameplayEffect> PeckEffectClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Peck")
 	TObjectPtr<UAnimMontage> PeckMontage;
+
+private:
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 };

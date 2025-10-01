@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/GameplayEffect/EGSprintEffect.h"
 #include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
+#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 
 UEGSprintEffect::UEGSprintEffect()
 {
@@ -13,4 +14,14 @@ UEGSprintEffect::UEGSprintEffect()
 	MoveSpeedModifier.Attribute = UEGCharacterAttributeSet::GetMoveSpeedAttribute();
 
 	Modifiers.Add(MoveSpeedModifier);
+
+	UTargetTagsGameplayEffectComponent* TargetTags = CreateDefaultSubobject<UTargetTagsGameplayEffectComponent>(TEXT("TargetTags"));
+	if (TargetTags)
+	{
+		FInheritedTagContainer TagChanges = TargetTags->GetConfiguredTargetTagChanges();
+		TagChanges.Added.AddTag(FGameplayTag::RequestGameplayTag(FName("Status.Sprint")));
+		TargetTags->SetAndApplyTargetTagChanges(TagChanges);
+        
+		this->GEComponents.Add(TargetTags);
+	}
 }
