@@ -57,12 +57,13 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 				FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
 
 				FActorSpawnParameters SpawnParams; // kms
-				SpawnParams.Owner = GetOwningActorFromActorInfo(); //kms
+				SpawnParams.Owner = ActorInfo->AvatarActor.Get(); //kms
 				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, SpawnLocation,
 				                                                        ActorInfo->AvatarActor->GetActorRotation(),
 				                                                         SpawnParams //kms
 				                                                         );
 				EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+				// 서버에서만 알 스폰
 
 				// add egg count for GameState (작성자 : KMS)
 				UE_LOG(LogTemp, Warning, TEXT("Ability Activated on %s (Owner: %s, Avatar: %s)"),
@@ -89,6 +90,7 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 					}
 				}//여기까지 kms
 				
+				UE_LOG(LogTemp, Log, TEXT("Egg Spawned"));
 			}
 		}
 	}
