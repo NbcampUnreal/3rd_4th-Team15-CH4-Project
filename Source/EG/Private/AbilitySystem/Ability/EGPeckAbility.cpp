@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/Ability/EGPeckAbility.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
 #include "AbilitySystem/GameplayEffect/EGPeckCooldownEffect.h"
@@ -64,6 +65,13 @@ void UEGPeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 			                                 GetNumericAttribute(UEGCharacterAttributeSet::GetEggEnergyAttribute());
 			UE_LOG(LogTemp, Log, TEXT("CurrentEnergy: %0.1f"), CurrentEnergy);
 		}
+
+		// JM : GameplayCue_Peck SFX
+		FGameplayCueParameters CueParams;
+		CueParams.Location = ActorInfo->AvatarActor->GetActorLocation();
+		ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.Peck")), CueParams);
+
+		
 	}
 
 }
