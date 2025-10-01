@@ -35,5 +35,8 @@ protected:
 	UAbilityTask_PlayMontageAndWait* MontageTask;
 
 	UFUNCTION()
-	void OnMontageFinished();
+	void OnMontageFinished_Completed();
+
+	UFUNCTION()
+	void OnMontageFinished_Cancelled();
 };
