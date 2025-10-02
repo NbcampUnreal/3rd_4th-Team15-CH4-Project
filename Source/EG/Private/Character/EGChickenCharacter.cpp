@@ -17,7 +17,6 @@
 
 #include "GameFramework/EGPlayerController.h"
 
-
 AEGChickenCharacter::AEGChickenCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false; // JM : Tick 비활성화
@@ -218,6 +217,11 @@ void AEGChickenCharacter::HandleJump()
 		{
 			return;
 		}
+
+		FGameplayTagContainer CancelTags;
+		CancelTags.AddTag(FGameplayTag::RequestGameplayTag("Ability.Active.Peck"));
+
+		AbilitySystemComponent->CancelAbilities(&CancelTags);
 	}
 
 	Jump();

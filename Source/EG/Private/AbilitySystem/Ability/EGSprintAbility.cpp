@@ -144,25 +144,33 @@ bool UEGSprintAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handl
 		return false;
 	}
 
-	const UAbilitySystemComponent* ASC = ActorInfo->AbilitySystemComponent.Get();
-	if (!IsValid(ASC))
+	ACharacter* Character = Cast<ACharacter>(ActorInfo->AvatarActor.Get());
+	if (Character && Character->GetCharacterMovement()->IsFalling())
 	{
 		return false;
 	}
 
-	const UEGCharacterAttributeSet* AttributeSet = Cast<UEGCharacterAttributeSet>(
-		ASC->GetAttributeSet(UEGCharacterAttributeSet::StaticClass()));
-	if (!IsValid(AttributeSet))
+	if (UAbilitySystemComponent* ASC = ActorInfo->AbilitySystemComponent.Get())
 	{
-		return false;
+		if (ASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Debuff.ForceJump"))))
+		{
+			return false;
+		}
+		
+		const UEGCharacterAttributeSet* AttributeSet = Cast<UEGCharacterAttributeSet>(
+			ASC->GetAttributeSet(UEGCharacterAttributeSet::StaticClass()));
+		if (!IsValid(AttributeSet))
+		{
+			return false;
+		}
+		
+		const float CurrentStamina = AttributeSet->GetStamina();
+		if (CurrentStamina <= 0.0f)
+		{
+			return false;
+		}
 	}
-
-	const float CurrentStamina = AttributeSet->GetStamina();
-	if (CurrentStamina <= 0.0f)
-	{
-		return false;
-	}
-
+	
 	return true;
 }
 

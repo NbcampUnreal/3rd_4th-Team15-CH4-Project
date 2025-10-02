@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -37,12 +37,18 @@ public:
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
 
-
-	/*UFUNCTION(BlueprintCallable, Category = "GameFlow")
-	void GameStart(int32 UniqueID);*/
-
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
+
+// 레벨 변경 (작성자 : 김효영)
+#pragma region LevelChange
+	void LevelChange();
+
+	void ShowScreen();
+	//void HideScreen();
+
+#pragma endregion
+
 
 	FTimerHandle GameStartingTimerHandle;
 	FTimerHandle GameEndTimerHandle;
@@ -57,3 +63,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TMap<int32, AEGPlayerStart*> PlayerStartList;
 };
+
+#pragma endregion

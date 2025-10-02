@@ -5,41 +5,33 @@
 
 UEGEggEnergyRegenAbility::UEGEggEnergyRegenAbility()
 {
-    InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-
-	EggEnergyRegenEffectClass = UEGEggEnergyRegenEffect::StaticClass();
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UEGEggEnergyRegenAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UEGEggEnergyRegenAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+                                               const FGameplayAbilityActorInfo* ActorInfo,
+                                               const FGameplayAbilityActivationInfo ActivationInfo,
+                                               const FGameplayEventData* TriggerEventData)
 {
-    if (EggEnergyRegenEffectClass && ActorInfo->AbilitySystemComponent.IsValid())
-    {
-        FGameplayEffectContextHandle ContextHandle =
-            ActorInfo->AbilitySystemComponent->MakeEffectContext();
-        ContextHandle.AddSourceObject(this);
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	
+	if (ActorInfo->AbilitySystemComponent.IsValid())
+	{
+		FGameplayEffectSpecHandle SpecHandle = MakeOutgoingGameplayEffectSpec(
+				UEGEggEnergyRegenEffect::StaticClass(), 1.0f);
 
-        FGameplayEffectSpecHandle SpecHandle =
-            ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(
-                EggEnergyRegenEffectClass, 1, ContextHandle);
-
-        if (SpecHandle.IsValid())
-        {
-            FActiveGameplayEffectHandle ActiveHandle =
-                ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(
-                    *SpecHandle.Data.Get());
-
-            if (ActiveHandle.WasSuccessfullyApplied())
-            {
-                UE_LOG(LogTemp, Log, TEXT("EggEnergy..."));
-            }
-        }
-    }
-
-    //EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+		if (SpecHandle.IsValid())
+		{
+			ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
 }
 
-void UEGEggEnergyRegenAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+void UEGEggEnergyRegenAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
+                                          const FGameplayAbilityActorInfo* ActorInfo,
+                                          const FGameplayAbilityActivationInfo ActivationInfo,
+                                          bool bReplicateEndAbility,
+                                          bool bWasCancelled)
 {
-    UE_LOG(LogTemp, Log, TEXT("EggEnergyRegen ability ended"));
-    Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

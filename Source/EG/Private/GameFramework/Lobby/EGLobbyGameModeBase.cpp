@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GameFramework/Lobby/EGLobbyGameModeBase.h"
@@ -58,12 +58,12 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(NewPlayer))
     {
 
-		// ��ȿ�� : ó�� ������ �÷��̾�Ը� �������� ���� ���̱�
-        if (!bChiefPlayer) // ó�� ������ �÷��̾
+		// 김효영 : 처음 접속한 플레이어에게만 레벨변경 위젯 보이기
+        if (!bChiefPlayer) // 처음 접속한 플레이어만
         {
             bChiefPlayer = true;
 
-            // �������� ���� ���̱�
+            // 레벨변경 위젯 보이기
             EGPC->ShowChiefPlayerUI();
         }
 
@@ -72,6 +72,8 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
         {
             GI->SetPlayerIndex(1);
         }
+
+        EGPC->ClientHideBlackScreen();
     }
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState)) 
     {
@@ -151,17 +153,39 @@ AActor* AEGLobbyGameModeBase::ChoosePlayerStart_Implementation(AController* Play
     return Super::ChoosePlayerStart_Implementation(Player);
 }
 
-//void AEGLobbyGameModeBase::GameStart(int32 UniqueID)
+// 레벨 변경 (작성자 : 김효영)
+#pragma region LevelChange
+void AEGLobbyGameModeBase::LevelChange()
+{
+    ShowScreen();
+
+    UEGGameInstance* EGGI = Cast<UEGGameInstance>(GetGameInstance());
+    if (EGGI)
+    {
+        EGGI->ChangeLevel();
+    }
+}
+
+void AEGLobbyGameModeBase::ShowScreen()
+{
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
+        {
+            EGPC->ClientShowBlackScreen();
+        }
+    }
+}
+
+//void AEGLobbyGameModeBase::HideScreen()
 //{
-//    if (UniqueID == LeaderNum)
+//    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 //    {
-//        if (GetNumPlayers() > 1)
+//        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
 //        {
-//            if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
-//            {
-//                GI->ChangeLevel();
-//            }
-//            
+//            EGPC->ClientHideBlackScreen();
 //        }
 //    }
 //}
+
+#pragma endregion
