@@ -54,21 +54,20 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(NewPlayer))
     {
 
-		// ±èÈ¿¿µ : Ã³À½ Á¢¼ÓÇÑ ÇÃ·¹ÀÌ¾î¿¡°Ô¸¸ ·¹º§º¯°æ À§Á¬ º¸ÀÌ±â
-        if (!bChiefPlayer) // Ã³À½ Á¢¼ÓÇÑ ÇÃ·¹ÀÌ¾î¸¸
+		// ï¿½ï¿½È¿ï¿½ï¿½ : Ã³ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î¿¡ï¿½Ô¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì±ï¿½
+        if (!bChiefPlayer) // Ã³ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î¸¸
         {
             bChiefPlayer = true;
 
-            // ·¹º§º¯°æ À§Á¬ º¸ÀÌ±â
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì±ï¿½
             EGPC->ShowChiefPlayerUI();
         }
 
         // =================================
 
         APlayingPlayerControllers.Add(EGPC);
-        int32 UniqueId = ++CurrentPlayerIndex;
+        int32 UniqueId = CurrentPlayerIndex++;
         EGPC->SetPlayerIndex(UniqueId);
-        SetRoomLeader();
 
         if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
         {
@@ -76,18 +75,6 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
         }
     }
 }
-
-void AEGLobbyGameModeBase::SetRoomLeader()
-{
-    if (APlayingPlayerControllers.Num() > 0)
-    {
-        if (APlayingPlayerControllers[0].IsValid())
-        {
-            LeaderNum = APlayingPlayerControllers[0]->PlayerIndex;
-        }
-    }
-}
-
 
 void AEGLobbyGameModeBase::Logout(AController* Exiting)
 {
@@ -101,7 +88,6 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
                 return !P.IsValid() || P.Get() == EGPC;
             });
     }
-    SetRoomLeader();
 }
 
 void AEGLobbyGameModeBase::InitializeSpawnPoint()

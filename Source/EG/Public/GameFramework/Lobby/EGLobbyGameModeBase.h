@@ -32,7 +32,6 @@ public:
 		FString& ErrorMessage) override;
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-	void SetRoomLeader();
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
 

@@ -35,7 +35,7 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(NewPlayer))
     {
         APlayingPlayerControllers.Add(EGPC);
-        int32 UniqueId = ++CurrentPlayerIndex;
+        int32 UniqueId = CurrentPlayerIndex++;
         EGPC->SetPlayerIndex(UniqueId);
         if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
         {
