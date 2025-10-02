@@ -30,6 +30,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SFX")
 	TObjectPtr<UAudioComponent> AudioComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SFX")
-	bool bIsLoop = true;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sounds")
+	TObjectPtr<USoundAttenuation> SFXAttenuation;
 };

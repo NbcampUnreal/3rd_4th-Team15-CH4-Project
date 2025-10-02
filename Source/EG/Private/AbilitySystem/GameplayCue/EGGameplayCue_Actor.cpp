@@ -72,7 +72,11 @@ void AEGGameplayCue_Actor::PlaySFXLoop(AActor* MyTarget)
 		NAME_None,
 		FVector::ZeroVector,
 		EAttachLocation::KeepRelativeOffset,
-		true
+		true,
+		1.0f,
+		1.0f,
+		0.0f,
+		SFXAttenuation
 	);
 	EG_LOG(LogJM, Log, TEXT("end"));
 }
