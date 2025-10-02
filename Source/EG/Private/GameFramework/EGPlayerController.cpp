@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GameFramework/EGPlayerController.h"
@@ -14,6 +14,7 @@
 
 // 김효영
 #include "GameFramework/EGGameModeBase.h"
+#include "GameFramework/Lobby/EGLobbyGameModeBase.h"
 #include "GameFramework/EGGameInstance.h"
 #include "UI/EGHUD.h"
 #include "UI/EGChatting.h" 
@@ -142,10 +143,14 @@ void AEGPlayerController::ServerRequestLevelChange_Implementation()
 {
 	if (HasAuthority())
 	{
-		if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
+		if (AEGLobbyGameModeBase* GM = GetWorld()->GetAuthGameMode<AEGLobbyGameModeBase>())
+		{
+			GM->LevelChange();
+		}
+		/*if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
 		{
 			GI->ChangeLevel();
-		}
+		}*/
 	}
 }
 
@@ -162,6 +167,38 @@ void AEGPlayerController::ToggleMouseCursor()
 	{
 		bShowMouseCursor = false;
 		SetInputMode(FInputModeGameOnly());  // 다시 게임 전용 입력
+	}
+}
+
+void AEGPlayerController::ClientShowBlackScreen_Implementation()
+{
+	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
+	{
+		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+		if (PC)
+		{
+			PC->SetIgnoreMoveInput(true);
+			PC->SetIgnoreLookInput(true);
+			bEnableClickEvents = false;
+			bEnableMouseOverEvents = false;
+		}
+		GI->FadeInScreen();
+	}
+}
+
+void AEGPlayerController::ClientHideBlackScreen_Implementation()
+{
+	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
+	{
+		GI->FadeOutScreen();
+		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+		if (PC)
+		{
+			PC->SetIgnoreMoveInput(false);
+			PC->SetIgnoreLookInput(false);
+			bEnableClickEvents = true;
+			bEnableMouseOverEvents = true;
+		}
 	}
 }
 
