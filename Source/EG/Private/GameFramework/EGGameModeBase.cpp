@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 #include "EG/Public/GameFramework/EGGameModeBase.h"
 #include "EngineUtils.h"
 #include "EG/Public/GameFramework/EGPlayerStart.h"
@@ -153,7 +153,10 @@ void AEGGameModeBase::GameStart()
             }
         }
         EG_LOG_ROLE(LogMS, Warning, TEXT("-------------------------------------"));
+
     }
+
+    HideScreen();
 }
 
 void AEGGameModeBase::GameOver()
@@ -182,5 +185,33 @@ void AEGGameModeBase::GameOver()
         EGGS->SetFinalResults(FinalPlayerScores);
         EGGS->FinalizeAward();
     }
+
+    ShowScreen();
 	GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
 }
+
+// 레벨 변경 (작성자 : 김효영)
+#pragma region LevelChange
+void AEGGameModeBase::ShowScreen()
+{
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
+        {
+            EGPC->ClientShowBlackScreen();
+        }
+    }
+}
+
+void AEGGameModeBase::HideScreen()
+{
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
+        {
+            EGPC->ClientHideBlackScreen();
+        }
+    }
+}
+
+#pragma endregion
