@@ -13,6 +13,10 @@
 #include "GameFramework/EGPlayerState.h"
 
 
+AEGLobbyGameModeBase::AEGLobbyGameModeBase()
+{
+    bUseSeamlessTravel = true;
+}
 
 void AEGLobbyGameModeBase::SendChatMessage(const FString& Message)
 {
@@ -64,12 +68,6 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
         }
 
         // =================================
-
-        APlayingPlayerControllers.Add(EGPC);
-        int32 UniqueId = ++CurrentPlayerIndex;
-        EGPC->SetPlayerIndex(UniqueId);
-        SetRoomLeader();
-
         if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
         {
             GI->SetPlayerIndex(1);
@@ -77,33 +75,46 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
 
         EGPC->ClientHideBlackScreen();
     }
-}
-
-void AEGLobbyGameModeBase::SetRoomLeader()
-{
-    if (APlayingPlayerControllers.Num() > 0)
+    if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState)) 
     {
-        if (APlayingPlayerControllers[0].IsValid())
+        APlayingPlayerStates.Add(EGPS);
+        if (EGPS->GetPlayerID() == -1)
         {
-            LeaderNum = APlayingPlayerControllers[0]->PlayerIndex;
+            
+            EGPS->SetPlayerID(CurrentPlayerIndex++);
         }
     }
+    
+    if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
+    {
+        GS->UpdateLeaderboard();
+    }
 }
-
 
 void AEGLobbyGameModeBase::Logout(AController* Exiting)
 {
     Super::Logout(Exiting);
 
-    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(Exiting))
+    if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(Exiting))
     {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPC->PlayerIndex);
-        APlayingPlayerControllers.RemoveAll([EGPC](const TWeakObjectPtr<AEGPlayerController>& P)
+        EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPS->GetPlayerID());
+        APlayingPlayerStates.RemoveAll([EGPS](const TWeakObjectPtr<AEGPlayerState>& P)
             {
-                return !P.IsValid() || P.Get() == EGPC;
+                return !P.IsValid() || P.Get() == EGPS;
             });
     }
-    SetRoomLeader();
+    if (bChiefPlayer && APlayingPlayerStates.Num() > 0)
+    {
+        if (AEGPlayerController* NewChief = Cast<AEGPlayerController>(APlayingPlayerStates[0]->GetOwner()))
+        {
+            bChiefPlayer = true;
+            NewChief->ShowChiefPlayerUI();
+        }
+    }
+    if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
+    {
+        GS->UpdateLeaderboard();
+    }
 }
 
 void AEGLobbyGameModeBase::InitializeSpawnPoint()

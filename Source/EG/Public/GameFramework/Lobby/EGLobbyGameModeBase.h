@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/EGPlayerState.h"
 #include "GameFramework/GameModeBase.h"
 #include "EGLobbyGameModeBase.generated.h"
 
@@ -20,6 +21,7 @@ class EG_API AEGLobbyGameModeBase : public AGameModeBase
 	
 public:
 
+	AEGLobbyGameModeBase();
 #pragma region Chatting
 	void SendChatMessage(const FString& Message);
 
@@ -32,7 +34,6 @@ public:
 		FString& ErrorMessage) override;
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-	void SetRoomLeader();
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
 
@@ -58,7 +59,7 @@ protected:
 
 
 	UPROPERTY(VisibleAnywhere, Category = "Players")
-	TArray<TWeakObjectPtr<AEGPlayerController>> APlayingPlayerControllers;
+	TArray<TWeakObjectPtr<AEGPlayerState>> APlayingPlayerStates;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TMap<int32, AEGPlayerStart*> PlayerStartList;
 };

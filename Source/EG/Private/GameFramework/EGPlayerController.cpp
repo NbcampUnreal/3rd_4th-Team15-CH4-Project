@@ -52,22 +52,21 @@ void AEGPlayerController::BeginPlay()
 	// ===== 여기까지 =====
 }
 
+/*
 void AEGPlayerController::SetPlayerIndex(int32 NewIndex)
 {
-	/*
 	if (HasAuthority())
 	{
-		if (UEGGameInstance* EGGI = GetGameInstance<UEGGameInstance>())
+		if (HasAuthority()) // 서버에서만 PlayerIndex를 설정해야 합니다.
 		{
-			int32 Index = EGGI->GetOwnPlayerIndex();
-			PlayerIndex = Index;
-			EG_LOG_ROLE(LogMS, Warning, TEXT("Player %d is online."), PlayerIndex);    
+			PlayerIndex = NewIndex;
+			EG_LOG_ROLE(LogMS, Warning, TEXT("Player Index set to: %d"), PlayerIndex);    
 		}
 	}
-	*/
+
 }
 
-
+*/
 
 
 // ====== 내가 추가한 구현 ======
