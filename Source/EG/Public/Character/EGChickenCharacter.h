@@ -83,6 +83,8 @@ private:
 public:
 	void ExecuteJump();
 
+	void PlayBlockSkillSFX();	// SFXManagerSubsystem 호출
+
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")

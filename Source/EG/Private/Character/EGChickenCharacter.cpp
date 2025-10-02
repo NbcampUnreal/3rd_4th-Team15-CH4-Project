@@ -16,6 +16,7 @@
 #include "GameFramework/EGPlayerState.h"
 
 #include "GameFramework/EGPlayerController.h"
+#include "Sounds/SFXManagerSubsystem.h"
 
 
 AEGChickenCharacter::AEGChickenCharacter()
@@ -358,6 +359,7 @@ void AEGChickenCharacter::ExecuteDash()
 		}
 		else
 		{
+			PlayBlockSkillSFX();	// 쿨타임 시에는 블로킹 SFX 재생
 			UE_LOG(LogTemp, Warning, TEXT("Dash Ability failed - cooldownTag having"));
 		}
 	}
@@ -383,6 +385,8 @@ void AEGChickenCharacter::ExecuteAttack()
 		}
 		else
 		{
+			// JM : 쿨타임 중일 때는 스킬 사용 불가 효과음 재생 (개인한테만 들리도록)
+			PlayBlockSkillSFX();
 			UE_LOG(LogTemp, Warning, TEXT("Attack Ability failed - cooldownTag having"));
 		}
 	}
@@ -408,6 +412,7 @@ void AEGChickenCharacter::ExecuteLayEgg()
 		}
 		else
 		{
+			PlayBlockSkillSFX();	// 쿨타임 시에는 블로킹 SFX 재생
 			UE_LOG(LogTemp, Warning, TEXT("LayEgg Ability failed - cooldownTag having"));
 		}
 	}
@@ -433,6 +438,7 @@ void AEGChickenCharacter::ExecutePeck()
 		}
 		else
 		{
+			PlayBlockSkillSFX();	// 쿨타임 시에는 블로킹 SFX 재생
 			UE_LOG(LogTemp, Warning, TEXT("Peck Ability failed - cooldownTag having"));
 		}
 	}
@@ -457,6 +463,7 @@ void AEGChickenCharacter::ExecuteLayBombEgg()
 		}
 		else
 		{
+			PlayBlockSkillSFX();	// 쿨타임 시에는 블로킹 SFX 재생
 			UE_LOG(LogTemp, Warning, TEXT("LayBombEgg Ability failed - cooldownTag having"));
 		}
 	}
@@ -481,6 +488,7 @@ void AEGChickenCharacter::ExecuteLayTrickEgg()
 		}
 		else
 		{
+			PlayBlockSkillSFX();	// 쿨타임 시에는 블로킹 SFX 재생
 			UE_LOG(LogTemp, Warning, TEXT("LayTrickEgg Ability failed - cooldownTag having"));
 		}
 	}
@@ -505,6 +513,15 @@ void AEGChickenCharacter::ExecuteJump()
 		{
 			// EG_LOG(LogJM, Warning, TEXT("Jump ability failed"));
 		}
+	}
+}
+
+void AEGChickenCharacter::PlayBlockSkillSFX()
+{
+	USFXManagerSubsystem* SFXManager = GetGameInstance()->GetSubsystem<USFXManagerSubsystem>();
+	if (SFXManager)
+	{
+		SFXManager->PlaySFXLocalClientOnly(ESFXType::BlockSkill, this);
 	}
 }
 
