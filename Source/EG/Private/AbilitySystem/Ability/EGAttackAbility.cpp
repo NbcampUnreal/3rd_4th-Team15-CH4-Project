@@ -11,7 +11,6 @@
 #include "Character/EGChickenCharacter.h"
 #include "Character/Egg/EggActor.h"
 #include "Engine/OverlapResult.h"
-#include "GameFramework/EGPlayerState.h"
 
 UEGAttackAbility::UEGAttackAbility()
 {
@@ -79,11 +78,11 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 				3.0f, // 표시 지속 시간 (초)
 				0, // 우선순위
 				1.0f);
-			
+
 			if (bHit)
 			{
 				TSet<AActor*> UniqueActors;
-				
+
 				for (const FOverlapResult& Result : OverlapResults)
 				{
 					if (AActor* HitActor = Result.GetActor())
@@ -111,7 +110,6 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 							UAbilitySystemComponent* TargetASC = Character->GetAbilitySystemComponent();
 							TargetASC->ApplyGameplayEffectSpecToSelf(*StunSpec.Data.Get());
 							TargetASC->ApplyGameplayEffectSpecToSelf(*ResetEnergySpec.Data.Get());
-
 						}
 						else if (AEGAICharacter* AICharacter = Cast<AEGAICharacter>(HitActor))
 						{
