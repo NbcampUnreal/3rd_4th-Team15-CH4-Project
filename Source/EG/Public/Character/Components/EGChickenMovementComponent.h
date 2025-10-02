@@ -45,6 +45,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="EGChickenMovementComponent|Movement")
 	float DashStrength = 1000.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category="EGChickenMovementComponent|Movement")
+	float JumpStrength = 500.0f;
 #pragma endregion
 	
 };

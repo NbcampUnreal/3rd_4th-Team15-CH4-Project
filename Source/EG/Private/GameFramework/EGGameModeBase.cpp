@@ -182,6 +182,5 @@ void AEGGameModeBase::GameOver()
         EGGS->SetFinalResults(FinalPlayerScores);
         EGGS->FinalizeAward();
     }
-
 	GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
 }

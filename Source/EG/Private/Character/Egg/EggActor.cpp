@@ -3,6 +3,7 @@
 #include "Character/Egg/EggActor.h"
 
 #include "AbilitySystemComponent.h"
+#include "GameFramework/EGPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
 AEggActor::AEggActor()
@@ -26,10 +27,6 @@ AEggActor::AEggActor()
 	StaticMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	StaticMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
-	StaticMesh->SetMassOverrideInKg(NAME_None, 20.0f, true); // 알 무게 20kg
-	StaticMesh->SetLinearDamping(1.5f); // 공기 저항 크게
-	StaticMesh->SetAngularDamping(1.5f); // 회전 저항 크게
-
 	StaticMesh->OnComponentBeginOverlap.AddDynamic(this, &AEggActor::OnPawnOverlap);
 }
 
@@ -41,6 +38,19 @@ void AEggActor::ApplyDamageAndCheckDestroy(int32 Damage, AActor* DamagedActor)
 	{
 		if (!IsValid(AbilityClass))
 		{
+			if (HasAuthority())
+			{
+				if (APawn* OwnerPawn = Cast<APawn>(GetOwner()))
+				{
+					if (AController* OwnerController = OwnerPawn->GetController())
+					{
+						if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(OwnerController->PlayerState))
+						{
+							EGPS->RemoveEgg_Internal(1); 
+						}
+					}
+				}
+			}
 			Destroy();
 		}
 	}

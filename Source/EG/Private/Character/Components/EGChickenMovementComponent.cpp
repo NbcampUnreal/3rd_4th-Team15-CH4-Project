@@ -18,6 +18,7 @@ void UEGChickenMovementComponent::Initialize(AEGChickenCharacter* InOwner)
 	if (OwnerCharacter)
 	{
 		OwnerCharacter->GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;	// JM: 초기 속도 세팅
+		OwnerCharacter->GetCharacterMovement()->JumpZVelocity = JumpStrength; // 점프력 높이기 (작성자 : 김세훈)
 	}
 	else
 	{

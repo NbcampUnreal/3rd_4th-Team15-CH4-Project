@@ -42,6 +42,9 @@ private:
 	UFUNCTION()
 	void OnStaminaTooLow(bool bMatchesComparison, float CurrentValue);
 
+	UFUNCTION()
+	void OnApplyStun();
+
 	FGameplayEffectSpecHandle SprintSpec;
 	FGameplayEffectSpecHandle SprintCostSpec;
 

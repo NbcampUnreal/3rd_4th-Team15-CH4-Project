@@ -2,8 +2,8 @@
 
 #include "AbilitySystem/Ability/EGPeckAbility.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystem/AttributeSet/EGCharacterAttributeSet.h"
 #include "AbilitySystem/GameplayEffect/EGPeckCooldownEffect.h"
 #include "AbilitySystem/GameplayEffect/EGPeckEffect.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
@@ -16,7 +16,8 @@ UEGPeckAbility::UEGPeckAbility()
 
 	CostGameplayEffectClass = nullptr;
 	CooldownGameplayEffectClass = UEGPeckCooldownEffect::StaticClass();
-	PeckEffectClass = UEGPeckEffect::StaticClass();
+
+	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("Ability.Cooldown.Peck"));
 }
 
 bool UEGPeckAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -81,24 +82,15 @@ void UEGPeckAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		}
 	}
 
-	if (IsValid(PeckEffectClass) && ActorInfo->AbilitySystemComponent.IsValid())
+	AbilitySystemComponent = ActorInfo->AbilitySystemComponent.Get();
+
+	if (IsValid(AbilitySystemComponent))
 	{
-		FGameplayEffectContextHandle ContextHandle = ActorInfo->AbilitySystemComponent->MakeEffectContext();
-		ContextHandle.AddSourceObject(this);
-
-		FGameplayEffectSpecHandle SpecHandle = ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(
-			PeckEffectClass, 1, ContextHandle);
-
-		if (SpecHandle.IsValid())
-		{
-			ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-
-			float CurrentEnergy = ActorInfo->AbilitySystemComponent->
-			                                 GetNumericAttribute(UEGCharacterAttributeSet::GetEggEnergyAttribute());
-			UE_LOG(LogTemp, Log, TEXT("CurrentEnergy: %0.1f"), CurrentEnergy);
-		}
-	}
-
+		// JM : GameplayCue_Peck SFX
+		FGameplayCueParameters CueParams;
+		CueParams.Location = ActorInfo->AvatarActor->GetActorLocation();
+		ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.Peck")), CueParams);
+	}	
 }
 
 void UEGPeckAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
@@ -107,7 +99,17 @@ void UEGPeckAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
                                 bool bReplicateEndAbility,
                                 bool bWasCancelled)
 {
-	UE_LOG(LogTemp, Log, TEXT("Peck Ability end"));
+	if (!bWasCancelled)
+	{
+		if (IsValid(AbilitySystemComponent))
+		{
+			FGameplayEffectSpecHandle PeckSpec = MakeOutgoingGameplayEffectSpec(
+				UEGPeckEffect::StaticClass(), 1.0f);
+
+			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*PeckSpec.Data.Get());
+		}
+	}
+	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
