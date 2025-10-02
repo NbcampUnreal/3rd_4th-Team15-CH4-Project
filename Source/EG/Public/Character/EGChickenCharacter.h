@@ -78,6 +78,7 @@ private:
 	void ExecutePeck();
 	void ExecuteLayBombEgg();
 	void ExecuteLayTrickEgg();
+	void ExecuteJump();
 
 
 protected:
@@ -178,6 +179,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
 	TSubclassOf<UGameplayAbility> LayTrickEggAbilityClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> JumpAbilityClass;
 
 #pragma endregion
 

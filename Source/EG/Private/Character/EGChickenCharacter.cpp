@@ -219,8 +219,8 @@ void AEGChickenCharacter::HandleJump()
 			return;
 		}
 	}
-
-	Jump();
+	// Jump();
+	ExecuteJump();
 }
 
 void AEGChickenCharacter::HandleStopJump()
@@ -279,7 +279,6 @@ void AEGChickenCharacter::HandleAttack()
 			return;
 		}
 	}
-	
 	ExecuteAttack();
 }
 
@@ -483,6 +482,28 @@ void AEGChickenCharacter::ExecuteLayTrickEgg()
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("LayTrickEgg Ability failed - cooldownTag having"));
+		}
+	}
+}
+
+void AEGChickenCharacter::ExecuteJump()
+{
+	// Jump Ability 실행시키기 (작성자 : JJM)
+	if (GetMovementComponent()->IsFalling())
+	{
+		return;
+	}
+	
+	if (IsValid(AbilitySystemComponent) && IsValid(JumpAbilityClass))
+	{
+		bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(JumpAbilityClass);
+		if (bSuccess)
+		{
+			// EG_LOG(LogJM, Log, TEXT("Jump ability activated"));
+		}
+		else
+		{
+			// EG_LOG(LogJM, Warning, TEXT("Jump ability failed"));
 		}
 	}
 }
