@@ -4,6 +4,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "EGLog.h"
+#include "Character/EGChickenCharacter.h"
 #include "GameFramework/Character.h"
 
 UEGItem_ForceJumpAbility::UEGItem_ForceJumpAbility()
@@ -94,6 +95,16 @@ void UEGItem_ForceJumpAbility::ForceJump(ACharacter* Character)
 {
 	if (Character && Character->CanJump())
 	{
-		Character->Jump();
+		// Character->Jump();
+		AEGChickenCharacter* EGChicken = Cast<AEGChickenCharacter>(Character);
+		if (EGChicken)
+		{
+			// JM : 점프시 소리 나도록 Ability 실행하는 래핑 함수 실행
+			EGChicken->ExecuteJump();
+		}
+		else
+		{
+			EG_LOG(LogJM, Warning, TEXT("Cast Failed <AEGChickenCharacter>"));
+		}
 	}
 }

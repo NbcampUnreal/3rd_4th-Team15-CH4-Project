@@ -78,6 +78,9 @@ private:
 	void ExecutePeck();
 	void ExecuteLayBombEgg();
 	void ExecuteLayTrickEgg();
+
+// JM : 강제 점프 아이템에서 호출하도록 하려고
+public:
 	void ExecuteJump();
 
 
