@@ -9,8 +9,6 @@
 
 void UBGMManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
-	EG_LOG(LogJM, Log, TEXT("Start"));
-	
 	Super::Initialize(Collection);
 	
 	if (IsRunningDedicatedServer())	// 0. 서버에서는 실행하지 않음
@@ -32,25 +30,17 @@ void UBGMManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	// 3. 맵(레벨) 로드가 완료될 때마다 OnPostLoadMap 함수를 실행하도록 '델리게이트'에 바인딩
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UBGMManagerSubsystem::OnPostLoadMap);
-	
-	EG_LOG(LogJM, Log, TEXT("End"));
 }
 
 void UBGMManagerSubsystem::Deinitialize()
 {
-	EG_LOG(LogJM, Log, TEXT("Start"));
-	
 	// 델리게이트 바인딩을 해제하여 메모리 누수를 방지
 	FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
 	Super::Deinitialize();
-	
-	EG_LOG(LogJM, Log, TEXT("End"));
 }
 
 void UBGMManagerSubsystem::PlayBGM(EBGMType InLevelName)
 {
-	EG_LOG(LogJM, Log, TEXT("Start"));
-	
     USoundBase* Sound = ResolveBGMSound(InLevelName, BGMDataAsset);
     if (!Sound)
     {
@@ -94,8 +84,6 @@ void UBGMManagerSubsystem::PlayBGM(EBGMType InLevelName)
 	BGMComponent->FadeIn(BGMDataAsset->FadeTime);						// BGM 페이드 인 
     // GMComponent->Play();							// FadeIn 적용 안하려면 바로 Play 해도 됨
     CurrentPlayingBGM = InLevelName;
-	
-	EG_LOG(LogJM, Log, TEXT("End"));
 }
 
 void UBGMManagerSubsystem::StopBGM()
@@ -112,8 +100,6 @@ void UBGMManagerSubsystem::StopBGM()
 
 void UBGMManagerSubsystem::OnPostLoadMap(UWorld* LoadedWorld)
 {
-	EG_LOG(LogJM, Log, TEXT("Start"));
-	
 	if (!LoadedWorld || !BGMDataAsset)
 	{
 		EG_LOG(LogJM, Warning, TEXT(" !LoadedWorld || !BGADataAsset"));
@@ -137,13 +123,10 @@ void UBGMManagerSubsystem::OnPostLoadMap(UWorld* LoadedWorld)
 		PlayBGM(EBGMType::None);		
 		EG_LOG(LogJM, Warning, TEXT("Map '%s' not found in BGM Data Asset. Stopping BGM."), *CurrentMapName);
 	}
-	EG_LOG(LogJM, Log, TEXT("End"));
 }
 
 USoundBase* UBGMManagerSubsystem::ResolveBGMSound(EBGMType InLevelName, const UBGMDataAsset* DataAsset)
 {
-	EG_LOG(LogJM, Log, TEXT("Start"));
-	
 	if (!DataAsset)
 	{
 		EG_LOG(LogJM, Log, TEXT("No DataAsset"));
@@ -163,8 +146,6 @@ USoundBase* UBGMManagerSubsystem::ResolveBGMSound(EBGMType InLevelName, const UB
 		return nullptr;
 	}
 
-	EG_LOG(LogJM, Log, TEXT("End"));
-	// 소프트 참조를 동기 로드
 	return Info->BGMSound;
 	// return Info->BGMSound.LoadSynchronous();
 }
