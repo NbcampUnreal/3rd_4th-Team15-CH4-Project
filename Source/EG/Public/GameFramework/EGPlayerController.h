@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -24,7 +24,7 @@ public:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category="Player")
 	int32 PlayerIndex;
     
-    void SetPlayerIndex(int32 NewIndex);
+    //void SetPlayerIndex(int32 NewIndex);
 
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange
@@ -36,6 +36,12 @@ public:
 	void ServerRequestLevelRecordChange(const FString& MapName);
 
 	void ToggleMouseCursor();
+
+	UFUNCTION(Client, Reliable)
+	void ClientShowBlackScreen();
+
+	UFUNCTION(Client, Reliable)
+	void ClientHideBlackScreen();
 
 private:
 	bool bMouseVisible = false;	
