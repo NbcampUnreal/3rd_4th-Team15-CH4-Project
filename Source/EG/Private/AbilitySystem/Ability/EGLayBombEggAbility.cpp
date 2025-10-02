@@ -15,8 +15,9 @@ UEGLayBombEggAbility::UEGLayBombEggAbility()
 }
 
 void UEGLayBombEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData)
+                                           const FGameplayAbilityActorInfo* ActorInfo,
+                                           const FGameplayAbilityActivationInfo ActivationInfo,
+                                           const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -50,7 +51,7 @@ void UEGLayBombEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 				FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
 
 				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, SpawnLocation,
-																		ActorInfo->AvatarActor->GetActorRotation());
+				                                                        ActorInfo->AvatarActor->GetActorRotation());
 				EggActor->SetOwner(ActorInfo->AvatarActor.Get());
 			}
 		}
@@ -58,8 +59,10 @@ void UEGLayBombEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 }
 
 void UEGLayBombEggAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-	bool bReplicateEndAbility, bool bWasCancelled)
+                                      const FGameplayAbilityActorInfo* ActorInfo,
+                                      const FGameplayAbilityActivationInfo ActivationInfo,
+                                      bool bReplicateEndAbility,
+                                      bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

@@ -19,6 +19,7 @@ protected:
 	                             const FGameplayAbilityActorInfo* ActorInfo,
 	                             const FGameplayAbilityActivationInfo ActivationInfo,
 	                             const FGameplayEventData* TriggerEventData) override;
+	
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle,
 	                        const FGameplayAbilityActorInfo* ActorInfo,
 	                        const FGameplayAbilityActivationInfo ActivationInfo,
@@ -27,7 +28,7 @@ protected:
 
 	UFUNCTION()
 	void OnDashFinished();
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dash")
 	float DashDuration = 0.2f;
 

@@ -17,7 +17,6 @@
 
 #include "GameFramework/EGPlayerController.h"
 
-
 AEGChickenCharacter::AEGChickenCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false; // JM : Tick 비활성화
