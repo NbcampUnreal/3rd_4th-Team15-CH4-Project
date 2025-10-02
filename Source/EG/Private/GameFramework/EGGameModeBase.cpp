@@ -20,6 +20,12 @@ void AEGGameModeBase::BeginPlay()
         playerCount = GI->GetPlayerIndex();
     }
 }
+
+AEGGameModeBase::AEGGameModeBase()
+{
+    bUseSeamlessTravel = true;
+}
+
 void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
     Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
@@ -32,15 +38,18 @@ void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, c
 void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
-    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(NewPlayer))
+    
+    if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
-        APlayingPlayerControllers.Add(EGPC);
-        int32 UniqueId = CurrentPlayerIndex++;
-        EGPC->SetPlayerIndex(UniqueId);
+        if (EGPS->GetPlayerID() == -1)
+        {
+            EGPS->SetPlayerID(CurrentPlayerIndex++);
+        }
+        
         if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
         {
             FAward Entry;
-            Entry.PlayerIndex = UniqueId;
+            Entry.PlayerID = EGPS->GetPlayerID();
             Entry.PlayerEggScore = 0;
             EGGS->LeaderboardSnapshot.Add(Entry);
             if (CurrentPlayerIndex == playerCount)

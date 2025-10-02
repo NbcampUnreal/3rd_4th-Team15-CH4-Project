@@ -1,22 +1,28 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "GameFramework/EGPlayerState.h"
-
 #include "GameFramework/EGGameStateBase.h"
 #include "Net/UnrealNetwork.h"
 
 
 AEGPlayerState::AEGPlayerState()
 {
-	PlayerName = "Player";
+	CurrentPlayerID = -1;
+	PlayerName = FString::Printf(TEXT("Player %d"), CurrentPlayerID);
 	PlayerEggCount = 0;
+}
+
+void AEGPlayerState::SetPlayerID(int32 Num)
+{
+	CurrentPlayerID = Num;
+	PlayerName = FString::Printf(TEXT("Player %d state On"), CurrentPlayerID);
 }
 
 void AEGPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AEGPlayerState, PlayerEggCount);
+	DOREPLIFETIME(AEGPlayerState, CurrentPlayerID);
 }
 
 void AEGPlayerState::OnRep_PlayerEggCount()

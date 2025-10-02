@@ -15,19 +15,19 @@ struct FAward
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 PlayerIndex;
+	int32 PlayerID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 PlayerEggScore;
 
 	FAward()
-	   : PlayerIndex(0)
+	   : PlayerID(0)
 	   , PlayerEggScore(0)
 	{}
 
 	bool operator==(const FAward& Other) const
 	{
-		return PlayerIndex == Other.PlayerIndex
+		return PlayerID == Other.PlayerID
 			&& PlayerEggScore == Other.PlayerEggScore;
 	}
 };

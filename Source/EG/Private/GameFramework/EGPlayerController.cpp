@@ -51,6 +51,7 @@ void AEGPlayerController::BeginPlay()
 	// ===== 여기까지 =====
 }
 
+/*
 void AEGPlayerController::SetPlayerIndex(int32 NewIndex)
 {
 	if (HasAuthority())
@@ -64,7 +65,7 @@ void AEGPlayerController::SetPlayerIndex(int32 NewIndex)
 
 }
 
-
+*/
 
 
 // ====== 내가 추가한 구현 ======

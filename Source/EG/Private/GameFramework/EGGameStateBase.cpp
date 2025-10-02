@@ -70,7 +70,7 @@ void AEGGameStateBase::OnRep_Leaderboard()
 void AEGGameStateBase::OnRep_Award()
 {
 	UE_LOG(LogTemp, Log, TEXT("Award replicated -> WinnerIndex: %d, Score: %d"),
-		RoundAward.PlayerIndex,
+		RoundAward.PlayerID,
 		RoundAward.PlayerEggScore);
 	
 	DelegateManager->OnAwardUpdated.Broadcast(RoundAward);
@@ -124,48 +124,32 @@ void AEGGameStateBase::DecrementCountdown()
 
 void AEGGameStateBase::UpdateLeaderboard()
 {
-	TArray<FAward> NewSnapshot = LeaderboardSnapshot;
+	// 새 스냅샷을 무조건 전체 PlayerArray 기준으로 만든다
+	TArray<FAward> NewSnapshot;
 
-	// 현재 존재하는 PlayerState들을 확인해서 갱신
 	for (APlayerState* PS : PlayerArray)
 	{
 		if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(PS))
 		{
-			if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(EGPS->GetOwner()))
-			{
-				int32 PlayerIdx = EGPC->PlayerIndex;
-
-				// Snapshot에 이미 존재하는지 확인
-				FAward* Found = NewSnapshot.FindByPredicate([PlayerIdx](const FAward& Entry) {
-					return Entry.PlayerIndex == PlayerIdx;
-				});
-
-				if (Found)
-				{
-					// 점수 갱신
-					Found->PlayerEggScore = EGPS->GetPlayerEggCount();
-				}
-				else
-				{
-					// 새로 추가 (처음 들어온 경우)
-					FAward Entry;
-					Entry.PlayerIndex    = PlayerIdx;
-					Entry.PlayerEggScore = EGPS->GetPlayerEggCount();
-					NewSnapshot.Add(Entry);
-				}
-			}
+			FAward Entry;
+			Entry.PlayerID       = EGPS->GetPlayerID();
+			Entry.PlayerEggScore = EGPS->GetPlayerEggCount();
+			NewSnapshot.Add(Entry);
 		}
 	}
 
-	// 점수 높은 순서대로 정렬
+	// 점수 높은 순서 + 동점자는 ID 낮은 순서
 	NewSnapshot.Sort([](const FAward& A, const FAward& B) {
-		return A.PlayerEggScore > B.PlayerEggScore;
+		return (A.PlayerEggScore == B.PlayerEggScore)
+			? (A.PlayerID < B.PlayerID)
+			: (A.PlayerEggScore > B.PlayerEggScore);
 	});
 
-	// 변경이 있을 때만 적용
+	// 달라졌을 때만 리플리케이트
 	if (LeaderboardSnapshot != NewSnapshot)
-    {
-       LeaderboardSnapshot = NewSnapshot;
+	{
+		LeaderboardSnapshot = MoveTemp(NewSnapshot);
+		OnRep_Leaderboard(); // 서버에서도 즉시 Broadcast 해주고 싶으면 직접 호출
 	}
 }
 
@@ -175,11 +159,11 @@ void AEGGameStateBase::FinalizeAward()
 	{
 		if (LeaderboardSnapshot.Num() > 0)
 		{
-			RoundAward.PlayerIndex     = LeaderboardSnapshot[0].PlayerIndex;
+			RoundAward.PlayerID     = LeaderboardSnapshot[0].PlayerID;
 			RoundAward.PlayerEggScore  = LeaderboardSnapshot[0].PlayerEggScore;
 
 			UE_LOG(LogTemp, Log, TEXT("FinalizeAward -> WinnerIndex: %d, Score: %d"),
-				RoundAward.PlayerIndex,
+				RoundAward.PlayerID,
 				RoundAward.PlayerEggScore);
 		}
 		else
@@ -196,22 +180,20 @@ void AEGGameStateBase::SetFinalResults(const TArray<TPair<TWeakObjectPtr<AEGPlay
 	{
 		if (Pair.Key.IsValid())
 		{
-			if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(Pair.Key.Get()))
-			{
-				if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(EGPC->PlayerState))
+			if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(Pair.Key->PlayerState))
+
 				{
 					FAward Entry;
-					Entry.PlayerIndex    = EGPC->PlayerIndex;         
+					Entry.PlayerID    = EGPS->GetPlayerID();         
 					Entry.PlayerEggScore = EGPS->GetPlayerEggCount(); 
 					LeaderboardSnapshot.Add(Entry);
 				}
-			}
 		}
 	}
 
 	if (LeaderboardSnapshot.Num() > 0)
 	{
-		RoundAward.PlayerIndex = 0;
+		RoundAward.PlayerID = 0;
 		RoundAward.PlayerEggScore = LeaderboardSnapshot[0].PlayerEggScore;
 	}
 }

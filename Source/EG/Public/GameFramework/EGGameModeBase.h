@@ -11,6 +11,7 @@ class EG_API AEGGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 public:
+	AEGGameModeBase();
 	int32 CurrentPlayerIndex = 0;
 	virtual void PreLogin(const FString& Options,
 		const FString& Address,
