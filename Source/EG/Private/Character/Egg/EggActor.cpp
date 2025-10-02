@@ -3,6 +3,7 @@
 #include "Character/Egg/EggActor.h"
 
 #include "AbilitySystemComponent.h"
+#include "EGLog.h"
 #include "GameFramework/EGPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
@@ -51,6 +52,18 @@ void AEggActor::ApplyDamageAndCheckDestroy(int32 Damage, AActor* DamagedActor)
 					}
 				}
 			}
+			// JM : 계란 파괴시 쪼개지는 소리 재생
+			if (AbilitySystemComponent)
+			{
+				FGameplayCueParameters CueParams;
+				CueParams.Location = GetActorLocation();
+				AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.BreakEgg")), CueParams);
+			}
+			else
+			{
+				EG_LOG_ROLE(LogJM, Warning, TEXT("AbilitySystemComponent is null"));
+			}
+			// TODO: Destroy 말고 오브젝트 풀링 방식으로 해야 소리나옴
 			Destroy();
 		}
 	}
