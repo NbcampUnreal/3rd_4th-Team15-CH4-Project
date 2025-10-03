@@ -2,6 +2,8 @@
 
 #include "AbilitySystem/Ability/EGLayBombEggAbility.h"
 
+#include "AbilitySystemComponent.h"
+#include "EGLog.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystem/GameplayEffect/EGLayBombEggCooldownEffect.h"
 #include "Character/Egg/EggActor.h"
@@ -42,6 +44,18 @@ void UEGLayBombEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 			PlayMontageTask->OnCancelled.AddDynamic(this, &UEGLayBombEggAbility::OnMontageCancelled);
 
 			PlayMontageTask->ReadyForActivation();
+		}
+		
+		// JM : GameplayCue Lay Egg SFX
+		if (ActorInfo->AbilitySystemComponent.IsValid())
+		{
+			FGameplayCueParameters CueParams;
+			CueParams.Location = ActorInfo->AvatarActor->GetActorLocation();
+			ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.LayEgg")), CueParams);
+		}
+		else
+		{
+			EG_LOG(LogJM, Warning, TEXT("ASC Is Not Valid"));
 		}
 
 		if (IsValid(EggActorClass))

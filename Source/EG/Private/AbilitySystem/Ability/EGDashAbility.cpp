@@ -2,6 +2,8 @@
 
 #include "AbilitySystem/Ability/EGDashAbility.h"
 
+#include "AbilitySystemComponent.h"
+#include "EGLog.h"
 #include "AbilitySystem/GameplayEffect/EGDashCooldownEffect.h"
 #include "AbilitySystem/GameplayEffect/EGDashCostEffect.h"
 #include "GameFramework/Character.h"
@@ -54,6 +56,18 @@ void UEGDashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	{
 		Delay->OnFinish.AddDynamic(this, &UEGDashAbility::OnDashFinished);
 		Delay->ReadyForActivation();
+	}
+
+	// JM : GameplayCue_Dash SFX
+	if (ActorInfo->AbilitySystemComponent.IsValid())
+	{
+		FGameplayCueParameters CueParams;
+		CueParams.Location = ActorInfo->AvatarActor->GetActorLocation();
+		ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.Dash")), CueParams);
+	}
+	else
+	{
+		EG_LOG(LogJM, Warning, TEXT("Dash Ability AbilitySystemComponent is null"));
 	}
 }
 

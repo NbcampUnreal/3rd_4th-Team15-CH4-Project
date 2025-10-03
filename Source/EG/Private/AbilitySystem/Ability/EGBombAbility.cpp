@@ -3,6 +3,7 @@
 #include "AbilitySystem/Ability/EGBombAbility.h"
 
 #include "AbilitySystemComponent.h"
+#include "EGLog.h"
 #include "AbilitySystem/GameplayEffect/EGStunEffect.h"
 #include "Character/EGChickenCharacter.h"
 #include "Character/Egg/EggActor.h"
@@ -79,9 +80,21 @@ void UEGBombAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 			}
 		}
 	}
+	// JM : GameplayCue Bomb SFX
+	if (ActorInfo->AbilitySystemComponent.IsValid())
+	{
+		FGameplayCueParameters CueParams;
+		CueParams.Location = ActorInfo->AvatarActor->GetActorLocation();
+		ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.Bomb")), CueParams);
+	}
+	else
+	{
+		EG_LOG(LogJM, Warning, TEXT("ASC Is Not Valid"));
+	}
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 
+	// TODO: JM / 현재 액터 파괴시 SFX 소리 재생이 안 됨(향후 오브젝트 풀링으로 바꿔야 할 필요 있음)
 	if (AEggActor* OwnerEgg = Cast<AEggActor>(ActorInfo->AvatarActor.Get()))
 	{
 		OwnerEgg->Destroy(); // 폭탄 알은 여기서 파괴

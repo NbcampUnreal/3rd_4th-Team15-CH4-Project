@@ -121,11 +121,13 @@ void UEGAttackAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 					}
 				}
 			}
-
 			// JM : GameplayCue_Attack SFX
-			FGameplayCueParameters CueParams;
-			CueParams.Location = ActorInfo->AvatarActor->GetActorLocation();
-			ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.Attack")), CueParams);
+			if (ActorInfo->AbilitySystemComponent.IsValid())
+			{
+				FGameplayCueParameters CueParams;
+				CueParams.Location = ActorInfo->AvatarActor->GetActorLocation();
+				ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.Attack")), CueParams);
+			}
 		}
 	}
 }

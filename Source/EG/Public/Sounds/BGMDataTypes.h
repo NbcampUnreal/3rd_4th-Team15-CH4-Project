@@ -36,5 +36,5 @@ struct FBGMInfo : public FTableRowBase
 
 	// USoundBase는 SoundWave, SoundCue 등 모든 사운드 타입을 받을 수 있음
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BGM")
-	TSoftObjectPtr<USoundBase> BGMSound;			// 레벨에서 재생할 사운드
+	TObjectPtr<USoundBase> BGMSound;			// 레벨에서 재생할 사운드
 };
