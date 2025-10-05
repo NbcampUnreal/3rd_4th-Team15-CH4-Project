@@ -67,7 +67,7 @@ public:
 	int32 RemainingCountdown = 100;
 
 	UPROPERTY(ReplicatedUsing = OnRep_RemainingPlayTime, VisibleAnywhere, BlueprintReadOnly)
-	int32 RemainingPlayTime = 300;
+	int32 RemainingPlayTime = 10;
 	
 	UPROPERTY()
 	class UEGDelegateManager* DelegateManager;
@@ -88,13 +88,15 @@ protected:
 	UFUNCTION()
 	void OnRep_Award();
 public:
-	void CheckRoomLeader();
+	//void CheckRoomLeader();
 	void StartCountdown();
 	void DecrementCountdown();
 	void UpdateLeaderboard();
-	void FinalizeAward();
+	void FinalizeAward(const TArray<TWeakObjectPtr<AEGPlayerController>>& Winners);
 	void SetFinalResults(const TArray<TPair<TWeakObjectPtr<AEGPlayerController>, int32>>& Scores);
 
+	UPROPERTY(ReplicatedUsing = OnRep_Award)
+	TArray<FAward> RoundAwards;
 	///여기까지 KMS
 	
 protected:
