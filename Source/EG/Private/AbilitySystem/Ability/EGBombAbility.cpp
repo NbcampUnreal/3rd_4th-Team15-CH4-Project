@@ -3,6 +3,7 @@
 #include "AbilitySystem/Ability/EGBombAbility.h"
 
 #include "AbilitySystemComponent.h"
+#include "EGLog.h"
 #include "AbilitySystem/GameplayEffect/EGStunEffect.h"
 #include "Character/EGChickenCharacter.h"
 #include "Character/Egg/EggActor.h"
@@ -46,17 +47,6 @@ void UEGBombAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		FCollisionShape::MakeSphere(SphereRadius),
 		QueryParams);
 
-	DrawDebugSphere(
-		GetWorld(), // 월드 포인터
-		SpawnLocation, // 중심 위치
-		SphereRadius, // 반지름
-		32, // 세그먼트 수
-		bHit ? FColor::Green : FColor::Red, // 충돌 시 초록색, 미충돌 시 빨간색
-		false, // 지속적으로 그릴지 여부
-		3.0f, // 표시 지속 시간 (초)
-		0, // 우선순위
-		1.0f);
-
 	if (bHit)
 	{
 		TSet<AActor*> UniqueActors;
@@ -90,9 +80,21 @@ void UEGBombAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 			}
 		}
 	}
+	// JM : GameplayCue Bomb SFX
+	if (ActorInfo->AbilitySystemComponent.IsValid())
+	{
+		FGameplayCueParameters CueParams;
+		CueParams.Location = ActorInfo->AvatarActor->GetActorLocation();
+		ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.Bomb")), CueParams);
+	}
+	else
+	{
+		EG_LOG(LogJM, Warning, TEXT("ASC Is Not Valid"));
+	}
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 
+	// TODO: JM / 현재 액터 파괴시 SFX 소리 재생이 안 됨(향후 오브젝트 풀링으로 바꿔야 할 필요 있음)
 	if (AEggActor* OwnerEgg = Cast<AEggActor>(ActorInfo->AvatarActor.Get()))
 	{
 		OwnerEgg->Destroy(); // 폭탄 알은 여기서 파괴

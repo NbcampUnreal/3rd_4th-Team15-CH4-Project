@@ -1,8 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/EGPlayerState.h"
 #include "GameFramework/GameModeBase.h"
 #include "EGLobbyGameModeBase.generated.h"
 
@@ -20,6 +21,7 @@ class EG_API AEGLobbyGameModeBase : public AGameModeBase
 	
 public:
 
+	AEGLobbyGameModeBase();
 #pragma region Chatting
 	void SendChatMessage(const FString& Message);
 
@@ -32,16 +34,21 @@ public:
 		FString& ErrorMessage) override;
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-	void SetRoomLeader();
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
 
-
-	/*UFUNCTION(BlueprintCallable, Category = "GameFlow")
-	void GameStart(int32 UniqueID);*/
-
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
+
+// 레벨 변경 (작성자 : 김효영)
+#pragma region LevelChange
+	void LevelChange();
+
+	void ShowScreen();
+	//void HideScreen();
+
+#pragma endregion
+
 
 	FTimerHandle GameStartingTimerHandle;
 	FTimerHandle GameEndTimerHandle;
@@ -52,7 +59,9 @@ protected:
 
 
 	UPROPERTY(VisibleAnywhere, Category = "Players")
-	TArray<TWeakObjectPtr<AEGPlayerController>> APlayingPlayerControllers;
+	TArray<TWeakObjectPtr<AEGPlayerState>> APlayingPlayerStates;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TMap<int32, AEGPlayerStart*> PlayerStartList;
 };
+
+#pragma endregion

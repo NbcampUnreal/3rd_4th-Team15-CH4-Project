@@ -11,6 +11,6 @@ UEGEggEnergyRegenEffect::UEGEggEnergyRegenEffect()
 	FGameplayModifierInfo EggEnergyRegenMod;
 	EggEnergyRegenMod.Attribute = UEGCharacterAttributeSet::GetEggEnergyAttribute();
 	EggEnergyRegenMod.ModifierOp = EGameplayModOp::Additive;
-	EggEnergyRegenMod.ModifierMagnitude = FScalableFloat(3.0f);
+	EggEnergyRegenMod.ModifierMagnitude = FScalableFloat(2.0f);
 	Modifiers.Add(EggEnergyRegenMod);
 }

@@ -15,15 +15,25 @@ class EG_API AEGPlayerState : public APlayerState
 	GENERATED_BODY()
 public:
 	AEGPlayerState();
+	void SetPlayerID(int32 Num);
+	int32 GetPlayerID()
+	{
+		return CurrentPlayerID;
+	}
 
 protected:
 	UPROPERTY(ReplicatedUsing=OnRep_PlayerEggCount, BlueprintReadOnly, Category="Score")
-	int32 PlayerEggCount = 0;
+	int32 PlayerEggCount;
+	
+	UPROPERTY(Replicated)
+	int32 CurrentPlayerID;
+	UPROPERTY(Replicated)
+	FString PlayerName;
 	
 	UFUNCTION()
 	void OnRep_PlayerEggCount();
 
-	FString PlayerName;
+	
 	
 public:
 	UFUNCTION(BlueprintPure, Category="Score")

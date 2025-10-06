@@ -30,6 +30,23 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeLevel();
 
+	void FadeInScreen();
+	void FadeOutScreen();
+	UFUNCTION(BlueprintCallable)
+	void FadeOutScreenRemove();
+
+	UPROPERTY()
+	UUserWidget* FadeInScreenWidget;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> FadeInScreenClass;
+
+	UPROPERTY()
+	UUserWidget* FadeOutcreenWidget;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> FadeOutScreenClass;
+
 private:
 	UPROPERTY()
 	FString CurrentLevelName = "Level_1";

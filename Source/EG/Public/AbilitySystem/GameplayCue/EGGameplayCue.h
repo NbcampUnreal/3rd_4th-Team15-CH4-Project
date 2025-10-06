@@ -20,4 +20,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sounds")
 	TObjectPtr<USoundBase> SFX;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sounds")
+	TObjectPtr<USoundAttenuation> SFXAttenuation;
 };

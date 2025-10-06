@@ -17,7 +17,9 @@ UEGPeckAbility::UEGPeckAbility()
 	CostGameplayEffectClass = nullptr;
 	CooldownGameplayEffectClass = UEGPeckCooldownEffect::StaticClass();
 
+	ActivationOwnedTags.AddTag(FGameplayTag::RequestGameplayTag("Ability.Active.Peck"));
 	CancelAbilitiesWithTag.AddTag(FGameplayTag::RequestGameplayTag("Ability.Cooldown.Peck"));
+	AbilityTags.AddTag(FGameplayTag::RequestGameplayTag("Ability.Active.Peck"));	
 }
 
 bool UEGPeckAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle,

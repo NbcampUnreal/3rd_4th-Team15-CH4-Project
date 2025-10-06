@@ -5,41 +5,31 @@
 
 UEGStaminaRegenAbility::UEGStaminaRegenAbility()
 {
-    InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-	//StaminaRegenEffectClass = UEGStaminaRegenAbility::StaticClass();
-	StaminaRegenEffectClass = UEGStaminaRegenEffect::StaticClass();
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UEGStaminaRegenAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UEGStaminaRegenAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+                                             const FGameplayAbilityActorInfo* ActorInfo,
+                                             const FGameplayAbilityActivationInfo ActivationInfo,
+                                             const FGameplayEventData* TriggerEventData)
 {
-    if (StaminaRegenEffectClass && ActorInfo->AbilitySystemComponent.IsValid())
-    {
-        FGameplayEffectContextHandle ContextHandle =
-            ActorInfo->AbilitySystemComponent->MakeEffectContext();
-        ContextHandle.AddSourceObject(this);
+	if (ActorInfo->AbilitySystemComponent.IsValid())
+	{
+		FGameplayEffectSpecHandle SpecHandle = MakeOutgoingGameplayEffectSpec(
+				UEGStaminaRegenEffect::StaticClass(), 1.0f);
 
-        FGameplayEffectSpecHandle SpecHandle =
-            ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(
-                StaminaRegenEffectClass, 1, ContextHandle);
-
-        if (SpecHandle.IsValid())
-        {
-            FActiveGameplayEffectHandle ActiveHandle =
-                ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(
-                    *SpecHandle.Data.Get());
-
-            if (ActiveHandle.WasSuccessfullyApplied())
-            {
-                UE_LOG(LogTemp, Log, TEXT("Staminaregen..."));
-            }
-        }
-    }
-
-    //EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+		if (SpecHandle.IsValid())
+		{
+			ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
 }
 
-void UEGStaminaRegenAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+void UEGStaminaRegenAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
+                                        const FGameplayAbilityActorInfo* ActorInfo,
+                                        const FGameplayAbilityActivationInfo ActivationInfo,
+                                        bool bReplicateEndAbility,
+                                        bool bWasCancelled)
 {
-    UE_LOG(LogTemp, Log, TEXT("StaminaRegen ability ended"));
-    Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

@@ -79,6 +79,12 @@ private:
 	void ExecuteLayBombEgg();
 	void ExecuteLayTrickEgg();
 
+// JM : 강제 점프 아이템에서 호출하도록 하려고
+public:
+	void ExecuteJump();
+
+	void PlayBlockSkillSFX();	// SFXManagerSubsystem 호출
+
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
@@ -178,6 +184,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
 	TSubclassOf<UGameplayAbility> LayTrickEggAbilityClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|GAS")
+	TSubclassOf<UGameplayAbility> JumpAbilityClass;
 
 #pragma endregion
 

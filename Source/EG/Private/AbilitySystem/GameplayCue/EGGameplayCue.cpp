@@ -22,7 +22,7 @@ void UEGGameplayCue::HandleGameplayCue(AActor* Target, EGameplayCueEvent::Type E
 			Location = FVector(Parameters.Location);	// NetQuntize10 -> FVector 변환
 			EG_LOG(LogJM, Warning, TEXT("Use Parameters Location"));
 		}
-		UGameplayStatics::PlaySoundAtLocation(Target, SFX, Location);
+		UGameplayStatics::PlaySoundAtLocation(Target, SFX, Location, 1.0f, 1.0f, 0.0f, SFXAttenuation);
 		EG_LOG(LogJM, Warning, TEXT("Play SFX"));
 	}
 	else

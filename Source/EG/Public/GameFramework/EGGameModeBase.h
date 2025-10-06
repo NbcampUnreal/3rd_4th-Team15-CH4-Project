@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "CoreMinimal.h"
 #include "EGInGameSpawnPoints.h"
 #include "GameFramework/GameModeBase.h"
@@ -11,6 +11,7 @@ class EG_API AEGGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 public:
+	AEGGameModeBase();
 	int32 CurrentPlayerIndex = 0;
 	virtual void PreLogin(const FString& Options,
 		const FString& Address,
@@ -25,6 +26,15 @@ public:
 	void GameOver();
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
+
+// 레벨 변경 (작성자 : 김효영)
+#pragma region LevelChange
+	void ShowScreen();
+	void HideScreen();
+
+#pragma endregion
+
+
 	FTimerHandle GameStartingTimerHandle;
 	FTimerHandle GameEndTimerHandle;
 	

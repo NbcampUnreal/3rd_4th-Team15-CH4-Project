@@ -2,6 +2,8 @@
 
 #include "AbilitySystem/Ability/EGDashAbility.h"
 
+#include "AbilitySystemComponent.h"
+#include "EGLog.h"
 #include "AbilitySystem/GameplayEffect/EGDashCooldownEffect.h"
 #include "AbilitySystem/GameplayEffect/EGDashCostEffect.h"
 #include "GameFramework/Character.h"
@@ -11,14 +13,15 @@
 UEGDashAbility::UEGDashAbility()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-	
+
 	CostGameplayEffectClass = UEGDashCostEffect::StaticClass();
 	CooldownGameplayEffectClass = UEGDashCooldownEffect::StaticClass();
 }
 
 void UEGDashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData)
+                                     const FGameplayAbilityActorInfo* ActorInfo,
+                                     const FGameplayAbilityActivationInfo ActivationInfo,
+                                     const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -54,12 +57,24 @@ void UEGDashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		Delay->OnFinish.AddDynamic(this, &UEGDashAbility::OnDashFinished);
 		Delay->ReadyForActivation();
 	}
+
+	// JM : GameplayCue_Dash SFX
+	if (ActorInfo->AbilitySystemComponent.IsValid())
+	{
+		FGameplayCueParameters CueParams;
+		CueParams.Location = ActorInfo->AvatarActor->GetActorLocation();
+		ActorInfo->AbilitySystemComponent->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.Dash")), CueParams);
+	}
+	else
+	{
+		EG_LOG(LogJM, Warning, TEXT("Dash Ability AbilitySystemComponent is null"));
+	}
 }
 
 void UEGDashAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+                                const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility,
+                                bool bWasCancelled)
 {
-	UE_LOG(LogTemp, Log, TEXT("Dash Ability end"));
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
