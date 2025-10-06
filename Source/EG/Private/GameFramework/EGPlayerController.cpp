@@ -21,6 +21,10 @@
 #include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+// Sequence
+#include "LevelSequenceActor.h"
+#include "LevelSequencePlayer.h"
+#include "MovieSceneSequencePlayer.h"
 
 void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -256,12 +260,75 @@ void AEGPlayerController::ShowChiefPlayerUI_Implementation()
 #pragma endregion
 
 
-void AEGPlayerController::WinnderLogic()
+void AEGPlayerController::ClientRPC_PlayEndingSequence_Implementation(bool bIsWinner)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Winnder Logic"));
+	bCachedIsWinner = bIsWinner;
+	PlayLevelSequence(CommonSequence, false);
 }
 
-void AEGPlayerController::LoserLogic()
+void AEGPlayerController::ServerRPC_NotifySequenceFinished_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Loser Logic"));
+	AEGGameModeBase* GM = GetWorld()->GetAuthGameMode<AEGGameModeBase>();
+	if (GM)
+	{
+		GM->ServerTravel();
+	}
+}
+
+void AEGPlayerController::PlayLevelSequence(ULevelSequence* Sequence, bool bIsFinal)
+{
+	if (!IsLocalController() || !Sequence)
+	{
+		return;
+	}
+
+	FMovieSceneSequencePlaybackSettings Settings;
+	ALevelSequenceActor* OutActor = nullptr;
+	CurrentSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Sequence, Settings, OutActor);
+
+	if (CurrentSequencePlayer)
+	{
+		if (bIsFinal)
+		{
+			CurrentSequencePlayer->OnFinished.AddDynamic(this, &ThisClass::OnFinalSequenceFinished);
+		}
+		else
+		{
+			CurrentSequencePlayer->OnFinished.AddDynamic(this, &ThisClass::OnCommonSequenceFinished);
+		}
+		
+		CurrentSequencePlayer->Play();
+	}
+}
+
+void AEGPlayerController::OnCommonSequenceFinished()
+{
+	if (CurrentSequencePlayer)
+	{
+		CurrentSequencePlayer->OnFinished.RemoveDynamic(this, &ThisClass::OnCommonSequenceFinished);
+		CurrentSequencePlayer = nullptr;
+	}
+
+	if (bCachedIsWinner)
+	{
+		PlayLevelSequence(WinSequence, true);
+	}
+	else
+	{
+		PlayLevelSequence(LoseSequence, true);
+	}
+}
+
+void AEGPlayerController::OnFinalSequenceFinished()
+{
+	if (CurrentSequencePlayer)
+	{
+		CurrentSequencePlayer->OnFinished.RemoveDynamic(this, &ThisClass::OnFinalSequenceFinished);
+		CurrentSequencePlayer = nullptr;
+	}
+
+	if (IsLocalController())
+	{
+		ServerRPC_NotifySequenceFinished();
+	}
 }

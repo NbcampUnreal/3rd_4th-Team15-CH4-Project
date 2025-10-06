@@ -6,6 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "EGPlayerController.generated.h"
 
+class ULevelSequencePlayer;
+class FOnMovieSceneSequencePlayerEvent;
+class ULevelSequence;
 class UAbilitySystemComponent;               // ★ 추가
 class UWBP_HUD;    
 
@@ -54,8 +57,6 @@ public:
 
 	UFUNCTION()
 	void ActivateChatBox();
-	void WinnderLogic();
-	void LoserLogic();
 
 	UFUNCTION(Server, Reliable)
 	void ServerSendChatMessage(const FString& Message);
@@ -92,5 +93,37 @@ protected:
 	void CreateAndShowHUD();
 	void BindHUDToASC();
 	// ===== 여기까지 =====
+
+// 시퀀스 재생 (작성자 : 김혁)
+#pragma region Seqeuence
+
+public:
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_PlayEndingSequence(bool bIsWinner);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_NotifySequenceFinished();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sequence")
+	TObjectPtr<ULevelSequence> CommonSequence;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sequence")
+	TObjectPtr<ULevelSequence> WinSequence;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sequence")
+	TObjectPtr<ULevelSequence> LoseSequence;
+
+	UPROPERTY()
+	ULevelSequencePlayer* CurrentSequencePlayer;
 	
+	UFUNCTION()
+	void OnCommonSequenceFinished();
+	UFUNCTION()
+	void OnFinalSequenceFinished();
+	
+private:
+	bool bCachedIsWinner;
+	
+	void PlayLevelSequence(ULevelSequence* Sequence, bool bIsFinal);
+	
+#pragma endregion 
 };

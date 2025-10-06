@@ -207,12 +207,11 @@ void AEGGameModeBase::GameOver()
 
         if (Winners.Contains(Pair.Key))     // winner
         {
-            Pair.Key->WinnderLogic();
-            
+            Pair.Key->ClientRPC_PlayEndingSequence(true);
         }
         else                                // loser
         {
-            Pair.Key->LoserLogic();
+            Pair.Key->ClientRPC_PlayEndingSequence(false);
         }
     }
 /*
@@ -226,8 +225,9 @@ void AEGGameModeBase::GameOver()
 
 void AEGGameModeBase::ServerTravel()
 {
-    ShowScreen();
-    GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
+    UE_LOG(LogTemp, Log, TEXT("Ending Sequence"));
+    //ShowScreen();
+    //GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
 }
 
 // 레벨 변경 (작성자 : 김효영)
