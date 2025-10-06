@@ -171,32 +171,63 @@ void AEGGameModeBase::GameStart()
 void AEGGameModeBase::GameOver()
 {
     EG_LOG_ROLE(LogMS, Warning, TEXT("Game Over"));
+    
     TArray<TPair<TWeakObjectPtr<AEGPlayerController>, int32>> FinalPlayerScores;
+
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
         {
             if (AEGPlayerState* PS = Cast<AEGPlayerState>(PC->PlayerState))
             {
-                FinalPlayerScores.Add(TPair<TWeakObjectPtr<AEGPlayerController>, int32>(PC, PS->GetPlayerEggCount()));
+                FinalPlayerScores.Add({ PC, PS->GetPlayerEggCount() });
             }
         }
     }
-    // player score sort
+    
     FinalPlayerScores.Sort([](const auto& A, const auto& B)
     {
-      if (A.Value != B.Value)
-          return A.Value > B.Value;
-      return A.Key.IsValid() && B.Key.IsValid() && A.Key->PlayerIndex < B.Key->PlayerIndex;
+        return A.Value > B.Value;
     });
+    int32 TopScore = (FinalPlayerScores.Num() > 0) ? FinalPlayerScores[0].Value : 0;
+    
+    TArray<TWeakObjectPtr<AEGPlayerController>> Winners;
+    for (const auto& Pair : FinalPlayerScores)
+    {
+        if (Pair.Value == TopScore)
+        {
+            Winners.Add(Pair.Key);
+        }
+        else break;
+    }
+
+    for (const auto& Pair : FinalPlayerScores)
+    {
+        if (!Pair.Key.IsValid()) continue;
+
+        if (Winners.Contains(Pair.Key))     // winner
+        {
+            Pair.Key->WinnderLogic();
+            
+        }
+        else                                // loser
+        {
+            Pair.Key->LoserLogic();
+        }
+    }
+/*
     if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
     {
         EGGS->SetFinalResults(FinalPlayerScores);
-        EGGS->FinalizeAward();
+        EGGS->FinalizeAward(Winners);
     }
+*/
+}
 
+void AEGGameModeBase::ServerTravel()
+{
     ShowScreen();
-	GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
+    GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
 }
 
 // 레벨 변경 (작성자 : 김효영)
@@ -207,7 +238,7 @@ void AEGGameModeBase::ShowScreen()
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientShowBlackScreen();
+            //EGPC->ClientShowBlackScreen();
         }
     }
 }
@@ -218,7 +249,7 @@ void AEGGameModeBase::HideScreen()
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientHideBlackScreen();
+            //EGPC->ClientHideBlackScreen();
         }
     }
 }
