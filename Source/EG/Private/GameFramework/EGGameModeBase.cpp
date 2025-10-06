@@ -207,22 +207,27 @@ void AEGGameModeBase::GameOver()
 
         if (Winners.Contains(Pair.Key))     // winner
         {
-            // Pair.Key-> 1등
+            Pair.Key->WinnderLogic();
+            
         }
         else                                // loser
         {
-            // Pair.Key-> 그 외
+            Pair.Key->LoserLogic();
         }
     }
-    
+/*
     if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
     {
         EGGS->SetFinalResults(FinalPlayerScores);
-        EGGS->FinalizeAward(Winners); // 여러 명을 받을 수 있도록 오버로드
+        EGGS->FinalizeAward(Winners);
     }
+*/
+}
 
+void AEGGameModeBase::ServerTravel()
+{
     ShowScreen();
-	GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
+    GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
 }
 
 // 레벨 변경 (작성자 : 김효영)
@@ -233,7 +238,7 @@ void AEGGameModeBase::ShowScreen()
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientShowBlackScreen();
+            //EGPC->ClientShowBlackScreen();
         }
     }
 }
@@ -244,7 +249,7 @@ void AEGGameModeBase::HideScreen()
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientHideBlackScreen();
+            //EGPC->ClientHideBlackScreen();
         }
     }
 }

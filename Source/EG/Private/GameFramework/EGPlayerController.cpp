@@ -254,3 +254,14 @@ void AEGPlayerController::ShowChiefPlayerUI_Implementation()
 }
 
 #pragma endregion
+
+
+void AEGPlayerController::WinnderLogic()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Winnder Logic"));
+}
+
+void AEGPlayerController::LoserLogic()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Loser Logic"));
+}

@@ -68,7 +68,7 @@ void AEGGameStateBase::OnRep_Award()
 	DelegateManager->OnAwardUpdated.Broadcast(RoundAward);
 
 }
-/*
+
 void AEGGameStateBase::CheckRoomLeader()
 {
 	//UE_LOG(LogTemp, Log, TEXT("StartCountdown called with UniqueID: %d"), UniqueID);
@@ -78,7 +78,7 @@ void AEGGameStateBase::CheckRoomLeader()
 		//UE_LOG(LogTemp, Log, TEXT("Try to Game Start player : %d"), UniqueID);
 	}
 }
-*/
+
 void AEGGameStateBase::StartCountdown()
 {
 	if (HasAuthority())
