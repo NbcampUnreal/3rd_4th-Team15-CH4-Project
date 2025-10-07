@@ -10,6 +10,7 @@ enum class ESFXType : uint8
 {
 	None		UMETA(DisplayName = "None"),
 	BlockSkill	UMETA(DisplayName = "BlockSkill"),
+	ItemUse		UMETA(DisplayName = "ItemUse"),
 		
 };
 

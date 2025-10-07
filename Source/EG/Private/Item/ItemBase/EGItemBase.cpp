@@ -2,10 +2,12 @@
 
 #include "Item/ItemBase/EGItemBase.h"
 
+#include "EGLog.h"
 #include "Components/SphereComponent.h"
 #include "NiagaraComponent.h"
 #include "Character/EGChickenCharacter.h"
 #include "Manager/EGDelegateManager.h"
+#include "Sounds/SFXManagerSubsystem.h"
 
 
 AEGItemBase::AEGItemBase()
@@ -36,6 +38,26 @@ void AEGItemBase::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 		OnItemPickUp.Broadcast();
 		
 		Execute_OnPickUp(this, OtherActor);
+
+		// JM : 각 클라에서만 sfx 재생
+		AEGChickenCharacter* Chicken = Cast<AEGChickenCharacter>(OtherActor);
+		if (Chicken->IsLocallyControlled())
+		{
+			PlayItemPickupSFX();
+		}
+	}
+}
+
+void AEGItemBase::PlayItemPickupSFX()
+{
+	USFXManagerSubsystem* SFXManger = GetGameInstance()->GetSubsystem<USFXManagerSubsystem>();
+	if (SFXManger)
+	{
+		SFXManger->PlaySFXLocalClientOnly(ESFXType::ItemUse, this);
+	}
+	else
+	{
+		EG_LOG_ROLE(LogJM, Warning, TEXT("No SFX Manager"));
 	}
 }
 
