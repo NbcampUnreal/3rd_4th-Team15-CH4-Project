@@ -27,7 +27,7 @@ UEGItem_StaminaBoostEffect::UEGItem_StaminaBoostEffect()
 	TargetTags->SetAndApplyTargetTagChanges(TagChanges);
 	GEComponents.Add(TargetTags);
 
-	// JM : GameplayCue_Actor : StaminaBoost 연결 (Local Client Only 재생되도록)
+	// JM : GameplayCue : StaminaBoost 연결 (Local Client Only 재생되도록)
 	FGameplayEffectCue StaminaBoostCue;
 	StaminaBoostCue.GameplayCueTags.AddTag(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.StaminaBoost.LocalOnly")));
 	GameplayCues.Add(StaminaBoostCue);

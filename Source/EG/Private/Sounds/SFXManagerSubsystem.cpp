@@ -4,6 +4,7 @@
 #include "Sounds/SFXManagerSubsystem.h"
 
 #include "EGLog.h"
+#include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 void USFXManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -26,8 +27,6 @@ void USFXManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	{
 		EG_LOG(LogJM, Error, TEXT("Failed to load SFX DataAsset: %s"), *DataAssetRef.ToString());
 	}
-	
-	EG_LOG(LogJM, Log, TEXT("End"));
 }
 
 void USFXManagerSubsystem::Deinitialize()
@@ -58,19 +57,28 @@ void USFXManagerSubsystem::PlaySFXLocalClientOnly(ESFXType InType, UObject* Worl
 		EG_LOG(LogJM, Warning, TEXT("No World"));
 		return;
 	}
-	
-	if (APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0))
+
+	APlayerController* PC = UGameplayStatics::GetPlayerController(World, 0);
+	if (!PC || !PC->IsLocalController())
 	{
-		if (PC->IsLocalController())
-		{
-			UGameplayStatics::PlaySound2D(World, Sound);
-		}
+		EG_LOG(LogJM, Warning, TEXT("No Local PlayerController"));
+		return;
 	}
-		
+
+	UAudioComponent* AudioComp = GetAudioComponent(World, InType);
+	if (AudioComp)
+	{
+		AudioComp->SetSound(Sound);
+		AudioComp->Play();
+	}
+	else
+	{
+		EG_LOG(LogJM, Warning, TEXT("Failed to get AudioComponent"));
+	}
 	EG_LOG(LogJM, Log, TEXT("End"));
 }
 
-void USFXManagerSubsystem::PlaySFXAtLocation(ESFXType InType, UObject* WorldContext, const FVector& Location)
+/*void USFXManagerSubsystem::PlaySFXAtLocation(ESFXType InType, UObject* WorldContext, const FVector& Location)
 {
 	if (!SFXDataAsset)
 	{
@@ -92,4 +100,60 @@ void USFXManagerSubsystem::PlaySFXAtLocation(ESFXType InType, UObject* WorldCont
 	}
 
 	UGameplayStatics::PlaySoundAtLocation(World, Sound, Location);
+}*/
+
+void USFXManagerSubsystem::StopSFX(ESFXType InType)
+{
+	EG_LOG(LogJM, Log, TEXT("Start"));
+	if (UAudioComponent* AudioComp = ActiveSFXMap.FindRef(InType))
+	{
+		if (AudioComp->IsPlaying())
+		{
+			AudioComp->Stop();
+		}
+		else
+		{
+			EG_LOG(LogJM, Warning, TEXT("AudioComponent is not playing"));
+		}
+	}
+	else
+	{
+		EG_LOG(LogJM, Warning, TEXT("No AudioComponent for %s"), *StaticEnum<ESFXType>()->GetValueAsString(InType));
+	}
+	EG_LOG(LogJM, Log, TEXT("End"));
+}
+
+UAudioComponent* USFXManagerSubsystem::GetAudioComponent(UWorld* World, ESFXType InType)
+{
+	if (!IsValid(World))
+	{
+		EG_LOG(LogJM, Warning, TEXT("Invalid World"));
+		return nullptr;
+	}
+
+	// 이미 존재하는 AudioComponent가 있으면 재사용
+	if (ActiveSFXMap.Contains(InType))
+	{
+		UAudioComponent* ExistingComp = ActiveSFXMap[InType];
+		if (ExistingComp)
+		{
+			if (ExistingComp->IsPlaying())
+			{
+				ExistingComp->Stop();	// 이미 같은 타입이 재생중이면 Stop 후 재사용
+			}
+			return ExistingComp;
+		}
+	}
+
+	// 기존 AudioComponent가 없다면 새로 생성
+	UAudioComponent* NewComp = NewObject<UAudioComponent>(this);
+	NewComp->bAutoActivate = false;
+	NewComp->RegisterComponentWithWorld(World);	// World 에 등록
+	ActiveSFXMap.Add(InType, NewComp);
+	return NewComp;
+	/*UAudioComponent* NewComp = NewObject<UAudioComponent>(World->GetWorldSettings());
+	NewComp->bAutoActivate = false;
+	NewComp->RegisterComponent();
+	ActiveSFXMap.Add(InType, NewComp);
+	return NewComp;*/
 }
