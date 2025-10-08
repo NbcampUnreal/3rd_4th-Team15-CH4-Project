@@ -1,8 +1,8 @@
-#include "UI/EGChatting.h"
+ï»¿#include "UI/EGChatting.h"
 
 #include "GameFramework/EGPlayerController.h"
 #include "Components/EditableText.h"
-#include "GameFramework/PlayerState.h"
+#include "GameFramework/EGPlayerState.h"
 #include "Components/Border.h"
 
 
@@ -40,23 +40,23 @@ void UEGChatting::OnTextCommitted(const FText& Text, ETextCommit::Type CommitMet
 			AEGPlayerController* PC = Cast<AEGPlayerController>(GetWorld()->GetFirstPlayerController());
 			if (PC)
 			{
-				// ÁÂ¿ì °ø¹é Á¦°Å
+				// ì¢Œìš° ê³µë°± ì œê±°
 				FText InputText = ChatText->GetText();
 				FString TrimmedText = InputText.ToString().TrimStartAndEnd();
 				if (!TrimmedText.IsEmpty())
 				{
-					// TrimmedText ¾Õ¿¡ UserNameÀ» ºÙ¿© ÃÖÁ¾ Message »ý¼º
-					APlayerState* PlayerState = PC->GetPlayerState<APlayerState>();
-					FString Message = FString::Printf(TEXT("%s : %s"), *PlayerState->GetPlayerName(), *TrimmedText);
-					// Ã¤ÆÃ ¸Þ½ÃÁö¸¦ º¸³»±â À§ÇÑ Server RPC È£Ãâ
+					// TrimmedText ì•žì— UserNameì„ ë¶™ì—¬ ìµœì¢… Message ìƒì„±
+					AEGPlayerState* PlayerState = PC->GetPlayerState<AEGPlayerState>();
+					FString Message = FString::Printf(TEXT("Player_%d : %s"), PlayerState->GetPlayerID(), *TrimmedText);
+					// ì±„íŒ… ë©”ì‹œì§€ë¥¼ ë³´ë‚´ê¸° ìœ„í•œ Server RPC í˜¸ì¶œ
 					PC->ServerSendChatMessage(Message);
 				}
 				
-				// ´Ù½Ã FInputModeGameOnly·Î ÀÎÇ²¸ðµå º¯°æ
+				// ë‹¤ì‹œ FInputModeGameOnlyë¡œ ì¸í’‹ëª¨ë“œ ë³€ê²½
 				FInputModeGameOnly InputMode;
 				PC->SetInputMode(InputMode);
 
-				// Ã¤ÆÃÃ¢ ºñ¿ì°í ºñÈ°¼ºÈ­
+				// ì±„íŒ…ì°½ ë¹„ìš°ê³  ë¹„í™œì„±í™”
 				ChatText->SetText(FText::GetEmpty());
 				ChatText->SetIsEnabled(false);
 				Chatting(false);

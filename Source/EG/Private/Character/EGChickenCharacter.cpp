@@ -76,6 +76,7 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 	EIC->BindAction(IA_Chatting, ETriggerEvent::Started, this, &AEGChickenCharacter::ChatButtonPressed);	// (작성자: 김효영)
 	EIC->BindAction(IA_ToggleMouse, ETriggerEvent::Started, this, &AEGChickenCharacter::ToggleMouse);	// (작성자: 김효영)
+	EIC->BindAction(IA_GetOut, ETriggerEvent::Started, this, &AEGChickenCharacter::GetOutWidget);	// (작성자: 김효영)
 
 	EIC->BindAction(IA_LayBombEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayBombEgg); 
 	EIC->BindAction(IA_LayTrickEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayTrickEgg); 
@@ -605,6 +606,15 @@ void AEGChickenCharacter::ToggleMouse()
 	if (PC)
 	{
 		PC->ToggleMouseCursor();
+	}
+}
+
+void AEGChickenCharacter::GetOutWidget()
+{
+	AEGPlayerController* PC = Cast<AEGPlayerController>(GetController());
+	if (PC)
+	{
+		PC->ClientGetOutWidget();
 	}
 }
 

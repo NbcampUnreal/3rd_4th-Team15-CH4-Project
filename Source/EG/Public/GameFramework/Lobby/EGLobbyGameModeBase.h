@@ -47,6 +47,9 @@ public:
 	void ShowScreen();
 	//void HideScreen();
 
+private:
+	bool bLevelChanging = false;
+
 #pragma endregion
 
 

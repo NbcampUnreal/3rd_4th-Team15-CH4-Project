@@ -165,7 +165,7 @@ void AEGGameModeBase::GameStart()
 
     }
 
-    HideScreen();
+    //HideScreen();
 }
 
 void AEGGameModeBase::GameOver()
@@ -222,6 +222,8 @@ void AEGGameModeBase::GameOver()
         EGGS->FinalizeAward(Winners);
     }
 */
+
+    //ServerTravel();
 }
 
 void AEGGameModeBase::ServerTravel()
@@ -238,7 +240,7 @@ void AEGGameModeBase::ShowScreen()
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            //EGPC->ClientShowBlackScreen();
+            EGPC->ClientShowBlackScreen();
         }
     }
 }
@@ -249,7 +251,7 @@ void AEGGameModeBase::HideScreen()
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            //EGPC->ClientHideBlackScreen();
+            EGPC->ClientHideBlackScreen();
         }
     }
 }

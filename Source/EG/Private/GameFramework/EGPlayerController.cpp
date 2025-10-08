@@ -225,6 +225,15 @@ void AEGPlayerController::ClientAddChatMessage_Implementation(const FString& Mes
 	}
 }
 
+void AEGPlayerController::ClientGetOutWidget_Implementation()
+{
+	EGHUD = EGHUD == nullptr ? Cast<AEGHUD>(GetHUD()) : EGHUD;
+	if (EGHUD)
+	{
+		EGHUD->GetOut();
+	}
+}
+
 void AEGPlayerController::ServerSendChatMessage_Implementation(const FString& Message)
 {
 	if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
