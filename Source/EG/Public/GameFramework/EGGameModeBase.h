@@ -24,6 +24,7 @@ public:
 	void GameStart();
 	UFUNCTION(BlueprintCallable, Category="GameFlow")
 	void GameOver();
+	void ServerTravel();
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	void InitializeSpawnPoint();
 

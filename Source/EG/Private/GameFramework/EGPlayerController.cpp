@@ -294,3 +294,13 @@ void AEGPlayerController::ClientRPC_PlaySFXGameOver_Implementation()
 		EG_LOG(LogJM, Warning, TEXT("No Game Instance"));
 	}
 }
+
+void AEGPlayerController::WinnderLogic()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Winnder Logic"));
+}
+
+void AEGPlayerController::LoserLogic()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Loser Logic"));
+}

@@ -47,24 +47,16 @@ void AEGGameStateBase::OnRep_RemainingPlayTime()
 // (작성자 : KMS)
 void AEGGameStateBase::OnRep_Leaderboard()
 {
-	// 리더보드 데이터가 복제될 때 클라이언트에서 호출됩니다.
-
-	// 1. GameInstanceSubsystem인 EGDelegateManager를 가져옵니다.
 	if (const UWorld* World = GetWorld())
 	{
 		if (const UGameInstance* GameInstance = World->GetGameInstance())
 		{
 			if (UEGDelegateManager* LocalDelegateManager = GameInstance->GetSubsystem<UEGDelegateManager>())
 			{
-				// 2. UI 갱신용 델리게이트를 브로드캐스트합니다.
-				//    클라이언트의 UI는 이 이벤트를 받아 순위표를 갱신합니다.
 				LocalDelegateManager->OnLeaderboardUpdated.Broadcast(LeaderboardSnapshot);
 			}
 		}
 	}
-
-	// **혹은** DelegateManager의 BroadcastPlayerState 함수를 사용하도록 설계되었다면 해당 함수를 호출합니다.
-	// BroadcastPlayerState(this); // GameState를 인자로 넘겨 리더보드 데이터를 브로드캐스트하도록 구현되어 있을 경우
 }
 
 void AEGGameStateBase::OnRep_Award()
@@ -153,24 +145,26 @@ void AEGGameStateBase::UpdateLeaderboard()
 	}
 }
 
-void AEGGameStateBase::FinalizeAward()
+void AEGGameStateBase::FinalizeAward(const TArray<TWeakObjectPtr<AEGPlayerController>>& Winners)
 {
-	if (HasAuthority())
+	if (!HasAuthority()) return;
+	RoundAwards.Empty();
+	for (const auto& Winner : Winners)
 	{
-		if (LeaderboardSnapshot.Num() > 0)
+		if (Winner.IsValid())
 		{
-			RoundAward.PlayerID     = LeaderboardSnapshot[0].PlayerID;
-			RoundAward.PlayerEggScore  = LeaderboardSnapshot[0].PlayerEggScore;
+			if (AEGPlayerState* PS = Cast<AEGPlayerState>(Winner->PlayerState))
+			{
+				FAward NewAward;
+				NewAward.PlayerID = PS->GetPlayerID();
+				NewAward.PlayerEggScore = PS->GetPlayerEggCount();
+				RoundAwards.Add(NewAward);
 
-			UE_LOG(LogTemp, Log, TEXT("FinalizeAward -> WinnerIndex: %d, Score: %d"),
-				RoundAward.PlayerID,
-				RoundAward.PlayerEggScore);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("FinalizeAward called with empty leaderboard!"));
+				UE_LOG(LogTemp, Log, TEXT("Awarded Player %d with Score %d"), PS->GetPlayerID(), PS->GetPlayerEggCount());
+			}
 		}
 	}
+	OnRep_Award();
 }
 
 void AEGGameStateBase::SetFinalResults(const TArray<TPair<TWeakObjectPtr<AEGPlayerController>, int32>>& Scores)

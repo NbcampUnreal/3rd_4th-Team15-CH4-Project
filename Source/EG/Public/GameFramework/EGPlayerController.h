@@ -54,6 +54,8 @@ public:
 
 	UFUNCTION()
 	void ActivateChatBox();
+	void WinnderLogic();
+	void LoserLogic();
 
 	UFUNCTION(Server, Reliable)
 	void ServerSendChatMessage(const FString& Message);

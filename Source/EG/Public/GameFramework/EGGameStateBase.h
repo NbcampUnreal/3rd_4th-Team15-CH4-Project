@@ -92,9 +92,11 @@ public:
 	void StartCountdown();
 	void DecrementCountdown();
 	void UpdateLeaderboard();
-	void FinalizeAward();
+	void FinalizeAward(const TArray<TWeakObjectPtr<AEGPlayerController>>& Winners);
 	void SetFinalResults(const TArray<TPair<TWeakObjectPtr<AEGPlayerController>, int32>>& Scores);
 
+	UPROPERTY(ReplicatedUsing = OnRep_Award)
+	TArray<FAward> RoundAwards;
 	///여기까지 KMS
 	
 protected:
