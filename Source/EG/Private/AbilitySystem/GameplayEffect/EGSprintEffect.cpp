@@ -24,4 +24,9 @@ UEGSprintEffect::UEGSprintEffect()
         
 		this->GEComponents.Add(TargetTags);
 	}
+
+	// JM : GameplayCue : Sprint 연결
+	FGameplayEffectCue SprintCue;
+	SprintCue.GameplayCueTags.AddTag(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Status.Sprint")));
+	GameplayCues.Add(SprintCue);
 }
