@@ -20,6 +20,7 @@
 #include "UI/EGChatting.h" 
 #include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sounds/SFXManagerSubsystem.h"
 
 
 void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -254,3 +255,42 @@ void AEGPlayerController::ShowChiefPlayerUI_Implementation()
 }
 
 #pragma endregion
+
+// JM : 게임 시작/종료시 sfx 재생
+void AEGPlayerController::ClientRPC_PlaySFXGameStart_Implementation()
+{
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (USFXManagerSubsystem* SFXManager = GI->GetSubsystem<USFXManagerSubsystem>())
+		{
+			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameStart, this);
+		}
+		else
+		{
+			EG_LOG(LogJM, Warning, TEXT("No SFXManager Subsystem"));
+		}
+	}
+	else
+	{
+		EG_LOG(LogJM, Warning, TEXT("No Game Instance"));
+	}
+}
+
+void AEGPlayerController::ClientRPC_PlaySFXGameOver_Implementation()
+{
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (USFXManagerSubsystem* SFXManager = GI->GetSubsystem<USFXManagerSubsystem>())
+		{
+			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameOver, this);
+		}
+		else
+		{
+			EG_LOG(LogJM, Warning, TEXT("No SFXManager Subsystem"));
+		}
+	}
+	else
+	{
+		EG_LOG(LogJM, Warning, TEXT("No Game Instance"));
+	}
+}

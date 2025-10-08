@@ -138,6 +138,9 @@ void AEGGameModeBase::GameStart()
                         SpawnNum++;
                     }
                 }
+
+                // JM : 게임 시작 시 SFX 재생
+                PC->ClientRPC_PlaySFXGameStart();
             }
         }
         for (int k = SpawnNum; k < AInGameSpawnPoints.Num(); k++)
@@ -180,6 +183,8 @@ void AEGGameModeBase::GameOver()
             {
                 FinalPlayerScores.Add(TPair<TWeakObjectPtr<AEGPlayerController>, int32>(PC, PS->GetPlayerEggCount()));
             }
+            // JM : 게임 종료 시 SFX 재생
+            PC->ClientRPC_PlaySFXGameOver();
         }
     }
     // player score sort

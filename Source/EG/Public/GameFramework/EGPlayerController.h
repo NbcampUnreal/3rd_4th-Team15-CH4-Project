@@ -90,5 +90,12 @@ protected:
 	void CreateAndShowHUD();
 	void BindHUDToASC();
 	// ===== 여기까지 =====
-	
+
+// JM : 게임 시작/종료시 SFX 재생 
+public:
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_PlaySFXGameStart();
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_PlaySFXGameOver();
 };
