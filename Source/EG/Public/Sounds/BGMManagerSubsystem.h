@@ -17,6 +17,8 @@ class EG_API UBGMManagerSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	UBGMManagerSubsystem();
+public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 	

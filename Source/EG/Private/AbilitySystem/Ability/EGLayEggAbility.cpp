@@ -8,6 +8,7 @@
 #include "AbilitySystem/GameplayEffect/EGLayEggCooldownEffect.h"
 #include "Character/Egg/EggActor.h"
 #include "AbilitySystem/GameplayEffect/EGResetEggEnergyEffect.h"
+#include "Character/Egg/EggPoolManagerSubsystem.h"
 #include "GameFramework/EGPlayerState.h"
 
 UEGLayEggAbility::UEGLayEggAbility()
@@ -67,7 +68,7 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		{
 			if (GetOwningActorFromActorInfo()->HasAuthority())
 			{
-				FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
+				/*FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
 
 				FActorSpawnParameters SpawnParams; // kms
 				SpawnParams.Owner = ActorInfo->AvatarActor.Get(); //kms
@@ -75,8 +76,20 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 				                                                        ActorInfo->AvatarActor->GetActorRotation(),
 				                                                         SpawnParams //kms
 				                                                         );
-				EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+				EggActor->SetOwner(ActorInfo->AvatarActor.Get());*/
 				// 서버에서만 알 스폰
+				// JM : 오브젝트 풀링으로 가져오기 
+				if (UEggPoolManagerSubsystem* PoolManager = GetWorld()->GetSubsystem<UEggPoolManagerSubsystem>())
+				{
+					FRotator SpawnRotation = ActorInfo->AvatarActor->GetActorRotation();
+					FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
+					AEggActor* EggActor = PoolManager->GetEggFromPool(EEggType::Egg, SpawnLocation, SpawnRotation);
+					EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+				}
+				else
+				{
+					EG_LOG(LogJM, Warning, TEXT("No Pool Manager"));
+				}
 
 				// add egg count for GameState (작성자 : KMS)
 				UE_LOG(LogTemp, Warning, TEXT("Ability Activated on %s (Owner: %s, Avatar: %s)"),

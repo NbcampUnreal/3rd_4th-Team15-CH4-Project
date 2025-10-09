@@ -6,6 +6,7 @@
 #include "EG/Public/GameFramework/EGGameStateBase.h"
 #include "Character/EGChickenCharacter.h"
 #include "Character/Egg/EggActor.h"
+#include "Character/Egg/EggPoolManagerSubsystem.h"
 #include "GameFramework/EGInGameSpawnPoints.h"
 #include "GameFramework/EGPlayerState.h"
 #include "GameFramework/EGGameInstance.h"
@@ -18,6 +19,18 @@ void AEGGameModeBase::BeginPlay()
     if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
     {
         playerCount = GI->GetPlayerIndex();
+    }
+
+    if (EggPoolDataAsset)
+    {
+        if (UEggPoolManagerSubsystem* PoolManager = GetWorld()->GetSubsystem<UEggPoolManagerSubsystem>())
+        {
+            PoolManager->InitPools(EggPoolDataAsset);
+        }
+    }
+    else
+    {
+        EG_LOG_ROLE(LogJM, Warning, TEXT("EggPoolDataAsset is null"));
     }
 }
 
@@ -138,6 +151,9 @@ void AEGGameModeBase::GameStart()
                         SpawnNum++;
                     }
                 }
+
+                // JM : 게임 시작 시 SFX 재생
+                PC->ClientRPC_PlaySFXGameStart();
             }
         }
         for (int k = SpawnNum; k < AInGameSpawnPoints.Num(); k++)
@@ -182,6 +198,8 @@ void AEGGameModeBase::GameOver()
             {
                 FinalPlayerScores.Add({ PC, PS->GetPlayerEggCount() });
             }
+            // JM : 게임 종료 시 SFX 재생
+            PC->ClientRPC_PlaySFXGameOver();
         }
     }
     

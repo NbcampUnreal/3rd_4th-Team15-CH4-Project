@@ -413,11 +413,12 @@ void AEGChickenCharacter::ExecuteLayEgg()
 			else
 			{
 				UE_LOG(LogTemp, Warning, TEXT("LayEgg ability failed (cooldown)"));
+				PlayBlockSkillSFX();	// JM : 쿨타임 시에는 블로킹 SFX 재생 (알 게이지가 다 안찼을 때)
 			}
 		}
 		else
 		{
-			PlayBlockSkillSFX();	// 쿨타임 시에는 블로킹 SFX 재생
+			PlayBlockSkillSFX();	// JM : 쿨타임 시에는 블로킹 SFX 재생
 			UE_LOG(LogTemp, Warning, TEXT("LayEgg Ability failed - cooldownTag having"));
 		}
 	}

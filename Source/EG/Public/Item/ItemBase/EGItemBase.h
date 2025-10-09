@@ -35,6 +35,9 @@ protected:
 	void OnOverlap(UPrimitiveComponent* OverlappedComp,
 		AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	// JM : 아이템 획득시 SFX 재생
+	void PlayItemPickupSFX();
 	
 public:
 	virtual void OnPickUp_Implementation(AActor* PickUpActor) override;
