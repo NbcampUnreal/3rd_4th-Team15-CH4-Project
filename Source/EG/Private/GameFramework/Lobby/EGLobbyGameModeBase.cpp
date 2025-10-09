@@ -103,7 +103,7 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
                 return !P.IsValid() || P.Get() == EGPS;
             });
     }
-    if (bChiefPlayer && APlayingPlayerStates.Num() > 0)
+    if (bChiefPlayer && APlayingPlayerStates.Num() > 0 && !bLevelChanging)
     {
         if (AEGPlayerController* NewChief = Cast<AEGPlayerController>(APlayingPlayerStates[0]->GetOwner()))
         {
@@ -163,6 +163,7 @@ void AEGLobbyGameModeBase::LevelChange()
     if (EGGI)
     {
         EGGI->ChangeLevel();
+		bLevelChanging = true;
     }
 }
 

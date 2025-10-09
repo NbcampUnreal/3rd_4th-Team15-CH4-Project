@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/EGHUD.h"
@@ -54,15 +54,31 @@ void AEGHUD::AddChatMessage(const FString& Message)
 
 	if (OwningPlayer && ChattingClass && Chatting && ChatMessageClass)
 	{
-		// ¸Ş½ÃÁö ÇÑ ÁÙ¿¡ ÇØ´çÇÏ´Â À§Á¬À» ¸¸µê
+		// ë©”ì‹œì§€ í•œ ì¤„ì— í•´ë‹¹í•˜ëŠ” ìœ„ì ¯ì„ ë§Œë“¦
 		UEGChatMessage* ChatMessageWidget = CreateWidget<UEGChatMessage>(OwningPlayer, ChatMessageClass);
 		if (ChatMessageWidget)
 		{
-			// Scroll box¿¡ AddChild ºÎÂø
+			// Scroll boxì— AddChild ë¶€ì°©
 			ChatMessageWidget->SetChatMessage(Message);
 			Chatting->ChatScrollBox->AddChild(ChatMessageWidget);
 			Chatting->ChatScrollBox->ScrollToEnd();
 			Chatting->ChatScrollBox->bAnimateWheelScrolling = true;			
+		}
+	}
+}
+
+void AEGHUD::GetOut()
+{
+	if (GetOutClass)
+	{
+		APlayerController* PlayerController = GetOwningPlayerController();
+		if (PlayerController)
+		{
+			UUserWidget* GetOutWidget = CreateWidget<UUserWidget>(PlayerController, GetOutClass);
+			if (GetOutWidget)
+			{
+				GetOutWidget->AddToViewport(10);
+			}
 		}
 	}
 }

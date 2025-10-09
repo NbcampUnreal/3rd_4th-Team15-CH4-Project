@@ -63,6 +63,9 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientAddChatMessage(const FString& Message);
 
+
+	UFUNCTION(Client, Reliable)
+	void ClientGetOutWidget();
 private:
 	UPROPERTY()
 	AEGHUD* EGHUD;
