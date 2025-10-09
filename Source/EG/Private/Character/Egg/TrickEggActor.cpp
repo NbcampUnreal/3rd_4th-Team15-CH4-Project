@@ -5,6 +5,11 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Character/EGChickenCharacter.h"
 
+ATrickEggActor::ATrickEggActor()
+{
+	EggType = EEggType::TrickEgg;
+}
+
 void ATrickEggActor::ApplyDamageAndCheckDestroy(int32 Damage, AActor* DamagedActor)
 {
 	Super::ApplyDamageAndCheckDestroy(Damage, DamagedActor);

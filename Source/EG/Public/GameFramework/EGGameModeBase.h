@@ -3,6 +3,7 @@
 #include "EGInGameSpawnPoints.h"
 #include "GameFramework/GameModeBase.h"
 #include "AI/EGAICharacter.h"
+#include "Character/Egg/EggPoolDataAsset.h"
 #include "GameFramework/EGPlayerController.h"
 #include "EGGameModeBase.generated.h"
 class AEGPlayerStart;
@@ -52,4 +53,9 @@ protected:
 	
 private:
 	int32 playerCount = 0;
+
+// JM : 오브젝트 풀링
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="EggPool")
+	UEggPoolDataAsset* EggPoolDataAsset;
 };

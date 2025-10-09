@@ -4,6 +4,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "EGLog.h"
+#include "Character/Egg/EggPoolManagerSubsystem.h"
 #include "GameFramework/EGPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
@@ -63,8 +64,19 @@ void AEggActor::ApplyDamageAndCheckDestroy(int32 Damage, AActor* DamagedActor)
 			{
 				EG_LOG_ROLE(LogJM, Warning, TEXT("AbilitySystemComponent is null"));
 			}
-			// TODO: Destroy 말고 오브젝트 풀링 방식으로 해야 소리나옴
-			Destroy();
+
+			// JM : Egg Pool에 반납
+			if (UEggPoolManagerSubsystem* PoolManager = GetWorld()->GetSubsystem<UEggPoolManagerSubsystem>())
+			{
+				PoolManager->ReturnEggToPool(this);
+			}
+			else
+			{
+				EG_LOG(LogJM, Warning, TEXT("No Pool Manager"));
+			}
+
+			// JM : 기존 Destroy 삭제
+			// Destroy(); 
 		}
 	}
 }
