@@ -7,6 +7,20 @@
 #include "Sounds/BGMDataAsset.h"
 
 
+UBGMManagerSubsystem::UBGMManagerSubsystem()
+{
+	// 하드 로딩(패키징 과정에서 data asset이 제외될 수 있음)
+	static ConstructorHelpers::FObjectFinder<UBGMDataAsset> DataAssetRef(TEXT("/Game/OhMyEgg/Sounds/DA_BGMList.DA_BGMList"));
+	if (DataAssetRef.Succeeded())
+	{
+		BGMDataAsset = DataAssetRef.Object;
+	}
+	else
+	{
+		EG_LOG(LogJM, Error, TEXT("Failed to load BGM DataAsset: %s"), TEXT("/Game/OhMyEgg/Sounds/DA_BGMList.DA_BGMList"));
+	}
+}
+
 void UBGMManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
@@ -18,7 +32,7 @@ void UBGMManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	}
 	
 	// 1. 에디터에 설정해 둔 데이터 에셋을 동기로드 (BP로 만들 수 없어서, DA를 에디터에서 할당할 수가 없음)
-	TSoftObjectPtr<UBGMDataAsset> DataAssetRef{ FSoftObjectPath(TEXT("/Game/OhMyEgg/Sounds/DA_BGMList.DA_BGMList")) };
+	/*TSoftObjectPtr<UBGMDataAsset> DataAssetRef{ FSoftObjectPath(TEXT("/Game/OhMyEgg/Sounds/DA_BGMList.DA_BGMList")) };
 	if (UBGMDataAsset* Loaded = DataAssetRef.LoadSynchronous())
 	{
         BGMDataAsset = Loaded;
@@ -26,7 +40,7 @@ void UBGMManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     else
     {
         EG_LOG(LogJM, Error, TEXT("Failed to load BGM DataAsset: %s"), *DataAssetRef.ToString());
-    }
+    }*/
 
 	// 3. 맵(레벨) 로드가 완료될 때마다 OnPostLoadMap 함수를 실행하도록 '델리게이트'에 바인딩
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UBGMManagerSubsystem::OnPostLoadMap);

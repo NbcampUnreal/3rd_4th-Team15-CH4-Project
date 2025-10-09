@@ -16,6 +16,9 @@ class EG_API USFXManagerSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	USFXManagerSubsystem();
+
+public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
