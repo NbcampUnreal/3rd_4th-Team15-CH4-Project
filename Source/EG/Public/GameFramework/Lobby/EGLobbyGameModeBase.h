@@ -8,6 +8,7 @@
 #include "EGLobbyGameModeBase.generated.h"
 
 
+class UEggPoolDataAsset;
 class AEGPlayerController;
 class AEGPlayerStart;
 
@@ -65,6 +66,11 @@ protected:
 	TArray<TWeakObjectPtr<AEGPlayerState>> APlayingPlayerStates;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TMap<int32, AEGPlayerStart*> PlayerStartList;
+
+// JM : 오브젝트 풀링
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="EggPool")
+	UEggPoolDataAsset* EggPoolDataAsset;
 };
 
 #pragma endregion
