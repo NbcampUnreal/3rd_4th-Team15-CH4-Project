@@ -6,6 +6,10 @@
 #include "GameFramework/PlayerController.h"
 #include "EGPlayerController.generated.h"
 
+class ALevelSequenceActor;
+class ULevelSequencePlayer;
+class FOnMovieSceneSequencePlayerEvent;
+class ULevelSequence;
 class UAbilitySystemComponent;               // ★ 추가
 class UWBP_HUD;    
 
@@ -103,4 +107,45 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_PlaySFXGameOver();
+
+// 시퀀스 재생 (작성자 : 김혁)
+#pragma region Seqeuence
+
+public:
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_PlayEndingSequence(bool bIsWinner);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_NotifySequenceFinished();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sequence")
+	TObjectPtr<ULevelSequence> CommonSequence;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sequence")
+	TObjectPtr<ULevelSequence> WinSequence;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sequence")
+	TObjectPtr<ULevelSequence> LoseSequence;
+
+	UPROPERTY()
+	ULevelSequencePlayer* CurrentSequencePlayer;
+	UPROPERTY()
+	ALevelSequenceActor* CurrentSequenceActor;
+
+	FTimerHandle SequenceTimerHandle;
+	
+	UFUNCTION()
+	void OnCommonSequenceFinished();
+	UFUNCTION()
+	void OnFinalSequenceFinished();
+	
+private:
+	bool bCachedIsWinner;
+	bool bSequenceHandled = false;
+	bool bCurrentSequenceIsFinal = false;
+	
+	void PlayLevelSequence(ULevelSequence* Sequence, bool bIsFinal, float OptionalDurationSeconds = -1.f);
+	float GetSequenceDuration(ULevelSequence* Sequence) const;
+	void HandleSequenceFallbackTimeout();
+	
+#pragma endregion 
 };

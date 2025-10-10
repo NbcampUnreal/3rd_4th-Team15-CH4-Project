@@ -25,6 +25,9 @@ public class EG : ModuleRules
 			
 			// Niagara
 			"Niagara",
+			
+			// Sequence
+			"MovieScene", "LevelSequence",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

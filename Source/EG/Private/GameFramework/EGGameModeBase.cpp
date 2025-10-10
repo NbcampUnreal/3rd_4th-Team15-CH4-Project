@@ -181,7 +181,7 @@ void AEGGameModeBase::GameStart()
 
     }
 
-    //HideScreen();
+    HideScreen();
 }
 
 void AEGGameModeBase::GameOver()
@@ -208,46 +208,26 @@ void AEGGameModeBase::GameOver()
         return A.Value > B.Value;
     });
     int32 TopScore = (FinalPlayerScores.Num() > 0) ? FinalPlayerScores[0].Value : 0;
-    
-    TArray<TWeakObjectPtr<AEGPlayerController>> Winners;
-    for (const auto& Pair : FinalPlayerScores)
-    {
-        if (Pair.Value == TopScore)
-        {
-            Winners.Add(Pair.Key);
-        }
-        else break;
-    }
+
+    TArray<FFinalResult> FinalResults;
 
     for (const auto& Pair : FinalPlayerScores)
     {
         if (!Pair.Key.IsValid()) continue;
 
-        if (Winners.Contains(Pair.Key))     // winner
-        {
-            Pair.Key->WinnderLogic();
-            
-        }
-        else                                // loser
-        {
-            Pair.Key->LoserLogic();
-        }
+        FFinalResult Result;
+        Result.PlayerId = Pair.Key->GetPlayerState<AEGPlayerState>()->GetPlayerID();
+        Result.bIsWinner = (Pair.Value == TopScore);
+
+        FinalResults.Add(Result);
     }
-/*
-    if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
+
+    if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
     {
-        EGGS->SetFinalResults(FinalPlayerScores);
-        EGGS->FinalizeAward(Winners);
+        GI->SetFinalResults(FinalResults);
     }
-*/
 
-    //ServerTravel();
-}
-
-void AEGGameModeBase::ServerTravel()
-{
-    ShowScreen();
-    GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
+    GetWorld()->ServerTravel(TEXT("/Game/OhMyEgg/Sequence/L_Sequence"), true);
 }
 
 // 레벨 변경 (작성자 : 김효영)

@@ -6,6 +6,7 @@
 #include "GameplayCueNotify_Static.h"
 #include "EGGameplayCue.generated.h"
 
+class UNiagaraSystem;
 /**
  * 
  */
@@ -22,4 +23,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sounds")
 	TObjectPtr<USoundAttenuation> SFXAttenuation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SFX")
+	TObjectPtr<UNiagaraSystem> NiagaraSystem;
 };

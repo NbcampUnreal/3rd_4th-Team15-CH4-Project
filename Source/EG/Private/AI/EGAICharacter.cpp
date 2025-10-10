@@ -65,9 +65,9 @@ void AEGAICharacter::OnAngryMode(FVector AttackLocation)
 			if (UBlackboardComponent* Blackboard = EGAIController->GetBlackboardComponent())
 			{
 				EG_LOG(LogKH, Log, TEXT("%s : Angry"), *this->GetName());
-				
-				Blackboard->SetValueAsEnum("ActionState", static_cast<uint8>(EAIState::Angry));
 
+				Blackboard->SetValueAsEnum("ActionState", static_cast<uint8>(EAIState::Angry));
+				
 				FVector curLocation = GetActorLocation();
 				FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(curLocation, AttackLocation);
 
@@ -75,6 +75,12 @@ void AEGAICharacter::OnAngryMode(FVector AttackLocation)
 				LookAtRotation.Roll = 0.f;
 
 				SetActorRotation(LookAtRotation);
+
+				if (AngryAbility)
+				{
+					AbilitySystemComponent->CancelAllAbilities();
+					AbilitySystemComponent->TryActivateAbilityByClass(AngryAbility);
+				}
 			}
 		}
 	}

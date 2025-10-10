@@ -35,6 +35,9 @@ private:
 	UPROPERTY()
 	UEGAI_AttributeSet* AttributeSet;
 
+	UPROPERTY(EditAnywhere, Category = "AICharacter|GAS")
+	TSubclassOf<UGameplayAbility> AngryAbility;
+
 	void GiveAbilities();
 	
 #pragma endregion
