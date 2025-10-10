@@ -87,13 +87,18 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
 
         EGPC->ClientRPCFadeOutScreen(); // 처음 접속했을 때 페이드아웃 (작성자 : 김세훈)
     }
-    if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState)) 
+    if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
-        APlayingPlayerStates.Add(EGPS);
-        if (EGPS->GetPlayerID() == -1)
+        // SeamlessTravel을 대비해 서버에서만 처리
+        if (HasAuthority())
         {
-            
-            EGPS->SetPlayerID(CurrentPlayerIndex++);
+            if (!APlayingPlayerStates.Contains(EGPS))
+            {
+                APlayingPlayerStates.Add(EGPS);
+            }
+
+            UE_LOG(LogTemp, Log, TEXT("Player joined: Controller=%s | PlayerId=%d"),
+                *NewPlayer->GetName(), EGPS->GetPlayerId());
         }
     }
     
@@ -109,7 +114,7 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
 
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(Exiting))
     {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPS->GetPlayerID());
+        EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPS->GetPlayerId());
         APlayingPlayerStates.RemoveAll([EGPS](const TWeakObjectPtr<AEGPlayerState>& P)
             {
                 return !P.IsValid() || P.Get() == EGPS;

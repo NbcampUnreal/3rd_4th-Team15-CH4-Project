@@ -29,7 +29,7 @@ void AEGGameModeBase_Cutscene::BeginPlay()
 			{
 				if (AEGPlayerController* PC = Cast<AEGPlayerController>(It->Get()))
 				{
-					int32 PlayerId = PC->GetPlayerState<AEGPlayerState>()->GetPlayerID();
+					int32 PlayerId = PC->GetPlayerState<AEGPlayerState>()->GetPlayerId();
 					const FFinalResult* Found = Results.FindByPredicate(
 						[PlayerId](const FFinalResult& Result) {return Result.PlayerId == PlayerId;}
 						);

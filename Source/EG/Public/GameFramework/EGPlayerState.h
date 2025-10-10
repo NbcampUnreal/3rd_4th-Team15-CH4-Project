@@ -13,32 +13,22 @@ UCLASS()
 class EG_API AEGPlayerState : public APlayerState
 {
 	GENERATED_BODY()
+	
 public:
 	AEGPlayerState();
-	void SetPlayerID(int32 Num);
-	int32 GetPlayerID()
-	{
-		return CurrentPlayerID;
-	}
 
 protected:
-	UPROPERTY(ReplicatedUsing=OnRep_PlayerEggCount, BlueprintReadOnly, Category="Score")
-	int32 PlayerEggCount;
-	
-	UPROPERTY(Replicated)
-	int32 CurrentPlayerID;
-	UPROPERTY(Replicated)
-	FString PlayerName;
-	
+	// 플레이어의 점수(알 개수)
+	UPROPERTY(ReplicatedUsing = OnRep_PlayerEggCount, BlueprintReadOnly, Category = "Score")
+	int32 PlayerEggCount = 0;
+
 	UFUNCTION()
 	void OnRep_PlayerEggCount();
 
-	
-	
 public:
-	UFUNCTION(BlueprintPure, Category="Score")
+	UFUNCTION(BlueprintPure, Category = "Score")
 	int32 GetPlayerEggCount() const { return PlayerEggCount; }
-
+	
 	UFUNCTION(Server, Reliable)
 	void ServerAddEgg(int32 Amount = 1);
 

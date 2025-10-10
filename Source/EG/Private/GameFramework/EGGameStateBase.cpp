@@ -66,7 +66,6 @@ void AEGGameStateBase::OnRep_Award()
 		RoundAward.PlayerEggScore);
 	
 	DelegateManager->OnAwardUpdated.Broadcast(RoundAward);
-
 }
 
 void AEGGameStateBase::CheckRoomLeader()
@@ -124,7 +123,7 @@ void AEGGameStateBase::UpdateLeaderboard()
 		if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(PS))
 		{
 			FAward Entry;
-			Entry.PlayerID       = EGPS->GetPlayerID();
+			Entry.PlayerID       = EGPS->GetPlayerId();
 			Entry.PlayerEggScore = EGPS->GetPlayerEggCount();
 			NewSnapshot.Add(Entry);
 		}
@@ -156,11 +155,11 @@ void AEGGameStateBase::FinalizeAward(const TArray<TWeakObjectPtr<AEGPlayerContro
 			if (AEGPlayerState* PS = Cast<AEGPlayerState>(Winner->PlayerState))
 			{
 				FAward NewAward;
-				NewAward.PlayerID = PS->GetPlayerID();
+				NewAward.PlayerID = PS->GetPlayerId();
 				NewAward.PlayerEggScore = PS->GetPlayerEggCount();
 				RoundAwards.Add(NewAward);
 
-				UE_LOG(LogTemp, Log, TEXT("Awarded Player %d with Score %d"), PS->GetPlayerID(), PS->GetPlayerEggCount());
+				UE_LOG(LogTemp, Log, TEXT("Awarded Player %d with Score %d"), PS->GetPlayerId(), PS->GetPlayerEggCount());
 			}
 		}
 	}
@@ -178,7 +177,7 @@ void AEGGameStateBase::SetFinalResults(const TArray<TPair<TWeakObjectPtr<AEGPlay
 
 				{
 					FAward Entry;
-					Entry.PlayerID    = EGPS->GetPlayerID();         
+					Entry.PlayerID    = EGPS->GetPlayerId();         
 					Entry.PlayerEggScore = EGPS->GetPlayerEggCount(); 
 					LeaderboardSnapshot.Add(Entry);
 				}

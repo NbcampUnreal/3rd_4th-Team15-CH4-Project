@@ -5,7 +5,6 @@
 #include "EGLog.h"
 #include "EG/Public/GameFramework/EGGameStateBase.h"
 #include "Character/EGChickenCharacter.h"
-#include "Character/Egg/EggActor.h"
 #include "Character/Egg/EggPoolManagerSubsystem.h"
 #include "GameFramework/EGInGameSpawnPoints.h"
 #include "GameFramework/EGPlayerState.h"
@@ -59,7 +58,7 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
         if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
         {
             FAward Entry;
-            Entry.PlayerID = EGPS->GetPlayerID();
+            Entry.PlayerID = EGPS->GetPlayerId();
             Entry.PlayerEggScore = 0;
             EGGS->LeaderboardSnapshot.Add(Entry);
             if (CurrentPlayerIndex == playerCount)
@@ -212,11 +211,13 @@ void AEGGameModeBase::GameOver()
     {
         if (!Pair.Key.IsValid()) continue;
 
-        FFinalResult Result;
-        Result.PlayerId = Pair.Key->GetPlayerState<AEGPlayerState>()->GetPlayerID();
-        Result.bIsWinner = (Pair.Value == TopScore);
-
-        FinalResults.Add(Result);
+        if (AEGPlayerState* PS = Pair.Key->GetPlayerState<AEGPlayerState>())
+        {
+            FFinalResult Result;
+            Result.PlayerId = PS->GetPlayerId();
+            Result.bIsWinner = (Pair.Value == TopScore);
+            FinalResults.Add(Result);
+        }
     }
 
     if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
