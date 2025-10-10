@@ -50,10 +50,11 @@ void AEGItemBase::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 
 void AEGItemBase::PlayItemPickupSFX()
 {
-	USFXManagerSubsystem* SFXManger = GetGameInstance()->GetSubsystem<USFXManagerSubsystem>();
-	if (SFXManger)
+	USFXManagerSubsystem* SFXManager = GetGameInstance()->GetSubsystem<USFXManagerSubsystem>();
+	if (SFXManager)
 	{
-		SFXManger->PlaySFXLocalClientOnly(ESFXType::ItemUse, this);
+		// SFXManager->PlaySFXLocalClientOnly(ESFXType::ItemUse, this);
+		SFXManager->PlaySFXLocalClientOnly(ESFXType::ItemUse, GetWorld());
 	}
 	else
 	{

@@ -529,7 +529,8 @@ void AEGChickenCharacter::PlayBlockSkillSFX()
 	USFXManagerSubsystem* SFXManager = GetGameInstance()->GetSubsystem<USFXManagerSubsystem>();
 	if (SFXManager)
 	{
-		SFXManager->PlaySFXLocalClientOnly(ESFXType::BlockSkill, this);
+		// SFXManager->PlaySFXLocalClientOnly(ESFXType::BlockSkill, this);
+		SFXManager->PlaySFXLocalClientOnly(ESFXType::BlockSkill, GetWorld());
 	}
 }
 

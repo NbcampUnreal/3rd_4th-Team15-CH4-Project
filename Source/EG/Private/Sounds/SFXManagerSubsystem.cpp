@@ -50,7 +50,7 @@ void USFXManagerSubsystem::Deinitialize()
 	// 불필요
 }
 
-void USFXManagerSubsystem::PlaySFXLocalClientOnly(ESFXType InType, UObject* WorldContext)
+void USFXManagerSubsystem::PlaySFXLocalClientOnly(ESFXType InType, UWorld* World)
 {
 	EG_LOG(LogJM, Log, TEXT("Start"));
 	if (!SFXDataAsset)
@@ -60,13 +60,13 @@ void USFXManagerSubsystem::PlaySFXLocalClientOnly(ESFXType InType, UObject* Worl
 	}
 
 	USoundBase* Sound = SFXDataAsset->GetSFXSound(InType);
-	if (!Sound || !WorldContext)
+	if (!Sound)
 	{
 		EG_LOG(LogJM, Warning, TEXT("No Sound or WorldContext"));
 		return;
 	}
 
-	UWorld* World = WorldContext->GetWorld();
+	//UWorld* World = WorldContext->GetWorld();
 	if (!World)
 	{
 		EG_LOG(LogJM, Warning, TEXT("No World"));
