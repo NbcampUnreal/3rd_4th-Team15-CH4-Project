@@ -179,7 +179,7 @@ void AEGPlayerController::ToggleMouseCursor()
 
 void AEGPlayerController::ClientRPCFadeInScreen_Implementation()
 {
-	/*if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
+	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
 	{
 		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
 		if (PC)
@@ -190,12 +190,12 @@ void AEGPlayerController::ClientRPCFadeInScreen_Implementation()
 			bEnableMouseOverEvents = false;
 		}
 		GI->FadeInScreen();
-	}*/
+	}
 }
 
 void AEGPlayerController::ClientRPCFadeOutScreen_Implementation()
 {
-	/*if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
+	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
 	{
 		GI->FadeOutScreen();
 		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
@@ -206,7 +206,7 @@ void AEGPlayerController::ClientRPCFadeOutScreen_Implementation()
 			bEnableClickEvents = true;
 			bEnableMouseOverEvents = true;
 		}
-	}*/
+	}
 }
 
 #pragma endregion
