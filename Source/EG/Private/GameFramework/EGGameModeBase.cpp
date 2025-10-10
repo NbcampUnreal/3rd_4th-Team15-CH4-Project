@@ -53,7 +53,6 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
     
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
-        EGPS->SetPlayerID(CurrentPlayerIndex++);
         
         if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
         {
