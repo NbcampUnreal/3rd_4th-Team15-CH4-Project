@@ -47,38 +47,25 @@ void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, c
         return;
     }
 }
-
 void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
-
+    
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
-        const int32 PlayerId = EGPS->GetPlayerId();
-
+        EGPS->SetPlayerID(CurrentPlayerIndex++);
+        
         if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
         {
-            bool bAlreadyExists = EGGS->LeaderboardSnapshot.ContainsByPredicate(
-                [PlayerId](const FAward& Entry)
-                {
-                    return Entry.PlayerID == PlayerId;
-                });
-
-            if (!bAlreadyExists)
-            {
-                FAward Entry;
-                Entry.PlayerID = PlayerId;
-                Entry.PlayerEggScore = 0;
-                EGGS->LeaderboardSnapshot.Add(Entry);
-
-                UE_LOG(LogTemp, Log, TEXT("[PostLogin] Added PlayerID %d to Leaderboard"), PlayerId);
-            }
-            
+            FAward Entry;
+            Entry.PlayerID = EGPS->GetPlayerId();
+            Entry.PlayerEggScore = 0;
+            EGGS->LeaderboardSnapshot.Add(Entry);
             if (CurrentPlayerIndex == playerCount)
             {
                 GameStart();
             }
-        }
+        }        
     }
 }
 
@@ -190,7 +177,7 @@ void AEGGameModeBase::GameStart()
 
     }
 
-    HideScreen();
+    FadeOutScreen(); // 게임 시작 시 페이드 아웃 (작성자 : 김세훈) 
 }
 
 void AEGGameModeBase::GameOver()
@@ -243,24 +230,24 @@ void AEGGameModeBase::GameOver()
 
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange
-void AEGGameModeBase::ShowScreen()
+void AEGGameModeBase::FadeInScreen()
 {
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientShowBlackScreen();
+            EGPC->ClientRPCFadeInScreen();
         }
     }
 }
 
-void AEGGameModeBase::HideScreen()
+void AEGGameModeBase::FadeOutScreen()
 {
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientHideBlackScreen();
+            EGPC->ClientRPCFadeOutScreen();
         }
     }
 }

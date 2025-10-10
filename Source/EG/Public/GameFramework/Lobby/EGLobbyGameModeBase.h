@@ -10,6 +10,7 @@
 
 class AEGPlayerController;
 class AEGPlayerStart;
+class UEggPoolDataAsset;
 
 /**
  * 
@@ -22,6 +23,10 @@ class EG_API AEGLobbyGameModeBase : public AGameModeBase
 public:
 
 	AEGLobbyGameModeBase();
+
+	// JM : 오브젝트 풀링
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EggPool")
+	UEggPoolDataAsset* EggPoolDataAsset;
 #pragma region Chatting
 	void SendChatMessage(const FString& Message);
 
@@ -44,8 +49,8 @@ public:
 #pragma region LevelChange
 	void LevelChange();
 
-	void ShowScreen();
-	//void HideScreen();
+	void FadeInScreen();
+	void FadeOutScreen();
 
 private:
 	bool bLevelChanging = false;
