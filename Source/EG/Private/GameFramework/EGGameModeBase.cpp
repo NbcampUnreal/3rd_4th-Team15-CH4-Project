@@ -48,28 +48,38 @@ void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, c
         return;
     }
 }
+
 void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
-    
+
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
-        if (EGPS->GetPlayerID() == -1)
-        {
-            EGPS->SetPlayerID(CurrentPlayerIndex++);
-        }
-        
+        const int32 PlayerId = EGPS->GetPlayerId();
+
         if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
         {
-            FAward Entry;
-            Entry.PlayerID = EGPS->GetPlayerID();
-            Entry.PlayerEggScore = 0;
-            EGGS->LeaderboardSnapshot.Add(Entry);
+            bool bAlreadyExists = EGGS->LeaderboardSnapshot.ContainsByPredicate(
+                [PlayerId](const FAward& Entry)
+                {
+                    return Entry.PlayerID == PlayerId;
+                });
+
+            if (!bAlreadyExists)
+            {
+                FAward Entry;
+                Entry.PlayerID = PlayerId;
+                Entry.PlayerEggScore = 0;
+                EGGS->LeaderboardSnapshot.Add(Entry);
+
+                UE_LOG(LogTemp, Log, TEXT("[PostLogin] Added PlayerID %d to Leaderboard"), PlayerId);
+            }
+            
             if (CurrentPlayerIndex == playerCount)
             {
                 GameStart();
             }
-        }        
+        }
     }
 }
 
@@ -215,11 +225,13 @@ void AEGGameModeBase::GameOver()
     {
         if (!Pair.Key.IsValid()) continue;
 
-        FFinalResult Result;
-        Result.PlayerId = Pair.Key->GetPlayerState<AEGPlayerState>()->GetPlayerID();
-        Result.bIsWinner = (Pair.Value == TopScore);
-
-        FinalResults.Add(Result);
+        if (AEGPlayerState* PS = Pair.Key->GetPlayerState<AEGPlayerState>())
+        {
+            FFinalResult Result;
+            Result.PlayerId = PS->GetPlayerId();
+            Result.bIsWinner = (Pair.Value == TopScore);
+            FinalResults.Add(Result);
+        }
     }
 
     if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())

@@ -54,8 +54,7 @@ class EG_API AEGGameStateBase : public AGameStateBase
 public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	void BeginPlay();
-	void RemovePlayerState(APlayerState* PlayerState);
+	virtual void BeginPlay() override;
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
 	int32 AlivePlayerControllerCount = 0;

@@ -179,7 +179,7 @@ void AEGPlayerController::ToggleMouseCursor()
 
 void AEGPlayerController::ClientShowBlackScreen_Implementation()
 {
-	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
+	/*if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
 	{
 		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
 		if (PC)
@@ -190,12 +190,12 @@ void AEGPlayerController::ClientShowBlackScreen_Implementation()
 			bEnableMouseOverEvents = false;
 		}
 		GI->FadeInScreen();
-	}
+	}*/
 }
 
 void AEGPlayerController::ClientHideBlackScreen_Implementation()
 {
-	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
+	/*if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
 	{
 		GI->FadeOutScreen();
 		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
@@ -206,7 +206,7 @@ void AEGPlayerController::ClientHideBlackScreen_Implementation()
 			bEnableClickEvents = true;
 			bEnableMouseOverEvents = true;
 		}
-	}
+	}*/
 }
 
 #pragma endregion

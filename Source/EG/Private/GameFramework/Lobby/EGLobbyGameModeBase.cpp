@@ -68,22 +68,23 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
         }
 
         // =================================
-        if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
+        if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
         {
-            GI->SetPlayerIndex(1);
-        }
+            // SeamlessTravel을 대비해 서버에서만 처리
+            if (HasAuthority())
+            {
+                if (!APlayingPlayerStates.Contains(EGPS))
+                {
+                    APlayingPlayerStates.Add(EGPS);
+                }
 
+                UE_LOG(LogTemp, Log, TEXT("Player joined: Controller=%s | PlayerId=%d"),
+                    *NewPlayer->GetName(), EGPS->GetPlayerId());
+            }
+        }
         EGPC->ClientHideBlackScreen();
     }
-    if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState)) 
-    {
-        APlayingPlayerStates.Add(EGPS);
-        if (EGPS->GetPlayerID() == -1)
-        {
-            
-            EGPS->SetPlayerID(CurrentPlayerIndex++);
-        }
-    }
+    
     
     if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
     {
@@ -97,7 +98,7 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
 
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(Exiting))
     {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPS->GetPlayerID());
+        EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPS->GetPlayerId());
         APlayingPlayerStates.RemoveAll([EGPS](const TWeakObjectPtr<AEGPlayerState>& P)
             {
                 return !P.IsValid() || P.Get() == EGPS;
