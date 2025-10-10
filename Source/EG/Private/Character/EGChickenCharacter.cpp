@@ -119,10 +119,10 @@ void AEGChickenCharacter::BeginPlay()
 				{
 					AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0, this));
 					UE_LOG(LogTemp, Log, TEXT("Give Ability : %s"), *AbilityClass->GetName());
-					HandleStaminaRegen();
-					HandleEggEnergyRegen();
 				}
 			}
+			HandleStaminaRegen();
+			HandleEggEnergyRegen();
 
 			UE_LOG(LogTemp, Warning, TEXT("GAS Initialized"));
 		}
