@@ -66,7 +66,7 @@ public:
 	int32 RemainingCountdown = 100;
 
 	UPROPERTY(ReplicatedUsing = OnRep_RemainingPlayTime, VisibleAnywhere, BlueprintReadOnly)
-	int32 RemainingPlayTime = 30;
+	int32 RemainingPlayTime = 300;
 	
 	UPROPERTY()
 	class UEGDelegateManager* DelegateManager;

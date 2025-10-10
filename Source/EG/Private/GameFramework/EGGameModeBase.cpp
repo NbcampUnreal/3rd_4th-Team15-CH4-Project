@@ -5,7 +5,6 @@
 #include "EGLog.h"
 #include "EG/Public/GameFramework/EGGameStateBase.h"
 #include "Character/EGChickenCharacter.h"
-#include "Character/Egg/EggActor.h"
 #include "Character/Egg/EggPoolManagerSubsystem.h"
 #include "GameFramework/EGInGameSpawnPoints.h"
 #include "GameFramework/EGPlayerState.h"
