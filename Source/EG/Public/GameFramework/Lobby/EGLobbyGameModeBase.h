@@ -44,8 +44,8 @@ public:
 #pragma region LevelChange
 	void LevelChange();
 
-	void ShowScreen();
-	//void HideScreen();
+	void FadeInScreen();
+	void FadeOutScreen();
 
 private:
 	bool bLevelChanging = false;

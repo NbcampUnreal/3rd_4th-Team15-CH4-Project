@@ -177,7 +177,7 @@ void AEGPlayerController::ToggleMouseCursor()
 	}
 }
 
-void AEGPlayerController::ClientShowBlackScreen_Implementation()
+void AEGPlayerController::ClientRPCFadeInScreen_Implementation()
 {
 	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
 	{
@@ -193,7 +193,7 @@ void AEGPlayerController::ClientShowBlackScreen_Implementation()
 	}
 }
 
-void AEGPlayerController::ClientHideBlackScreen_Implementation()
+void AEGPlayerController::ClientRPCFadeOutScreen_Implementation()
 {
 	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
 	{

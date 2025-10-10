@@ -27,6 +27,7 @@ class EG_API UEGGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	virtual void Init() override;
 	// 작성자: 김효영
 
 #pragma region Chatting
@@ -44,8 +45,6 @@ public:
 
 	void FadeInScreen();
 	void FadeOutScreen();
-	UFUNCTION(BlueprintCallable)
-	void FadeOutScreenRemove();
 
 	UPROPERTY()
 	UUserWidget* FadeInScreenWidget;
@@ -54,7 +53,7 @@ public:
 	TSubclassOf<UUserWidget> FadeInScreenClass;
 
 	UPROPERTY()
-	UUserWidget* FadeOutcreenWidget;
+	UUserWidget* FadeOutScreenWidget;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> FadeOutScreenClass;

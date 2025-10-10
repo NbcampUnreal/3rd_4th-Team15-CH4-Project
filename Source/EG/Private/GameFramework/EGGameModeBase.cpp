@@ -54,10 +54,7 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
     
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
-        if (EGPS->GetPlayerID() == -1)
-        {
-            EGPS->SetPlayerID(CurrentPlayerIndex++);
-        }
+        EGPS->SetPlayerID(CurrentPlayerIndex++);
         
         if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
         {
@@ -181,7 +178,7 @@ void AEGGameModeBase::GameStart()
 
     }
 
-    HideScreen();
+    FadeOutScreen(); // 게임 시작 시 페이드 아웃 (작성자 : 김세훈) 
 }
 
 void AEGGameModeBase::GameOver()
@@ -232,24 +229,24 @@ void AEGGameModeBase::GameOver()
 
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange
-void AEGGameModeBase::ShowScreen()
+void AEGGameModeBase::FadeInScreen()
 {
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientShowBlackScreen();
+            EGPC->ClientRPCFadeInScreen();
         }
     }
 }
 
-void AEGGameModeBase::HideScreen()
+void AEGGameModeBase::FadeOutScreen()
 {
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientHideBlackScreen();
+            EGPC->ClientRPCFadeOutScreen();
         }
     }
 }

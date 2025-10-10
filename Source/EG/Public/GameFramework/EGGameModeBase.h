@@ -30,8 +30,8 @@ public:
 
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange
-	void ShowScreen();
-	void HideScreen();
+	void FadeInScreen();
+	void FadeOutScreen();
 
 #pragma endregion
 

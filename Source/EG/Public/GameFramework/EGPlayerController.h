@@ -42,10 +42,10 @@ public:
 	void ToggleMouseCursor();
 
 	UFUNCTION(Client, Reliable)
-	void ClientShowBlackScreen();
+	void ClientRPCFadeInScreen();
 
 	UFUNCTION(Client, Reliable)
-	void ClientHideBlackScreen();
+	void ClientRPCFadeOutScreen();
 
 private:
 	bool bMouseVisible = false;	
