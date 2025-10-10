@@ -73,7 +73,7 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
             GI->SetPlayerIndex(1);
         }
 
-        EGPC->ClientHideBlackScreen();
+        EGPC->ClientRPCFadeOutScreen(); // 처음 접속했을 때 페이드아웃 (작성자 : 김세훈)
     }
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState)) 
     {
@@ -157,7 +157,7 @@ AActor* AEGLobbyGameModeBase::ChoosePlayerStart_Implementation(AController* Play
 #pragma region LevelChange
 void AEGLobbyGameModeBase::LevelChange()
 {
-    ShowScreen();
+    FadeInScreen();
 
     UEGGameInstance* EGGI = Cast<UEGGameInstance>(GetGameInstance());
     if (EGGI)
@@ -167,26 +167,26 @@ void AEGLobbyGameModeBase::LevelChange()
     }
 }
 
-void AEGLobbyGameModeBase::ShowScreen()
+void AEGLobbyGameModeBase::FadeInScreen()
 {
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientShowBlackScreen();
+            EGPC->ClientRPCFadeInScreen();
         }
     }
 }
 
-//void AEGLobbyGameModeBase::HideScreen()
-//{
-//    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-//    {
-//        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
-//        {
-//            EGPC->ClientHideBlackScreen();
-//        }
-//    }
-//}
+void AEGLobbyGameModeBase::FadeOutScreen()
+{
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
+        {
+            EGPC->ClientRPCFadeOutScreen();
+        }
+    }
+}
 
 #pragma endregion
