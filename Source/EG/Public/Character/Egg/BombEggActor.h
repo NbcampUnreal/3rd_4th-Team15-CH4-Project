@@ -11,6 +11,10 @@ class EG_API ABombEggActor : public AEggActor
 {
 	GENERATED_BODY()
 
+// JM : 오브젝트 풀링용
+public:
+	ABombEggActor();
+	
 public:
 	virtual void ApplyDamageAndCheckDestroy(int32 Damage, AActor* DamagedActor) override;
 
@@ -24,4 +28,8 @@ protected:
 
 private:
 	void PlayAbility();
+
+// JM : 오브젝트 풀링 적용
+public:
+	void StartExplosionTimer();
 };

@@ -58,6 +58,8 @@ public:
 
 	UFUNCTION()
 	void ActivateChatBox();
+	void WinnderLogic();
+	void LoserLogic();
 
 	UFUNCTION(Server, Reliable)
 	void ServerSendChatMessage(const FString& Message);
@@ -65,6 +67,9 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientAddChatMessage(const FString& Message);
 
+
+	UFUNCTION(Client, Reliable)
+	void ClientGetOutWidget();
 private:
 	UPROPERTY()
 	AEGHUD* EGHUD;
@@ -94,6 +99,14 @@ protected:
 	void CreateAndShowHUD();
 	void BindHUDToASC();
 	// ===== 여기까지 =====
+
+// JM : 게임 시작/종료시 SFX 재생 
+public:
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_PlaySFXGameStart();
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_PlaySFXGameOver();
 
 // 시퀀스 재생 (작성자 : 김혁)
 #pragma region Seqeuence

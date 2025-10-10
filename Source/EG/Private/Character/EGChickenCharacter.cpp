@@ -76,6 +76,7 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 	EIC->BindAction(IA_Chatting, ETriggerEvent::Started, this, &AEGChickenCharacter::ChatButtonPressed);	// (작성자: 김효영)
 	EIC->BindAction(IA_ToggleMouse, ETriggerEvent::Started, this, &AEGChickenCharacter::ToggleMouse);	// (작성자: 김효영)
+	EIC->BindAction(IA_GetOut, ETriggerEvent::Started, this, &AEGChickenCharacter::GetOutWidget);	// (작성자: 김효영)
 
 	EIC->BindAction(IA_LayBombEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayBombEgg); 
 	EIC->BindAction(IA_LayTrickEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayTrickEgg); 
@@ -412,11 +413,12 @@ void AEGChickenCharacter::ExecuteLayEgg()
 			else
 			{
 				UE_LOG(LogTemp, Warning, TEXT("LayEgg ability failed (cooldown)"));
+				PlayBlockSkillSFX();	// JM : 쿨타임 시에는 블로킹 SFX 재생 (알 게이지가 다 안찼을 때)
 			}
 		}
 		else
 		{
-			PlayBlockSkillSFX();	// 쿨타임 시에는 블로킹 SFX 재생
+			PlayBlockSkillSFX();	// JM : 쿨타임 시에는 블로킹 SFX 재생
 			UE_LOG(LogTemp, Warning, TEXT("LayEgg Ability failed - cooldownTag having"));
 		}
 	}
@@ -605,6 +607,15 @@ void AEGChickenCharacter::ToggleMouse()
 	if (PC)
 	{
 		PC->ToggleMouseCursor();
+	}
+}
+
+void AEGChickenCharacter::GetOutWidget()
+{
+	AEGPlayerController* PC = Cast<AEGPlayerController>(GetController());
+	if (PC)
+	{
+		PC->ClientGetOutWidget();
 	}
 }
 

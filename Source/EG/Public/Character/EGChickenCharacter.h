@@ -128,7 +128,11 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
 	TObjectPtr<UInputAction> IA_ToggleMouse;
-	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
+	TObjectPtr<UInputAction> IA_GetOut;
+
+
 	UPROPERTY(Replicated)
 	uint8 bIsSprinting:1;
 
@@ -214,4 +218,6 @@ private:
 		void ToggleMouse();
 
 #pragma endregion
+	protected:
+		void GetOutWidget();
 };

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> ChiefPlayerClass;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> GetOutClass;
+
 	UPROPERTY()
 	class UEGChatting* Chatting;
 
@@ -34,4 +37,5 @@ public:
 	void ChiefPlayerSetting();
 	void AddChatting();
 	void AddChatMessage(const FString& Message);
+	void GetOut();
 };

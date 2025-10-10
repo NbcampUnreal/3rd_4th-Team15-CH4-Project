@@ -16,15 +16,23 @@ class EG_API USFXManagerSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	USFXManagerSubsystem();
+
+public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
 	void PlaySFXLocalClientOnly(ESFXType InType, UObject* WorldContext);
-	void PlaySFXAtLocation(ESFXType InType, UObject* WorldContext, const FVector& Location);
+	/*void PlaySFXAtLocation(ESFXType InType, UObject* WorldContext, const FVector& Location);*/
+	void StopSFX(ESFXType InType);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SFX")
 	TObjectPtr<USFXDataAsset> SFXDataAsset;
 
-	// BGM과 달리 즉발성이고 추가적인 관리가 필요 없어서 AudioComponent 안쓰고
-	// UGameplayStatics로만 재생함
+	UPROPERTY()
+	TMap<ESFXType, TObjectPtr<UAudioComponent>> ActiveSFXMap;
+
+private:
+	UAudioComponent* GetAudioComponent(UWorld* World, ESFXType InType);		// 재사용 or 새로만듦
+
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "EEggType.h"
 #include "GameFramework/Actor.h"
 #include "EggActor.generated.h"
 
@@ -23,9 +24,12 @@ public:
 public:
 	virtual void ApplyDamageAndCheckDestroy(int32 Damage, AActor* DamagedActor);
 
-protected:
+	// JM : Object Pooling에서 쓰려고 public으로 변경
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mesh")
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
+	
+protected:
 
 	virtual void BeginPlay() override;
 
@@ -53,4 +57,9 @@ protected:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 #pragma endregion
+
+// JM : 오브젝트 풀링용
+public:
+	UPROPERTY()
+	EEggType EggType = EEggType::Egg;
 };

@@ -3,12 +3,14 @@
 #include "AbilitySystem/Ability/EGTrickAbility.h"
 
 #include "AbilitySystemComponent.h"
+#include "EGLog.h"
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/GameplayEffect/EGResetEggEnergyEffect.h"
 #include "AbilitySystem/GameplayEffect/EGStunEffect.h"
 #include "Character/EGChickenCharacter.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Character/Egg/EggActor.h"
+#include "Character/Egg/EggPoolManagerSubsystem.h"
 
 UEGTrickAbility::UEGTrickAbility()
 {
@@ -60,7 +62,16 @@ void UEGTrickAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 	if (AEggActor* OwnerEgg = Cast<AEggActor>(ActorInfo->AvatarActor.Get()))
 	{
-		OwnerEgg->Destroy(); // 함정 알은 여기서 파괴
+		// OwnerEgg->Destroy(); // 함정 알은 여기서 파괴
+		// JM : 오브젝트 풀에 반납
+		if (UEggPoolManagerSubsystem* PoolManager = GetWorld()->GetSubsystem<UEggPoolManagerSubsystem>())
+		{
+			PoolManager->ReturnEggToPool(OwnerEgg);
+		}
+		else
+		{
+			EG_LOG(LogJM, Warning, TEXT("No Pool Manager"));
+		}
 	}
 }
 

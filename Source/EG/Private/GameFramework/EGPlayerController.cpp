@@ -20,6 +20,7 @@
 #include "UI/EGChatting.h" 
 #include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sounds/SFXManagerSubsystem.h"
 
 // Sequence
 #include "LevelSequenceActor.h"
@@ -232,6 +233,15 @@ void AEGPlayerController::ClientAddChatMessage_Implementation(const FString& Mes
 	}
 }
 
+void AEGPlayerController::ClientGetOutWidget_Implementation()
+{
+	EGHUD = EGHUD == nullptr ? Cast<AEGHUD>(GetHUD()) : EGHUD;
+	if (EGHUD)
+	{
+		EGHUD->GetOut();
+	}
+}
+
 void AEGPlayerController::ServerSendChatMessage_Implementation(const FString& Message)
 {
 	if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
@@ -262,6 +272,44 @@ void AEGPlayerController::ShowChiefPlayerUI_Implementation()
 
 #pragma endregion
 
+// JM : 게임 시작/종료시 sfx 재생
+void AEGPlayerController::ClientRPC_PlaySFXGameStart_Implementation()
+{
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (USFXManagerSubsystem* SFXManager = GI->GetSubsystem<USFXManagerSubsystem>())
+		{
+			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameStart, this);
+		}
+		else
+		{
+			EG_LOG(LogJM, Warning, TEXT("No SFXManager Subsystem"));
+		}
+	}
+	else
+	{
+		EG_LOG(LogJM, Warning, TEXT("No Game Instance"));
+	}
+}
+
+void AEGPlayerController::ClientRPC_PlaySFXGameOver_Implementation()
+{
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (USFXManagerSubsystem* SFXManager = GI->GetSubsystem<USFXManagerSubsystem>())
+		{
+			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameOver, this);
+		}
+		else
+		{
+			EG_LOG(LogJM, Warning, TEXT("No SFXManager Subsystem"));
+		}
+	}
+	else
+	{
+		EG_LOG(LogJM, Warning, TEXT("No Game Instance"));
+	}
+}
 
 void AEGPlayerController::ClientRPC_PlayEndingSequence_Implementation(bool bIsWinner)
 {

@@ -7,6 +7,9 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystem/GameplayEffect/EGLayTrickEggCooldownEffect.h"
 #include "Character/Egg/EggActor.h"
+#include "Character/Egg/EggPoolManagerSubsystem.h"
+
+class UEggPoolManagerSubsystem;
 
 UEGLayTrickEggAbility::UEGLayTrickEggAbility()
 {
@@ -63,11 +66,24 @@ void UEGLayTrickEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 		{
 			if (GetOwningActorFromActorInfo()->HasAuthority())
 			{
-				FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
+				/*FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
 
 				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, SpawnLocation,
 				                                                        ActorInfo->AvatarActor->GetActorRotation());
-				EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+				EggActor->SetOwner(ActorInfo->AvatarActor.Get());*/
+
+				// JM : 오브젝트 풀에서 가져오기
+				if (UEggPoolManagerSubsystem* PoolManager = GetWorld()->GetSubsystem<UEggPoolManagerSubsystem>())
+				{
+					FRotator SpawnRotation = ActorInfo->AvatarActor->GetActorRotation();
+					FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
+					AEggActor* EggActor = PoolManager->GetEggFromPool(EEggType::TrickEgg, SpawnLocation, SpawnRotation);
+					EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+				}
+				else
+				{
+					EG_LOG(LogJM, Warning, TEXT("No Pool Manager"));
+				}
 			}
 		}
 	}

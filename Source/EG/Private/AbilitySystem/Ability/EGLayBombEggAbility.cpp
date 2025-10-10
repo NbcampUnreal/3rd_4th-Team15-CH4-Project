@@ -6,7 +6,9 @@
 #include "EGLog.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystem/GameplayEffect/EGLayBombEggCooldownEffect.h"
+#include "Character/Egg/BombEggActor.h"
 #include "Character/Egg/EggActor.h"
+#include "Character/Egg/EggPoolManagerSubsystem.h"
 
 UEGLayBombEggAbility::UEGLayBombEggAbility()
 {
@@ -62,11 +64,33 @@ void UEGLayBombEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 		{
 			if (GetOwningActorFromActorInfo()->HasAuthority())
 			{
-				FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
+				/*FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
 
 				AEggActor* EggActor = GetWorld()->SpawnActor<AEggActor>(EggActorClass, SpawnLocation,
 				                                                        ActorInfo->AvatarActor->GetActorRotation());
-				EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+				EggActor->SetOwner(ActorInfo->AvatarActor.Get());*/
+
+				// JM : 오브젝트 풀에서 가져오기
+				if (UEggPoolManagerSubsystem* PoolManager = GetWorld()->GetSubsystem<UEggPoolManagerSubsystem>())
+				{
+					FRotator SpawnRotation = ActorInfo->AvatarActor->GetActorRotation();
+					FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
+					AEggActor* EggActor = PoolManager->GetEggFromPool(EEggType::BombEgg, SpawnLocation, SpawnRotation);
+					EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+					ABombEggActor* BombEggActor = Cast<ABombEggActor>(EggActor);
+					if (BombEggActor)
+					{
+						BombEggActor->StartExplosionTimer();		// JM : 폭발 타이머 시작
+					}
+					else
+					{
+						EG_LOG(LogJM, Warning, TEXT("No BombEggActor"));
+					}
+				}
+				else
+				{
+					EG_LOG(LogJM, Warning, TEXT("No Pool Manager"));
+				}
 			}
 		}
 	}
