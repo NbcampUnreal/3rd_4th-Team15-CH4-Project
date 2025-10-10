@@ -24,14 +24,15 @@ void UEGBombAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (IsValid(ExplosionParticle))
+	// 세훈 : 나이아가라 쓰니까 지워도 됨
+	/*if (IsValid(ExplosionParticle))
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(),
 			ExplosionParticle,
 			ActorInfo->AvatarActor->GetActorLocation(),
 			ActorInfo->AvatarActor->GetActorRotation());
-	}
+	}*/
 	
 	FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
 	float SphereRadius = 200.0f;
