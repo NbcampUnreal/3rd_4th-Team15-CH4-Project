@@ -140,6 +140,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "AEGChickenCharacter|Input")
 	bool bIsFreeLooking = false;
 
+	FRotator FreeLookBaseRotation;
+
 #pragma endregion
 
 // GAS로 스킬 사용 코드 (작성자 : 김세훈)
