@@ -26,6 +26,9 @@
 #include "LevelSequencePlayer.h"
 #include "MovieSceneSequencePlayer.h"
 
+static constexpr float DEFAULT_SEQUENCE_DURATION = 5.0f;
+static constexpr float DURATION_PADDING = 0.25f;
+
 void AEGPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -269,45 +272,148 @@ void AEGPlayerController::ClientRPC_PlayEndingSequence_Implementation(bool bIsWi
 void AEGPlayerController::ServerRPC_NotifySequenceFinished_Implementation()
 {
 	AEGGameModeBase* GM = GetWorld()->GetAuthGameMode<AEGGameModeBase>();
-	if (GM)
-	{
-		GM->ServerTravel();
-	}
+	//if (GM)
+	//{
+	//	GM->ServerTravel();
+	//}
 }
 
-void AEGPlayerController::PlayLevelSequence(ULevelSequence* Sequence, bool bIsFinal)
+void AEGPlayerController::PlayLevelSequence(ULevelSequence* Sequence, bool bIsFinal, float OptionalDurationSeconds)
 {
 	if (!IsLocalController() || !Sequence)
+	{
+		EG_LOG(LogKH, Warning, TEXT("PlayLevelSequence : Not LocalController or Sequence is null"));
+		return;
+	}
+
+	if (CurrentSequencePlayer)
+	{
+		CurrentSequencePlayer->OnFinished.RemoveAll(this);
+		CurrentSequencePlayer = nullptr;
+	}
+	if (CurrentSequenceActor)
+	{
+		CurrentSequenceActor = nullptr;
+	}
+	
+	bCurrentSequenceIsFinal = bIsFinal;
+	bSequenceHandled = false;
+	GetWorldTimerManager().ClearTimer(SequenceTimerHandle);
+
+	FMovieSceneSequencePlaybackSettings Settings;
+	Settings.LoopCount.Value = 0;
+	Settings.bDisableMovementInput = true;
+	Settings.bDisableLookAtInput = true;
+	Settings.PlayRate = 1.0f;
+	
+	ALevelSequenceActor* OutActor = nullptr;
+	CurrentSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Sequence, Settings, OutActor);
+
+	if (!CurrentSequencePlayer)
+	{
+		EG_LOG(LogKH, Warning, TEXT("Failed to create LevelSequencePlayer"));
+		HandleSequenceFallbackTimeout();
+		return;
+	}
+	CurrentSequenceActor = OutActor;
+	
+	if (bIsFinal)
+	{
+		CurrentSequencePlayer->OnFinished.AddDynamic(this, &AEGPlayerController::OnFinalSequenceFinished);
+	}
+	else
+	{
+		CurrentSequencePlayer->OnFinished.AddDynamic(this, &AEGPlayerController::OnCommonSequenceFinished);
+	}
+
+	float DurationSeconds = OptionalDurationSeconds;
+	if (DurationSeconds <= 0.f)
+	{
+		DurationSeconds = GetSequenceDuration(Sequence);
+	}
+	if (DurationSeconds <= 0.f)
+	{
+		DurationSeconds = DEFAULT_SEQUENCE_DURATION;
+	}
+	DurationSeconds += DURATION_PADDING;
+
+	EG_LOG(LogKH, Log, TEXT("PlayLevelSequence: Playing %s (duration fallback %.2f s)"), *Sequence->GetName(), DurationSeconds);
+	CurrentSequencePlayer->Play();
+
+	GetWorldTimerManager().SetTimer(SequenceTimerHandle, this, &AEGPlayerController::HandleSequenceFallbackTimeout, DurationSeconds, false);
+}
+
+float AEGPlayerController::GetSequenceDuration(ULevelSequence* Sequence) const
+{
+	if (!Sequence) return -1.f;
+
+	UMovieScene* MovieScene = Sequence->GetMovieScene();
+	if (!MovieScene) return -1.f;
+
+	const TRange<FFrameNumber> Range = MovieScene->GetPlaybackRange();
+	if (Range.IsEmpty()) return -1.f;
+
+	FFrameRate TickSolution = MovieScene->GetTickResolution();
+
+	int64 Lower = Range.GetLowerBoundValue().Value;
+	int64 Upper = Range.GetUpperBoundValue().Value;
+	int64 NumFrames = Upper - Lower;
+
+	if (NumFrames <= 0) return -1.f;
+
+	double Duration = double(NumFrames) / TickSolution.AsDecimal();
+	return static_cast<float>(Duration);
+}
+
+void AEGPlayerController::HandleSequenceFallbackTimeout()
+{
+	if (bSequenceHandled)
 	{
 		return;
 	}
 
-	FMovieSceneSequencePlaybackSettings Settings;
-	ALevelSequenceActor* OutActor = nullptr;
-	CurrentSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Sequence, Settings, OutActor);
+	bSequenceHandled = true;
+
+	UE_LOG(LogTemp, Warning, TEXT("Sequence fallback timeout reached. bIsFinal=%d"), bCurrentSequenceIsFinal ? 1 : 0);
 
 	if (CurrentSequencePlayer)
 	{
-		if (bIsFinal)
-		{
-			CurrentSequencePlayer->OnFinished.AddDynamic(this, &ThisClass::OnFinalSequenceFinished);
-		}
-		else
-		{
-			CurrentSequencePlayer->OnFinished.AddDynamic(this, &ThisClass::OnCommonSequenceFinished);
-		}
-		
-		CurrentSequencePlayer->Play();
+		CurrentSequencePlayer->OnFinished.RemoveAll(this);
+		CurrentSequencePlayer = nullptr;
+	}
+	if (CurrentSequenceActor)
+	{
+		CurrentSequenceActor = nullptr;
+	}
+
+	if (bCurrentSequenceIsFinal)
+	{
+		OnFinalSequenceFinished();
+	}
+	else
+	{
+		OnCommonSequenceFinished();
 	}
 }
 
 void AEGPlayerController::OnCommonSequenceFinished()
 {
+	EG_LOG(LogKH, Log, TEXT("OnCommonSequenceFinished"));
+
+	if (bSequenceHandled)
+	{
+		return;
+	}
+	bSequenceHandled = true;
+
+	GetWorldTimerManager().ClearTimer(SequenceTimerHandle);
+	
 	if (CurrentSequencePlayer)
 	{
-		CurrentSequencePlayer->OnFinished.RemoveDynamic(this, &ThisClass::OnCommonSequenceFinished);
+		CurrentSequencePlayer->OnFinished.RemoveDynamic(this, &AEGPlayerController::OnCommonSequenceFinished);
 		CurrentSequencePlayer = nullptr;
 	}
+	CurrentSequenceActor = nullptr;
 
 	if (bCachedIsWinner)
 	{
@@ -321,12 +427,23 @@ void AEGPlayerController::OnCommonSequenceFinished()
 
 void AEGPlayerController::OnFinalSequenceFinished()
 {
+	EG_LOG(LogKH, Log, TEXT("OnFinalSequenceFinished"));
+
+	if (bSequenceHandled)
+	{
+		return;
+	}
+	bSequenceHandled = true;
+
+	GetWorldTimerManager().ClearTimer(SequenceTimerHandle);
+	
 	if (CurrentSequencePlayer)
 	{
-		CurrentSequencePlayer->OnFinished.RemoveDynamic(this, &ThisClass::OnFinalSequenceFinished);
+		CurrentSequencePlayer->OnFinished.RemoveDynamic(this, &AEGPlayerController::OnFinalSequenceFinished);
 		CurrentSequencePlayer = nullptr;
 	}
-
+	CurrentSequenceActor = nullptr;
+	
 	if (IsLocalController())
 	{
 		ServerRPC_NotifySequenceFinished();

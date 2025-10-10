@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "EGPlayerController.generated.h"
 
+class ALevelSequenceActor;
 class ULevelSequencePlayer;
 class FOnMovieSceneSequencePlayerEvent;
 class ULevelSequence;
@@ -114,6 +115,10 @@ protected:
 
 	UPROPERTY()
 	ULevelSequencePlayer* CurrentSequencePlayer;
+	UPROPERTY()
+	ALevelSequenceActor* CurrentSequenceActor;
+
+	FTimerHandle SequenceTimerHandle;
 	
 	UFUNCTION()
 	void OnCommonSequenceFinished();
@@ -122,8 +127,12 @@ protected:
 	
 private:
 	bool bCachedIsWinner;
+	bool bSequenceHandled = false;
+	bool bCurrentSequenceIsFinal = false;
 	
-	void PlayLevelSequence(ULevelSequence* Sequence, bool bIsFinal);
+	void PlayLevelSequence(ULevelSequence* Sequence, bool bIsFinal, float OptionalDurationSeconds = -1.f);
+	float GetSequenceDuration(ULevelSequence* Sequence) const;
+	void HandleSequenceFallbackTimeout();
 	
 #pragma endregion 
 };

@@ -120,3 +120,13 @@ void UEGGameInstance::FadeOutScreenRemove()
 }
 
 #pragma endregion
+
+void UEGGameInstance::SetFinalResults(const TArray<FFinalResult>& InResults)
+{
+    FinalResults = InResults;
+}
+
+TArray<FFinalResult>& UEGGameInstance::GetFinalResults()
+{
+    return FinalResults;
+}

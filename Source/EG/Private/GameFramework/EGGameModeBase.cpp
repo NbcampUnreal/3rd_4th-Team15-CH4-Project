@@ -190,44 +190,26 @@ void AEGGameModeBase::GameOver()
         return A.Value > B.Value;
     });
     int32 TopScore = (FinalPlayerScores.Num() > 0) ? FinalPlayerScores[0].Value : 0;
-    
-    TArray<TWeakObjectPtr<AEGPlayerController>> Winners;
-    for (const auto& Pair : FinalPlayerScores)
-    {
-        if (Pair.Value == TopScore)
-        {
-            Winners.Add(Pair.Key);
-        }
-        else break;
-    }
+
+    TArray<FFinalResult> FinalResults;
 
     for (const auto& Pair : FinalPlayerScores)
     {
         if (!Pair.Key.IsValid()) continue;
 
-        if (Winners.Contains(Pair.Key))     // winner
-        {
-            Pair.Key->ClientRPC_PlayEndingSequence(true);
-        }
-        else                                // loser
-        {
-            Pair.Key->ClientRPC_PlayEndingSequence(false);
-        }
-    }
-/*
-    if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
-    {
-        EGGS->SetFinalResults(FinalPlayerScores);
-        EGGS->FinalizeAward(Winners);
-    }
-*/
-}
+        FFinalResult Result;
+        Result.PlayerId = Pair.Key->GetPlayerState<AEGPlayerState>()->GetPlayerID();
+        Result.bIsWinner = (Pair.Value == TopScore);
 
-void AEGGameModeBase::ServerTravel()
-{
-    UE_LOG(LogTemp, Log, TEXT("Ending Sequence"));
-    //ShowScreen();
-    //GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");  // 작성자: 김효영
+        FinalResults.Add(Result);
+    }
+
+    if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
+    {
+        GI->SetFinalResults(FinalResults);
+    }
+
+    GetWorld()->ServerTravel(TEXT("/Game/OhMyEgg/Sequence/L_Sequence"), true);
 }
 
 // 레벨 변경 (작성자 : 김효영)

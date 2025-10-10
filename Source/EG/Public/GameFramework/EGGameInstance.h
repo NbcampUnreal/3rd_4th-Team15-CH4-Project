@@ -6,6 +6,18 @@
 #include "Engine/GameInstance.h"
 #include "EGGameInstance.generated.h"
 
+USTRUCT()
+struct FFinalResult
+{
+	GENERATED_BODY()
+	
+	UPROPERTY()
+	int32 PlayerId;
+
+	UPROPERTY()
+	bool bIsWinner;
+};
+
 /**
  * 
  */
@@ -77,4 +89,16 @@ public:
 
 	UPROPERTY();
 	int32 PlayerIndex = 0;
+
+// 작성자: 김혁
+#pragma region MatchResult
+
+public:
+	UPROPERTY()
+	TArray<FFinalResult> FinalResults;
+
+	void SetFinalResults(const TArray<FFinalResult>& InResults);
+	TArray<FFinalResult>& GetFinalResults();
+
+#pragma endregion 
 };
