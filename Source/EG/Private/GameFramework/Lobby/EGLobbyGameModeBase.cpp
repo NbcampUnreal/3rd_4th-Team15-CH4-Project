@@ -40,14 +40,31 @@ void AEGLobbyGameModeBase::BeginPlay()
     }
 }
 
+void AEGLobbyGameModeBase::PostSeamlessTravel()
+{
+    Super::PostSeamlessTravel();
+    
+    if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
+    {
+        GS->MatchState=EMatchState::Waiting;
+    }
+}
+
 void AEGLobbyGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
     Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
-
-    if (GameState && GameState->PlayerArray.Num() >= 6)
+    if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
     {
-        ErrorMessage = TEXT("ServerError_MaxPlayersReached");
-        return;
+        if (GS->MatchState!=EMatchState::Waiting)
+        {
+            ErrorMessage = TEXT("ServerError_AlreadyGameStart");
+            return;
+        }
+        if (GS && GS->PlayerArray.Num() >= 6)
+        {
+            ErrorMessage = TEXT("ServerError_MaxPlayersReached");
+            return;
+        }
     }
 }
 
@@ -103,14 +120,22 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
                 return !P.IsValid() || P.Get() == EGPS;
             });
     }
-    if (bChiefPlayer && APlayingPlayerStates.Num() > 0)
+    if (!bChiefPlayer && APlayingPlayerStates.Num() > 0)
     {
-        if (AEGPlayerController* NewChief = Cast<AEGPlayerController>(APlayingPlayerStates[0]->GetOwner()))
+        if (AEGPlayerState* TargetState = APlayingPlayerStates[0].Get())
         {
-            bChiefPlayer = true;
-            NewChief->ShowChiefPlayerUI();
+            if (IsValid(TargetState))
+            {
+                AEGPlayerController* NewChief = Cast<AEGPlayerController>(TargetState->GetOwner());
+                if (IsValid(NewChief))
+                {
+                    bChiefPlayer = true;
+                    NewChief->ShowChiefPlayerUI();
+                }
+            }
         }
     }
+
     if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
     {
         GS->UpdateLeaderboard();
@@ -168,6 +193,13 @@ void AEGLobbyGameModeBase::LevelChange()
 
 void AEGLobbyGameModeBase::ShowScreen()
 {
+    // 여기부터 MS
+    if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
+    {
+        GS->MatchState=EMatchState::Playing; 
+    }
+    // 여기까지 MS
+        
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))

@@ -26,15 +26,34 @@ AEGGameModeBase::AEGGameModeBase()
     bUseSeamlessTravel = true;
 }
 
-void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
+void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address,
+                               const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
     Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
-    if (GameState && GameState->PlayerArray.Num() >= 6)
+    if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
     {
-        ErrorMessage = TEXT("ServerError_MaxPlayersReached");
-        return;
+        for (APlayerState* PS : GameState->PlayerArray)
+        {
+            if (PS && PS->GetUniqueId() == UniqueId)
+            {
+                return;
+            }
+        }
+        
+        if (GS->PlayerArray.Num() >= 6)
+        {
+            ErrorMessage = TEXT("ServerError_MaxPlayersReached");
+            return;
+        }
+
+        if (GS->MatchState != EMatchState::Waiting)
+        {
+            ErrorMessage = TEXT("ServerError_AlreadyGameStart");
+            return;
+        }
     }
 }
+
 void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
@@ -215,6 +234,8 @@ void AEGGameModeBase::GameOver()
             Pair.Key->LoserLogic();
         }
     }
+
+    ServerTravel();
 /*
     if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
     {
@@ -238,7 +259,7 @@ void AEGGameModeBase::ShowScreen()
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            //EGPC->ClientShowBlackScreen();
+            EGPC->ClientShowBlackScreen();
         }
     }
 }
@@ -249,7 +270,7 @@ void AEGGameModeBase::HideScreen()
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            //EGPC->ClientHideBlackScreen();
+            EGPC->ClientHideBlackScreen();
         }
     }
 }
