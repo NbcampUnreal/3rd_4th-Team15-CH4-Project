@@ -78,7 +78,14 @@ void UEGLayTrickEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Han
 					FRotator SpawnRotation = ActorInfo->AvatarActor->GetActorRotation();
 					FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
 					AEggActor* EggActor = PoolManager->GetEggFromPool(EEggType::TrickEgg, SpawnLocation, SpawnRotation);
-					EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+					if (EggActor)
+					{
+						EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+					}
+					else
+					{
+						EG_LOG(LogJM, Warning, TEXT("EggPoolManagerSubsystem::GetEggFromPool() is NULL"));
+					}
 				}
 				else
 				{
