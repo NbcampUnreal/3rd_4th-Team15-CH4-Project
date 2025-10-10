@@ -12,7 +12,7 @@
 #include "Character/Egg/EggPoolManagerSubsystem.h"
 #include "GameFramework/EGGameStateBase.h"
 #include "GameFramework/EGPlayerState.h"
-
+#include "Character/Egg/EggPoolManagerSubsystem.h"
 
 AEGLobbyGameModeBase::AEGLobbyGameModeBase()
 {
@@ -87,15 +87,20 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
             GI->SetPlayerIndex(1);
         }
 
-        EGPC->ClientHideBlackScreen();
+        EGPC->ClientRPCFadeOutScreen(); // 처음 접속했을 때 페이드아웃 (작성자 : 김세훈)
     }
-    if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState)) 
+    if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
-        APlayingPlayerStates.Add(EGPS);
-        if (EGPS->GetPlayerID() == -1)
+        // SeamlessTravel을 대비해 서버에서만 처리
+        if (HasAuthority())
         {
-            
-            EGPS->SetPlayerID(CurrentPlayerIndex++);
+            if (!APlayingPlayerStates.Contains(EGPS))
+            {
+                APlayingPlayerStates.Add(EGPS);
+            }
+
+            UE_LOG(LogTemp, Log, TEXT("Player joined: Controller=%s | PlayerId=%d"),
+                *NewPlayer->GetName(), EGPS->GetPlayerId());
         }
     }
     
@@ -111,7 +116,7 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
 
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(Exiting))
     {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPS->GetPlayerID());
+        EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPS->GetPlayerId());
         APlayingPlayerStates.RemoveAll([EGPS](const TWeakObjectPtr<AEGPlayerState>& P)
             {
                 return !P.IsValid() || P.Get() == EGPS;
@@ -171,7 +176,7 @@ AActor* AEGLobbyGameModeBase::ChoosePlayerStart_Implementation(AController* Play
 #pragma region LevelChange
 void AEGLobbyGameModeBase::LevelChange()
 {
-    ShowScreen();
+    FadeInScreen();
 
     UEGGameInstance* EGGI = Cast<UEGGameInstance>(GetGameInstance());
     if (EGGI)
@@ -181,26 +186,26 @@ void AEGLobbyGameModeBase::LevelChange()
     }
 }
 
-void AEGLobbyGameModeBase::ShowScreen()
+void AEGLobbyGameModeBase::FadeInScreen()
 {
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientShowBlackScreen();
+            EGPC->ClientRPCFadeInScreen();
         }
     }
 }
 
-//void AEGLobbyGameModeBase::HideScreen()
-//{
-//    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-//    {
-//        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
-//        {
-//            EGPC->ClientHideBlackScreen();
-//        }
-//    }
-//}
+void AEGLobbyGameModeBase::FadeOutScreen()
+{
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
+        {
+            EGPC->ClientRPCFadeOutScreen();
+        }
+    }
+}
 
 #pragma endregion

@@ -47,7 +47,7 @@ void UEGChatting::OnTextCommitted(const FText& Text, ETextCommit::Type CommitMet
 				{
 					// TrimmedText 앞에 UserName을 붙여 최종 Message 생성
 					AEGPlayerState* PlayerState = PC->GetPlayerState<AEGPlayerState>();
-					FString Message = FString::Printf(TEXT("Player_%d : %s"), PlayerState->GetPlayerID(), *TrimmedText);
+					FString Message = FString::Printf(TEXT("Player_%d : %s"), PlayerState->GetPlayerId(), *TrimmedText);
 					// 채팅 메시지를 보내기 위한 Server RPC 호출
 					PC->ServerSendChatMessage(Message);
 				}

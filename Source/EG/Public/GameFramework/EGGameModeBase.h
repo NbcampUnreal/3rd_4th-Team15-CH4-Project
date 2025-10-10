@@ -30,10 +30,11 @@ public:
 
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange
-	void ShowScreen();
-	void HideScreen();
+
 // JM : 서버이동 (게임 끝나고 SFX 재생하는데, 월드 파괴시 예외발생으로 5초 뒤 이동)
 	void TravelToLevel();	
+	void FadeInScreen();
+	void FadeOutScreen();
 
 #pragma endregion
 

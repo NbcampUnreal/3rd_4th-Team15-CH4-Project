@@ -8,9 +8,18 @@
 
 
 
-// 작성자: 김효영
+// (작성자 : 김세훈)
+void UEGGameInstance::Init()
+{
+    Super::Init();
 
+    FadeInScreenWidget = UUserWidget::CreateWidgetInstance(*this, FadeInScreenClass, NAME_None);
+    FadeOutScreenWidget = UUserWidget::CreateWidgetInstance(*this, FadeOutScreenClass, NAME_None);
+}
+
+// 작성자: 김효영
 #pragma region Chatting
+
 void UEGGameInstance::SendChatMessage(const FString& Message)
 {
     if (GetWorld()->GetNetMode() == NM_DedicatedServer)
@@ -50,73 +59,18 @@ void UEGGameInstance::ChangeLevel()
 
 void UEGGameInstance::FadeInScreen()
 {
-
-    if (!FadeInScreenWidget && FadeInScreenClass)
+    if (FadeInScreenWidget)
     {
-        UGameViewportClient* ViewportClient = GetGameViewportClient();
-        if (ViewportClient)
-        {
-            // Widget 생성
-            FadeInScreenWidget = UUserWidget::CreateWidgetInstance(
-                *this, FadeInScreenClass, NAME_None);
-
-            if (FadeInScreenWidget)
-            {
-                // ViewportClient에 직접 추가
-                ViewportClient->AddViewportWidgetContent(FadeInScreenWidget->TakeWidget(), 1000);
-                UE_LOG(LogTemp, Warning, TEXT("LoadingScreen 표시됨"));
-            }
-        }
+        FadeInScreenWidget->AddToViewport(0);
     }
 }
 
 void UEGGameInstance::FadeOutScreen()
 {
-    if (FadeInScreenWidget)
+    if (FadeOutScreenWidget)
     {
-        UGameViewportClient* ViewportClient = GetGameViewportClient();
-        if (ViewportClient)
-        {
-            ViewportClient->RemoveViewportWidgetContent(FadeInScreenWidget->TakeWidget());
-        }
-
-        FadeInScreenWidget = nullptr;
-        UE_LOG(LogTemp, Warning, TEXT("LoadingScreen 제거됨"));
+        FadeOutScreenWidget->AddToViewport(0);
     }
-    
-    if (!FadeOutcreenWidget && FadeOutScreenClass)
-    {
-        UGameViewportClient* ViewportClient = GetGameViewportClient();
-        if (ViewportClient)
-        {
-            // Widget 생성
-            FadeOutcreenWidget = UUserWidget::CreateWidgetInstance(
-                *this, FadeOutScreenClass, NAME_None);
-
-            if (FadeOutcreenWidget)
-            {
-                // ViewportClient에 직접 추가
-                ViewportClient->AddViewportWidgetContent(FadeOutcreenWidget->TakeWidget(), 1000);
-                UE_LOG(LogTemp, Warning, TEXT("LoadingScreen 표시됨"));
-            }
-        }
-    }
-}
-
-void UEGGameInstance::FadeOutScreenRemove()
-{
-    if (FadeOutcreenWidget)
-    {
-        UGameViewportClient* ViewportClient = GetGameViewportClient();
-        if (ViewportClient)
-        {
-            ViewportClient->RemoveViewportWidgetContent(FadeOutcreenWidget->TakeWidget());
-        }
-
-        FadeOutcreenWidget = nullptr;
-        UE_LOG(LogTemp, Warning, TEXT("LoadingScreen 제거됨"));
-    }
-
 }
 
 #pragma endregion
