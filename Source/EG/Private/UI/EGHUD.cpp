@@ -74,10 +74,18 @@ void AEGHUD::GetOut()
 		APlayerController* PlayerController = GetOwningPlayerController();
 		if (PlayerController)
 		{
-			UUserWidget* GetOutWidget = CreateWidget<UUserWidget>(PlayerController, GetOutClass);
-			if (GetOutWidget)
+			if (GetOutWidgetInstance && GetOutWidgetInstance->IsInViewport())
 			{
-				GetOutWidget->AddToViewport(10);
+				GetOutWidgetInstance->RemoveFromParent();
+				GetOutWidgetInstance = nullptr; 
+			}
+			else 
+			{
+				GetOutWidgetInstance = CreateWidget<UUserWidget>(PlayerController, GetOutClass);
+				if (GetOutWidgetInstance)
+				{
+					GetOutWidgetInstance->AddToViewport(10);
+				}
 			}
 		}
 	}

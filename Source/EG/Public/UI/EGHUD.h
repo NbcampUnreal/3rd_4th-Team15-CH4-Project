@@ -30,6 +30,9 @@ public:
 	TSubclassOf<UUserWidget> GetOutClass;
 
 	UPROPERTY()
+	UUserWidget* GetOutWidgetInstance;
+
+	UPROPERTY()
 	class UEGChatting* Chatting;
 
 	virtual void PostInitializeComponents() override;

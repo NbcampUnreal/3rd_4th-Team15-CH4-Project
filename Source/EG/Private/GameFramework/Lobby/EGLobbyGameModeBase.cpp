@@ -11,7 +11,7 @@
 #include "EGLog.h"
 #include "GameFramework/EGGameStateBase.h"
 #include "GameFramework/EGPlayerState.h"
-
+#include "Character/Egg/EggPoolManagerSubsystem.h"
 
 AEGLobbyGameModeBase::AEGLobbyGameModeBase()
 {
@@ -37,6 +37,18 @@ void AEGLobbyGameModeBase::BeginPlay()
     if(UEGGameInstance * GI = GetGameInstance<UEGGameInstance>())
     {
         GI->PlayerIndexReset();
+    }
+
+    if (EggPoolDataAsset)
+    {
+        if (UEggPoolManagerSubsystem* PoolManager = GetWorld()->GetSubsystem<UEggPoolManagerSubsystem>())
+        {
+            PoolManager->InitPools(EggPoolDataAsset);
+        }
+    }
+    else
+    {
+        EG_LOG_ROLE(LogJM, Warning, TEXT("EggPoolDataAsset is null"));
     }
 }
 
