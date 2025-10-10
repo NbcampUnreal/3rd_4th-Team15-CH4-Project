@@ -67,7 +67,7 @@ void AEGChickenCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EIC->BindAction(IA_Sprint, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleStartSprintInput); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_Sprint, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopSprintInput);
 	EIC->BindAction(IA_Dash, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleDash); // Start로 바꾸기 (작성자 : 김세훈)
-	EIC->BindAction(IA_FreeLook, ETriggerEvent::Triggered, this, &AEGChickenCharacter::HandleStartFreeLook);
+	EIC->BindAction(IA_FreeLook, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleStartFreeLook);
 	EIC->BindAction(IA_FreeLook, ETriggerEvent::Completed, this, &AEGChickenCharacter::HandleStopFreeLook);
 	EIC->BindAction(IA_Attack, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleAttack); // Start로 바꾸기 (작성자 : 김세훈)
 	EIC->BindAction(IA_LayEgg, ETriggerEvent::Started, this, &AEGChickenCharacter::HandleLayEgg); // Start로 바꾸기 (작성자 : 김세훈)
@@ -260,6 +260,8 @@ void AEGChickenCharacter::HandleDash()
 void AEGChickenCharacter::HandleStartFreeLook()
 {
 	bIsFreeLooking = true;
+
+	FreeLookBaseRotation = GetActorRotation();
 
 	// 캐릭터가 회전하지 않음
 	bUseControllerRotationYaw = false;
