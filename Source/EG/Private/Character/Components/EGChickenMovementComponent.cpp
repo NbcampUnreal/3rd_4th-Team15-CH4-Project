@@ -39,24 +39,36 @@ void UEGChickenMovementComponent::PerformMove(const FVector2D& InMovementVector)
 		EG_LOG_SUBOBJECT_ROLE(LogJM, Warning, TEXT("InMovementVector IsNearlyZero"));
 		return;
 	}
-	
-	const FRotator ControlRotation = OwnerCharacter->Controller->GetControlRotation();
-	FRotator ControlYawRotation;
+
+	FRotator BaseRotation;
 	if (OwnerCharacter->bIsFreeLooking)
 	{
-		ControlYawRotation = OwnerCharacter->GetActorRotation();	// 캐릭터 방향 고정
+		// FreeLook 시작 시점의 캐릭터 회전 고정
+		BaseRotation = OwnerCharacter->FreeLookBaseRotation;
 	}
 	else
 	{
-		ControlYawRotation = FRotator(0.f, ControlRotation.Yaw, 0.f);	// 카메라 방향
+		// 일반 모드에서는 카메라 방향 사용
+		const FRotator ControlRotation = OwnerCharacter->Controller->GetControlRotation();
+		BaseRotation = FRotator(0.f, ControlRotation.Yaw, 0.f);
 	}
-	
-	const FVector ForwardDirection = FRotationMatrix(ControlYawRotation).GetUnitAxis(EAxis::X);
-	const FVector RightDirection = FRotationMatrix(ControlYawRotation).GetUnitAxis(EAxis::Y);
+
+	const FVector ForwardDirection = FRotationMatrix(BaseRotation).GetUnitAxis(EAxis::X);
+	const FVector RightDirection = FRotationMatrix(BaseRotation).GetUnitAxis(EAxis::Y);
+
+	const FVector MoveDir = (ForwardDirection * InMovementVector.X + RightDirection * InMovementVector.Y).GetSafeNormal();
 
 	OwnerCharacter->AddMovementInput(ForwardDirection, InMovementVector.X);
 	OwnerCharacter->AddMovementInput(RightDirection, InMovementVector.Y);
-	
+
+	// FreeLook 모드라면 이동 방향으로 회전
+	if (OwnerCharacter->bIsFreeLooking && !MoveDir.IsNearlyZero())
+	{
+		const FRotator TargetRot = MoveDir.Rotation();
+		const float RotationSpeed = OwnerCharacter->GetCharacterMovement()->RotationRate.Yaw;
+		const FRotator NewRot = FMath::RInterpConstantTo(OwnerCharacter->GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), RotationSpeed);
+		OwnerCharacter->SetActorRotation(NewRot);
+	}
 }
 
 void UEGChickenMovementComponent::PerformLook(const FVector2D& InLookVector)
