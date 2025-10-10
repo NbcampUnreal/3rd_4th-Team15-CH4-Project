@@ -17,7 +17,7 @@ public:
 	virtual void PreLogin(const FString& Options,
 		const FString& Address,
 		const FUniqueNetIdRepl& UniqueId,
-		FString& ErrorMessage) override;
+		FString& ErrorMessage) override; 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
@@ -32,6 +32,8 @@ public:
 #pragma region LevelChange
 	void ShowScreen();
 	void HideScreen();
+// JM : 서버이동 (게임 끝나고 SFX 재생하는데, 월드 파괴시 예외발생으로 5초 뒤 이동)
+	void TravelToLevel();	
 
 #pragma endregion
 
@@ -57,4 +59,5 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="EggPool")
 	UEggPoolDataAsset* EggPoolDataAsset;
+
 };

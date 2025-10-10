@@ -21,6 +21,7 @@ void AEGGameModeBase::BeginPlay()
         playerCount = GI->GetPlayerIndex();
     }
 
+    // JM : 오브젝트 풀 Init Pool
     if (EggPoolDataAsset)
     {
         if (UEggPoolManagerSubsystem* PoolManager = GetWorld()->GetSubsystem<UEggPoolManagerSubsystem>())
@@ -54,10 +55,10 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
     
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
-        if (EGPS->GetPlayerID() == -1)
-        {
+        // if (EGPS->GetPlayerID() == -1)
+        // {
             EGPS->SetPlayerID(CurrentPlayerIndex++);
-        }
+        // }
         
         if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
         {
@@ -227,8 +228,18 @@ void AEGGameModeBase::GameOver()
         GI->SetFinalResults(FinalResults);
     }
 
-    GetWorld()->ServerTravel(TEXT("/Game/OhMyEgg/Sequence/L_Sequence"), true);
+    // GetWorld()->ServerTravel(TEXT("/Game/OhMyEgg/Sequence/L_Sequence?listen"), true);
+    FTimerHandle LevelTravelTimerHandle;
+    GetWorldTimerManager().SetTimer(LevelTravelTimerHandle, this, &AEGGameModeBase::TravelToLevel, 5.0f, false);
 }
+
+void AEGGameModeBase::TravelToLevel()
+{
+    EG_LOG(LogJM, Log, TEXT("Start"));
+    GetWorld()->ServerTravel(TEXT("/Game/OhMyEgg/Sequence/L_Sequence?listen"), true);
+    EG_LOG(LogJM, Log, TEXT("End"));
+}
+
 
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange
