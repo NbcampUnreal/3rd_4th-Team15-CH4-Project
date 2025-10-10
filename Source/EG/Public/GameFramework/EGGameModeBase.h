@@ -17,7 +17,7 @@ public:
 	virtual void PreLogin(const FString& Options,
 		const FString& Address,
 		const FUniqueNetIdRepl& UniqueId,
-		FString& ErrorMessage) override;
+		FString& ErrorMessage) override; 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 	virtual void BeginPlay() override;
@@ -30,6 +30,9 @@ public:
 
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange
+
+// JM : 서버이동 (게임 끝나고 SFX 재생하는데, 월드 파괴시 예외발생으로 5초 뒤 이동)
+	void TravelToLevel();	
 	void FadeInScreen();
 	void FadeOutScreen();
 
@@ -57,4 +60,5 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="EggPool")
 	UEggPoolDataAsset* EggPoolDataAsset;
+
 };

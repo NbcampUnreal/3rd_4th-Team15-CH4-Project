@@ -8,9 +8,9 @@
 #include "EGLobbyGameModeBase.generated.h"
 
 
+class UEggPoolDataAsset;
 class AEGPlayerController;
 class AEGPlayerStart;
-class UEggPoolDataAsset;
 
 /**
  * 
@@ -27,6 +27,7 @@ public:
 	// JM : 오브젝트 풀링
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EggPool")
 	UEggPoolDataAsset* EggPoolDataAsset;
+	
 #pragma region Chatting
 	void SendChatMessage(const FString& Message);
 

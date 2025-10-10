@@ -28,7 +28,8 @@ protected:
 							bool bReplicateEndAbility,
 							bool bWasCancelled) override;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Particle)
-	TObjectPtr<UNiagaraSystem> ExplosionParticle;
+	/* 나이아가라 써서 필요 X
+	 *UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Particle)
+	TObjectPtr<UNiagaraSystem> ExplosionParticle;*/
 	
 };

@@ -281,7 +281,8 @@ void AEGPlayerController::ClientRPC_PlaySFXGameStart_Implementation()
 	{
 		if (USFXManagerSubsystem* SFXManager = GI->GetSubsystem<USFXManagerSubsystem>())
 		{
-			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameStart, this);
+			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameStart, GetWorld());
+			EG_LOG(LogJM, Log, TEXT("SFX Play GameStart"));
 		}
 		else
 		{
@@ -300,7 +301,8 @@ void AEGPlayerController::ClientRPC_PlaySFXGameOver_Implementation()
 	{
 		if (USFXManagerSubsystem* SFXManager = GI->GetSubsystem<USFXManagerSubsystem>())
 		{
-			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameOver, this);
+			// SFXManager->PlaySFXLocalClientOnly(ESFXType::GameOver, this);
+			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameOver, GetWorld());
 		}
 		else
 		{

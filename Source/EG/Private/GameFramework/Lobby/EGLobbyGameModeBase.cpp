@@ -9,6 +9,7 @@
 #include "EngineUtils.h"
 #include "GameFramework/EGPlayerStart.h"
 #include "EGLog.h"
+#include "Character/Egg/EggPoolManagerSubsystem.h"
 #include "GameFramework/EGGameStateBase.h"
 #include "GameFramework/EGPlayerState.h"
 #include "Character/Egg/EggPoolManagerSubsystem.h"
@@ -39,6 +40,7 @@ void AEGLobbyGameModeBase::BeginPlay()
         GI->PlayerIndexReset();
     }
 
+    // JM : 오브젝트 풀 Init Pool
     if (EggPoolDataAsset)
     {
         if (UEggPoolManagerSubsystem* PoolManager = GetWorld()->GetSubsystem<UEggPoolManagerSubsystem>())
