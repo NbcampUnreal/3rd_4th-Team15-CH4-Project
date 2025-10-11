@@ -48,37 +48,55 @@ void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, c
         return;
     }
 }
+
 void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
     
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
+        if (!APlayingPlayerState.Contains(EGPS))
+        {
+            APlayingPlayerState.Add(EGPS);
+        }
+        
         if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
         {
             FAward Entry;
             Entry.PlayerID = EGPS->GetPlayerId();
             Entry.PlayerEggScore = 0;
             EGGS->LeaderboardSnapshot.Add(Entry);
-            if (CurrentPlayerIndex == playerCount)
-            {
-                GameStart();
-            }
+            
+            if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
+                {
+                    if (GI->PlayerIndex == playerCount)
+                    {
+                        GameStart();
+                    }
+                }
+            
         }        
     }
 }
 
 void AEGGameModeBase::Logout(AController* Exiting)
 {
-    Super::Logout(Exiting);
-    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(Exiting))
+    if (APlayerController* PC = Cast<APlayerController>(Exiting))
     {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPC->PlayerIndex);
-        APlayingPlayerControllers.RemoveAll([EGPC](const TWeakObjectPtr<AEGPlayerController>& P)
+        if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(PC->PlayerState))
         {
-            return !P.IsValid() || P.Get() == EGPC;
-        });
+            EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPS->GetPlayerId());
+
+            APlayingPlayerState.RemoveAll([EGPS](const TWeakObjectPtr<AEGPlayerState>& P)
+            {
+                return !P.IsValid() || P.Get() == EGPS;
+            });
+            
+            EG_LOG_ROLE(LogMS, Warning, TEXT("Current Player Count: %d"), APlayingPlayerState.Num());
+        }
     }
+
+    Super::Logout(Exiting);
 }
 
 void AEGGameModeBase::InitializeSpawnPoint()
