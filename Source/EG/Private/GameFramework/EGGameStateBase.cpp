@@ -33,7 +33,7 @@ void AEGGameStateBase::BeginPlay()
 
 void AEGGameStateBase::OnRep_RemainingCountdown()
 {
-	EG_LOG_NET(LogJM, Log, TEXT("Countdown updated: %d"), RemainingCountdown);
+	EG_LOG_NET(LogTemp, Log, TEXT("Countdown updated: %d"), RemainingCountdown);
 	
 	DelegateManager->OnCountdownUpdated.Broadcast(RemainingCountdown);
 }
