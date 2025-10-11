@@ -20,6 +20,8 @@ AEGAICharacter::AEGAICharacter()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 	AttributeSet = CreateDefaultSubobject<UEGAI_AttributeSet>(TEXT("AttributeSet"));
+
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 }
 
 void AEGAICharacter::BeginPlay()
