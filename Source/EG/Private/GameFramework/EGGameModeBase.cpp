@@ -216,6 +216,8 @@ void AEGGameModeBase::GameOver()
             Result.PlayerId = PS->GetPlayerId();
             Result.bIsWinner = (Pair.Value == TopScore);
             FinalResults.Add(Result);
+            
+            EG_LOG(LogKH, Log, TEXT("player %d score %d : %s"), PS->GetPlayerId(), Pair.Value, Result.bIsWinner ? TEXT("Winner") : TEXT("Loser"));
         }
     }
 
