@@ -47,9 +47,6 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientRPCFadeOutScreen();
 
-private:
-	bool bMouseVisible = false;	
-
 #pragma endregion
 
 // 채팅 (작성자 : 김효영)

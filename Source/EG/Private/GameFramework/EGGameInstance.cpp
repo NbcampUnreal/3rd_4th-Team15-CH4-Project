@@ -5,6 +5,8 @@
 
 #include "GameFramework/EGPlayerController.h"
 #include "Blueprint/UserWidget.h" 
+#include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
 
 
 
@@ -84,3 +86,23 @@ TArray<FFinalResult>& UEGGameInstance::GetFinalResults()
 {
     return FinalResults;
 }
+
+// 작성자: 김효영
+#pragma region LogOut
+void UEGGameInstance::ReturnMainMenu()
+{
+    APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (PC)
+    {
+        // 서버 연결 해제
+        PC->ConsoleCommand(TEXT("disconnect"));
+
+        // 0.5초 뒤에 메인 메뉴 레벨로 이동
+        FTimerHandle TimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+            {
+                UGameplayStatics::OpenLevel(this, FName("MainMenu"));
+            }, 0.5f, false);
+    }
+}
+#pragma endregion 
