@@ -58,6 +58,6 @@ private:
 	FRotator ClosedRotation;
 
 	UPROPERTY(ReplicatedUsing = OnRep_DoorState)
-	bool bIsOpen;
+	uint8 bIsOpen : 1;
 
 };

@@ -316,12 +316,23 @@ void AEGPlayerController::ClientRPC_PlaySFXGameOver_Implementation()
 void AEGPlayerController::ClientRPC_PlayEndingSequence_Implementation(bool bIsWinner)
 {
 	bCachedIsWinner = bIsWinner;
+
+	if (bIsWinner)
+	{
+		FinalSequenceToPlay = WinSequence;
+	}
+	else
+	{
+		FinalSequenceToPlay = LoseSequence;
+	}
+	
 	PlayLevelSequence(CommonSequence, false);
 }
 
 void AEGPlayerController::ServerRPC_NotifySequenceFinished_Implementation()
 {
-	AEGGameModeBase* GM = GetWorld()->GetAuthGameMode<AEGGameModeBase>();
+	EG_LOG(LogKH, Warning, TEXT("ServerRPC_NotifySequenceFinished"));
+	//AEGGameModeBase* GM = GetWorld()->GetAuthGameMode<AEGGameModeBase>();
 	//if (GM)
 	//{
 	//	GM->ServerTravel();
@@ -359,6 +370,12 @@ void AEGPlayerController::PlayLevelSequence(ULevelSequence* Sequence, bool bIsFi
 	ALevelSequenceActor* OutActor = nullptr;
 	CurrentSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Sequence, Settings, OutActor);
 
+	if (OutActor)
+	{
+		OutActor->SetReplicates(false);
+		OutActor->SetActorHiddenInGame(false);
+	}
+
 	if (!CurrentSequencePlayer)
 	{
 		EG_LOG(LogKH, Warning, TEXT("Failed to create LevelSequencePlayer"));
@@ -387,7 +404,7 @@ void AEGPlayerController::PlayLevelSequence(ULevelSequence* Sequence, bool bIsFi
 	}
 	DurationSeconds += DURATION_PADDING;
 
-	EG_LOG(LogKH, Log, TEXT("PlayLevelSequence: Playing %s (duration fallback %.2f s)"), *Sequence->GetName(), DurationSeconds);
+	EG_LOG(LogKH, Log, TEXT("PlayLevelSequence: Playing %s"), *Sequence->GetName());
 	CurrentSequencePlayer->Play();
 
 	GetWorldTimerManager().SetTimer(SequenceTimerHandle, this, &AEGPlayerController::HandleSequenceFallbackTimeout, DurationSeconds, false);
@@ -417,6 +434,8 @@ float AEGPlayerController::GetSequenceDuration(ULevelSequence* Sequence) const
 
 void AEGPlayerController::HandleSequenceFallbackTimeout()
 {
+	EG_LOG(LogKH, Warning, TEXT("HandleSequenceFallbackTimeout"));
+	
 	if (bSequenceHandled)
 	{
 		return;
@@ -424,7 +443,7 @@ void AEGPlayerController::HandleSequenceFallbackTimeout()
 
 	bSequenceHandled = true;
 
-	UE_LOG(LogTemp, Warning, TEXT("Sequence fallback timeout reached. bIsFinal=%d"), bCurrentSequenceIsFinal ? 1 : 0);
+	UE_LOG(LogKH, Warning, TEXT("Sequence fallback timeout reached. bIsFinal=%d"), bCurrentSequenceIsFinal ? 1 : 0);
 
 	if (CurrentSequencePlayer)
 	{
@@ -450,7 +469,7 @@ void AEGPlayerController::OnCommonSequenceFinished()
 {
 	EG_LOG(LogKH, Log, TEXT("OnCommonSequenceFinished"));
 
-	if (bSequenceHandled)
+	if (bSequenceHandled || !IsLocalController())
 	{
 		return;
 	}
@@ -465,21 +484,23 @@ void AEGPlayerController::OnCommonSequenceFinished()
 	}
 	CurrentSequenceActor = nullptr;
 
-	if (bCachedIsWinner)
+	if (FinalSequenceToPlay)
 	{
-		PlayLevelSequence(WinSequence, true);
+		PlayLevelSequence(FinalSequenceToPlay, true);
 	}
 	else
 	{
-		PlayLevelSequence(LoseSequence, true);
+		EG_LOG(LogKH, Error, TEXT("No Final Sequence to play"));
+		return;
 	}
+	
 }
 
 void AEGPlayerController::OnFinalSequenceFinished()
 {
 	EG_LOG(LogKH, Log, TEXT("OnFinalSequenceFinished"));
 
-	if (bSequenceHandled)
+	if (bSequenceHandled || !IsLocalController())
 	{
 		return;
 	}
@@ -494,8 +515,5 @@ void AEGPlayerController::OnFinalSequenceFinished()
 	}
 	CurrentSequenceActor = nullptr;
 	
-	if (IsLocalController())
-	{
-		ServerRPC_NotifySequenceFinished();
-	}
+	ServerRPC_NotifySequenceFinished();
 }

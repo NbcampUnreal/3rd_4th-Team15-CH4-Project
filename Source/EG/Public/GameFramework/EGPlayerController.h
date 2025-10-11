@@ -137,6 +137,9 @@ private:
 	bool bCachedIsWinner;
 	bool bSequenceHandled = false;
 	bool bCurrentSequenceIsFinal = false;
+
+	UPROPERTY()
+	ULevelSequence* FinalSequenceToPlay;
 	
 	void PlayLevelSequence(ULevelSequence* Sequence, bool bIsFinal, float OptionalDurationSeconds = -1.f);
 	float GetSequenceDuration(ULevelSequence* Sequence) const;
