@@ -246,7 +246,15 @@ void AEGGameModeBase::GameOver()
 
     // GetWorld()->ServerTravel(TEXT("/Game/OhMyEgg/Sequence/L_Sequence?listen"), true);
     FTimerHandle LevelTravelTimerHandle;
-    GetWorldTimerManager().SetTimer(LevelTravelTimerHandle, this, &AEGGameModeBase::TravelToLevel, 5.0f, false);
+    GetWorldTimerManager().SetTimer(LevelTravelTimerHandle, this, &AEGGameModeBase::TravelToLevel, 1.0f, false);
+
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
+        {
+            EGPC->ClientRPC_ShowBlackScreen();
+        }
+    }
 }
 
 void AEGGameModeBase::TravelToLevel()
