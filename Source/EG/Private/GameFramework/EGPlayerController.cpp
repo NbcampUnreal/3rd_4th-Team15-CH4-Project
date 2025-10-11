@@ -163,17 +163,15 @@ void AEGPlayerController::ServerRequestLevelChange_Implementation()
 
 void AEGPlayerController::ToggleMouseCursor()
 {
-	bMouseVisible = !bMouseVisible;
-
-	if (bMouseVisible)
-	{
-		bShowMouseCursor = true;
-		SetInputMode(FInputModeGameAndUI()); // 게임+UI 모두 입력
-	}
-	else
+	if (bShowMouseCursor)
 	{
 		bShowMouseCursor = false;
 		SetInputMode(FInputModeGameOnly());  // 다시 게임 전용 입력
+	}
+	else
+	{
+		bShowMouseCursor = true;
+		SetInputMode(FInputModeGameAndUI()); // 게임+UI 모두 입력
 	}
 }
 

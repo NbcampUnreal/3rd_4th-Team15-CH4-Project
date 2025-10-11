@@ -100,4 +100,13 @@ public:
 	TArray<FFinalResult>& GetFinalResults();
 
 #pragma endregion 
+
+	// 작성자: 김효영
+#pragma region LogOut
+public:
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void ReturnMainMenu();
+
+#pragma endregion 
+
 };
