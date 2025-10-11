@@ -154,10 +154,6 @@ void AEGPlayerController::ServerRequestLevelChange_Implementation()
 		{
 			GM->LevelChange();
 		}
-		/*if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
-		{
-			GI->ChangeLevel();
-		}*/
 	}
 }
 
