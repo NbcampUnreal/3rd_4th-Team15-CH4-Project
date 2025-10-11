@@ -112,8 +112,6 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
 
 void AEGLobbyGameModeBase::Logout(AController* Exiting)
 {
-    Super::Logout(Exiting);
-
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(Exiting))
     {
         EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPS->GetPlayerId());
@@ -134,6 +132,8 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
     {
         GS->UpdateLeaderboard();
     }
+    
+    Super::Logout(Exiting);
 }
 
 void AEGLobbyGameModeBase::InitializeSpawnPoint()

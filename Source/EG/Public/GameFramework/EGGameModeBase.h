@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
 #include "EGInGameSpawnPoints.h"
+#include "EGPlayerState.h"
 #include "GameFramework/GameModeBase.h"
 #include "AI/EGAICharacter.h"
 #include "Character/Egg/EggPoolDataAsset.h"
@@ -47,7 +48,7 @@ public:
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Players")
-	TArray<TWeakObjectPtr<AEGPlayerController>> APlayingPlayerControllers;
+	TArray<TWeakObjectPtr<AEGPlayerState>> APlayingPlayerState;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spawn")
 	TMap<int32, AEGPlayerStart*> PlayerStartList;
 	UPROPERTY(VisibleAnywhere, Category="Spawn")
