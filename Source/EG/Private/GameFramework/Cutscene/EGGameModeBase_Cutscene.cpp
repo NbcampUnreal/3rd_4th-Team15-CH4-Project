@@ -18,8 +18,8 @@ void AEGGameModeBase_Cutscene::BeginPlay()
 	Super::BeginPlay();
 
 	EG_LOG(LogKH, Log, TEXT("Cutscene Game Mode BeginPlay"));
-
-	GetWorldTimerManager().SetTimer(TimerHandle_Cutscene, this, &AEGGameModeBase_Cutscene::OnPlayCutscene, 1.f, false);
+	
+	GetWorldTimerManager().SetTimer(TimerHandle_Cutscene, this, &AEGGameModeBase_Cutscene::OnPlayCutscene, 3.f, false);
 }
 
 void AEGGameModeBase_Cutscene::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -31,6 +31,14 @@ void AEGGameModeBase_Cutscene::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void AEGGameModeBase_Cutscene::OnCutsceneFinished()
 {
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
+		{
+			EGPC->ClientRPC_HideBlackScreen();
+		}
+	}
+	
 	GetWorld()->ServerTravel("/Game/UI/Map/LobbyMap?listen");
 }
 
