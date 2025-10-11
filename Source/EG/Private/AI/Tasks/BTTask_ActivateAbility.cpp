@@ -28,19 +28,17 @@ EBTNodeResult::Type UBTTask_ActivateAbility::ExecuteTask(UBehaviorTreeComponent&
 					FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(AbilityToActivate);
 					if (Spec)
 					{
-						ASC->AbilityEndedCallbacks.AddUObject(this, &ThisClass::OnAbilityEnded);
-						
 						bool bActivated = ASC->TryActivateAbilityByClass(AbilityToActivate);
 						if (bActivated)
 						{
-							return EBTNodeResult::InProgress;
+							return EBTNodeResult::Succeeded;
 						}
 					}
 				}
 			}
 		}
 	}
-	
+
 	return EBTNodeResult::Failed;
 }
 
