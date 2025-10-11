@@ -18,8 +18,14 @@ public:
 	AEGGameModeBase_Cutscene();
 
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 protected:
 	UFUNCTION()
 	void OnCutsceneFinished();
+
+	UFUNCTION()
+	void OnPlayCutscene();
+
+	FTimerHandle TimerHandle_Cutscene;
 };

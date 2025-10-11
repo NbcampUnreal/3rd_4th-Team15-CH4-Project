@@ -12,10 +12,10 @@ struct FFinalResult
 	GENERATED_BODY()
 	
 	UPROPERTY()
-	int32 PlayerId;
+	int32 PlayerId = 0;
 
 	UPROPERTY()
-	bool bIsWinner;
+	bool bIsWinner = false;
 };
 
 /**
