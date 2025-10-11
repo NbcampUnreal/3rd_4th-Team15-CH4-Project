@@ -54,7 +54,7 @@ public:
 	void FadeOutScreen();
 
 private:
-	bool bLevelChanging = false;
+	//bool bLevelChanging = false;
 
 #pragma endregion
 

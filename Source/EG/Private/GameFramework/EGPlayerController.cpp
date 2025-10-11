@@ -215,7 +215,7 @@ void AEGPlayerController::ActivateChatBox()
 	if (EGHUD && EGHUD->Chatting)
 	{
 		EGHUD->Chatting->ActivateChatText();
-		ToggleMouseCursor();
+		//ToggleMouseCursor();
 	}
 }
 
@@ -234,7 +234,7 @@ void AEGPlayerController::ClientGetOutWidget_Implementation()
 	if (EGHUD)
 	{
 		EGHUD->GetOut();
-		ToggleMouseCursor();
+		//ToggleMouseCursor();
 	}
 }
 
