@@ -154,10 +154,6 @@ void AEGPlayerController::ServerRequestLevelChange_Implementation()
 		{
 			GM->LevelChange();
 		}
-		/*if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
-		{
-			GI->ChangeLevel();
-		}*/
 	}
 }
 
@@ -320,10 +316,23 @@ void AEGPlayerController::ClientRPC_PlayEndingSequence_Implementation(bool bIsWi
 	if (bIsWinner)
 	{
 		FinalSequenceToPlay = WinSequence;
+		EndingWidget = UUserWidget::CreateWidgetInstance(*this, WinnerWidgetClass, NAME_None);
 	}
 	else
 	{
 		FinalSequenceToPlay = LoseSequence;
+		EndingWidget = UUserWidget::CreateWidgetInstance(*this, LoserWidgetClass, NAME_None);
+	}
+
+	if (HUDRef)
+	{
+		HUDRef->RemoveFromParent();
+		HUDRef = nullptr;
+	}
+	
+	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
+	{
+		GI->HideBlackScreen();
 	}
 	
 	PlayLevelSequence(CommonSequence, false);
@@ -337,6 +346,22 @@ void AEGPlayerController::ServerRPC_NotifySequenceFinished_Implementation()
 	//{
 	//	GM->ServerTravel();
 	//}
+}
+
+void AEGPlayerController::ClientRPC_ShowBlackScreen_Implementation()
+{
+	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
+	{
+		GI->ShowBlackScreen();
+	}
+}
+
+void AEGPlayerController::ClientRPC_HideBlackScreen_Implementation()
+{
+	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
+	{
+		GI->HideBlackScreen();
+	}
 }
 
 void AEGPlayerController::PlayLevelSequence(ULevelSequence* Sequence, bool bIsFinal, float OptionalDurationSeconds)
@@ -387,6 +412,7 @@ void AEGPlayerController::PlayLevelSequence(ULevelSequence* Sequence, bool bIsFi
 	if (bIsFinal)
 	{
 		CurrentSequencePlayer->OnFinished.AddDynamic(this, &AEGPlayerController::OnFinalSequenceFinished);
+		EndingWidget->AddToViewport();
 	}
 	else
 	{
@@ -514,6 +540,17 @@ void AEGPlayerController::OnFinalSequenceFinished()
 		CurrentSequencePlayer = nullptr;
 	}
 	CurrentSequenceActor = nullptr;
+
+	if (EndingWidget)
+	{
+		EndingWidget->RemoveFromParent();
+		EndingWidget = nullptr;
+	}
+
+	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
+	{
+		GI->ShowBlackScreen();
+	}
 	
 	ServerRPC_NotifySequenceFinished();
 }

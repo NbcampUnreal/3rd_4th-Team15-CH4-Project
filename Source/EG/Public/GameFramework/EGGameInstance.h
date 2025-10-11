@@ -107,6 +107,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ReturnMainMenu();
 
+#pragma endregion
+
+// 작성자: 김혁
+#pragma region BlackScreen
+
+protected:
+	UPROPERTY()
+	TObjectPtr<UUserWidget> BlackScreenWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "BlackScreen")
+	TSubclassOf<UUserWidget> BlackScreenWidgetClass;
+
+public:
+	void ShowBlackScreen();
+	void HideBlackScreen();
+	
 #pragma endregion 
 
 };
