@@ -105,4 +105,30 @@ void UEGGameInstance::ReturnMainMenu()
             }, 0.5f, false);
     }
 }
-#pragma endregion 
+#pragma endregion
+
+void UEGGameInstance::ShowBlackScreen()
+{
+    if (BlackScreenWidget)
+    {
+        BlackScreenWidget->AddToViewport(1000);
+    }
+
+    if (!BlackScreenWidget && BlackScreenWidgetClass)
+    {
+        BlackScreenWidget = CreateWidget<UUserWidget>(this, BlackScreenWidgetClass);
+        if (BlackScreenWidget)
+        {
+            BlackScreenWidget->AddToViewport(1000);
+        }
+    }
+}
+
+void UEGGameInstance::HideBlackScreen()
+{
+    if (BlackScreenWidget)
+    {
+        BlackScreenWidget->RemoveFromParent();
+        BlackScreenWidget = nullptr;
+    }
+}

@@ -113,6 +113,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_NotifySequenceFinished();
 
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_ShowBlackScreen();
+
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_HideBlackScreen();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sequence")
 	TObjectPtr<ULevelSequence> CommonSequence;
@@ -121,6 +127,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sequence")
 	TObjectPtr<ULevelSequence> LoseSequence;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Sequence|UI")
+	TSubclassOf<UUserWidget> WinnerWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Sequence|UI")
+	TSubclassOf<UUserWidget> LoserWidgetClass;
+	UPROPERTY()
+	TObjectPtr<UUserWidget> EndingWidget;
+	
 	UPROPERTY()
 	ULevelSequencePlayer* CurrentSequencePlayer;
 	UPROPERTY()

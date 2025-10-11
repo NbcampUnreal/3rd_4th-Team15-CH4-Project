@@ -67,17 +67,6 @@ void AEGLobbyGameModeBase::BeginPlay()
     }
 }
 
-void AEGLobbyGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
-{
-    Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
-
-    if (GameState && GameState->PlayerArray.Num() >= 6)
-    {
-        ErrorMessage = TEXT("ServerError_MaxPlayersReached");
-        return;
-    }
-}
-
 void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);

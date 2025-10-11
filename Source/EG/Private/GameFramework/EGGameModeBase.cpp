@@ -14,7 +14,7 @@
 void AEGGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
-
+    
     if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
     {
         playerCount = GI->GetPlayerIndex();
@@ -42,16 +42,17 @@ AEGGameModeBase::AEGGameModeBase()
 void AEGGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
     Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
-    if (GameState && GameState->PlayerArray.Num() >= 6)
-    {
-        ErrorMessage = TEXT("ServerError_MaxPlayersReached");
-        return;
-    }
+    
+    ErrorMessage = TEXT("ServerError_MaxPlayersReached");
+    return;
 }
 
 void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
+
+    UE_LOG(LogTemp, Warning, TEXT("PostLogin PlayerID: %d"), 
+    NewPlayer->GetPlayerState<APlayerState>() ? NewPlayer->GetPlayerState<APlayerState>()->GetPlayerId() : -1);
     
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
@@ -68,16 +69,41 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
             EGGS->LeaderboardSnapshot.Add(Entry);
             
             if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
-                {
-                    if (GI->PlayerIndex == playerCount)
-                    {
-                        GameStart();
-                    }
-                }
-            
+             {
+                 if (GI->PlayerIndex == playerCount)
+                 {
+                     GameStart();
+                 }
+             }
         }        
     }
 }
+
+void AEGGameModeBase::HandleSeamlessTravelPlayer(AController* C)
+{
+    EG_LOG_ROLE(LogMS, Warning, TEXT("HandleSeamlessTravelPlayer Start"));
+    
+    Super::HandleSeamlessTravelPlayer(C);
+    if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
+    {
+        if (GI->PlayerIndex == GetNumPlayers())
+        {
+            EG_LOG_ROLE(LogMS, Warning, TEXT("player %d in."), C->GetPlayerState<AEGPlayerState>()->GetPlayerId());
+            GameStart();
+        }
+        else
+        {
+            EG_LOG_ROLE(LogMS, Warning, TEXT("player %d out."), C->GetPlayerState<AEGPlayerState>()->GetPlayerId());
+        }
+    }
+    else
+    {
+        EG_LOG_ROLE(LogMS, Warning, TEXT("PlayerIndex is null"));
+    }
+
+    EG_LOG_ROLE(LogMS, Warning, TEXT("HandleSeamlessTravelPlayer END"));
+}
+
 
 void AEGGameModeBase::Logout(AController* Exiting)
 {
@@ -121,7 +147,7 @@ void AEGGameModeBase::InitializeSpawnPoint()
 AActor* AEGGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
     InitializeSpawnPoint();
-    int32 PlayerNum = GetNumPlayers()-1;
+    int32 PlayerNum = GetNumPlayers();
         if (AEGPlayerStart** FoundStart = PlayerStartList.Find(PlayerNum))
         {
             return *FoundStart;
@@ -246,7 +272,15 @@ void AEGGameModeBase::GameOver()
 
     // GetWorld()->ServerTravel(TEXT("/Game/OhMyEgg/Sequence/L_Sequence?listen"), true);
     FTimerHandle LevelTravelTimerHandle;
-    GetWorldTimerManager().SetTimer(LevelTravelTimerHandle, this, &AEGGameModeBase::TravelToLevel, 5.0f, false);
+    GetWorldTimerManager().SetTimer(LevelTravelTimerHandle, this, &AEGGameModeBase::TravelToLevel, 1.0f, false);
+
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
+        {
+            EGPC->ClientRPC_ShowBlackScreen();
+        }
+    }
 }
 
 void AEGGameModeBase::TravelToLevel()
@@ -255,7 +289,6 @@ void AEGGameModeBase::TravelToLevel()
     GetWorld()->ServerTravel(TEXT("/Game/OhMyEgg/Sequence/L_Sequence?listen"), true);
     EG_LOG(LogJM, Log, TEXT("End"));
 }
-
 
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange

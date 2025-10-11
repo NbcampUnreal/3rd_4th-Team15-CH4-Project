@@ -52,8 +52,6 @@ class EG_API AEGGameStateBase : public AGameStateBase
 	GENERATED_BODY()
 
 public:
-
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void BeginPlay() override;
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
@@ -66,26 +64,22 @@ public:
 	int32 RemainingCountdown = 100;
 
 	UPROPERTY(ReplicatedUsing = OnRep_RemainingPlayTime, VisibleAnywhere, BlueprintReadOnly)
-	int32 RemainingPlayTime = 300;
+	int32 RemainingPlayTime = 20;
 	
 	UPROPERTY()
 	class UEGDelegateManager* DelegateManager;
 	
 	/// (작성자 : KMS)
 	FTimerHandle CountdownTimerHandle;
-	
-	UPROPERTY(ReplicatedUsing=OnRep_Leaderboard)
-	TArray<FAward> LeaderboardSnapshot;
-	
-	UPROPERTY(ReplicatedUsing=OnRep_Award)
-	FAward RoundAward;
+
 
 protected:
 	UFUNCTION()
 	void OnRep_Leaderboard();
 
 	UFUNCTION()
-	void OnRep_Award();
+	void OnRep_Awards();
+	
 public:
 	void CheckRoomLeader();
 	void StartCountdown();
@@ -93,9 +87,15 @@ public:
 	void UpdateLeaderboard();
 	void FinalizeAward(const TArray<TWeakObjectPtr<AEGPlayerController>>& Winners);
 	void SetFinalResults(const TArray<TPair<TWeakObjectPtr<AEGPlayerController>, int32>>& Scores);
+	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(ReplicatedUsing = OnRep_Award)
+	UPROPERTY(ReplicatedUsing=OnRep_Leaderboard)
+	TArray<FAward> LeaderboardSnapshot;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Awards)
 	TArray<FAward> RoundAwards;
+	
 	///여기까지 KMS
 	
 protected:
