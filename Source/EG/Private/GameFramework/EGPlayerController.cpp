@@ -177,7 +177,7 @@ void AEGPlayerController::ToggleMouseCursor()
 	}
 }
 
-void AEGPlayerController::ClientShowBlackScreen_Implementation()
+void AEGPlayerController::ClientRPCFadeInScreen_Implementation()
 {
 	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
 	{
@@ -193,7 +193,7 @@ void AEGPlayerController::ClientShowBlackScreen_Implementation()
 	}
 }
 
-void AEGPlayerController::ClientHideBlackScreen_Implementation()
+void AEGPlayerController::ClientRPCFadeOutScreen_Implementation()
 {
 	if (UEGGameInstance* GI = Cast<UEGGameInstance>(GetGameInstance()))
 	{
@@ -221,6 +221,7 @@ void AEGPlayerController::ActivateChatBox()
 	if (EGHUD && EGHUD->Chatting)
 	{
 		EGHUD->Chatting->ActivateChatText();
+		ToggleMouseCursor();
 	}
 }
 
@@ -239,6 +240,7 @@ void AEGPlayerController::ClientGetOutWidget_Implementation()
 	if (EGHUD)
 	{
 		EGHUD->GetOut();
+		ToggleMouseCursor();
 	}
 }
 
@@ -279,7 +281,8 @@ void AEGPlayerController::ClientRPC_PlaySFXGameStart_Implementation()
 	{
 		if (USFXManagerSubsystem* SFXManager = GI->GetSubsystem<USFXManagerSubsystem>())
 		{
-			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameStart, this);
+			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameStart, GetWorld());
+			EG_LOG(LogJM, Log, TEXT("SFX Play GameStart"));
 		}
 		else
 		{
@@ -298,7 +301,8 @@ void AEGPlayerController::ClientRPC_PlaySFXGameOver_Implementation()
 	{
 		if (USFXManagerSubsystem* SFXManager = GI->GetSubsystem<USFXManagerSubsystem>())
 		{
-			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameOver, this);
+			// SFXManager->PlaySFXLocalClientOnly(ESFXType::GameOver, this);
+			SFXManager->PlaySFXLocalClientOnly(ESFXType::GameOver, GetWorld());
 		}
 		else
 		{

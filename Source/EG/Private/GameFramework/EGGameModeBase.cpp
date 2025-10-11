@@ -5,7 +5,6 @@
 #include "EGLog.h"
 #include "EG/Public/GameFramework/EGGameStateBase.h"
 #include "Character/EGChickenCharacter.h"
-#include "Character/Egg/EggActor.h"
 #include "Character/Egg/EggPoolManagerSubsystem.h"
 #include "GameFramework/EGInGameSpawnPoints.h"
 #include "GameFramework/EGPlayerState.h"
@@ -21,6 +20,7 @@ void AEGGameModeBase::BeginPlay()
         playerCount = GI->GetPlayerIndex();
     }
 
+    // JM : 오브젝트 풀 Init Pool
     if (EggPoolDataAsset)
     {
         if (UEggPoolManagerSubsystem* PoolManager = GetWorld()->GetSubsystem<UEggPoolManagerSubsystem>())
@@ -54,15 +54,10 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
     
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
-        if (EGPS->GetPlayerID() == -1)
-        {
-            EGPS->SetPlayerID(CurrentPlayerIndex++);
-        }
-        
         if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
         {
             FAward Entry;
-            Entry.PlayerID = EGPS->GetPlayerID();
+            Entry.PlayerID = EGPS->GetPlayerId();
             Entry.PlayerEggScore = 0;
             EGGS->LeaderboardSnapshot.Add(Entry);
             if (CurrentPlayerIndex == playerCount)
@@ -181,7 +176,7 @@ void AEGGameModeBase::GameStart()
 
     }
 
-    HideScreen();
+    FadeOutScreen(); // 게임 시작 시 페이드 아웃 (작성자 : 김세훈) 
 }
 
 void AEGGameModeBase::GameOver()
@@ -215,11 +210,13 @@ void AEGGameModeBase::GameOver()
     {
         if (!Pair.Key.IsValid()) continue;
 
-        FFinalResult Result;
-        Result.PlayerId = Pair.Key->GetPlayerState<AEGPlayerState>()->GetPlayerID();
-        Result.bIsWinner = (Pair.Value == TopScore);
-
-        FinalResults.Add(Result);
+        if (AEGPlayerState* PS = Pair.Key->GetPlayerState<AEGPlayerState>())
+        {
+            FFinalResult Result;
+            Result.PlayerId = PS->GetPlayerId();
+            Result.bIsWinner = (Pair.Value == TopScore);
+            FinalResults.Add(Result);
+        }
     }
 
     if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
@@ -227,29 +224,39 @@ void AEGGameModeBase::GameOver()
         GI->SetFinalResults(FinalResults);
     }
 
-    GetWorld()->ServerTravel(TEXT("/Game/OhMyEgg/Sequence/L_Sequence"), true);
+    // GetWorld()->ServerTravel(TEXT("/Game/OhMyEgg/Sequence/L_Sequence?listen"), true);
+    FTimerHandle LevelTravelTimerHandle;
+    GetWorldTimerManager().SetTimer(LevelTravelTimerHandle, this, &AEGGameModeBase::TravelToLevel, 5.0f, false);
 }
+
+void AEGGameModeBase::TravelToLevel()
+{
+    EG_LOG(LogJM, Log, TEXT("Start"));
+    GetWorld()->ServerTravel(TEXT("/Game/OhMyEgg/Sequence/L_Sequence?listen"), true);
+    EG_LOG(LogJM, Log, TEXT("End"));
+}
+
 
 // 레벨 변경 (작성자 : 김효영)
 #pragma region LevelChange
-void AEGGameModeBase::ShowScreen()
+void AEGGameModeBase::FadeInScreen()
 {
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientShowBlackScreen();
+            EGPC->ClientRPCFadeInScreen();
         }
     }
 }
 
-void AEGGameModeBase::HideScreen()
+void AEGGameModeBase::FadeOutScreen()
 {
     for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
     {
         if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
         {
-            EGPC->ClientHideBlackScreen();
+            EGPC->ClientRPCFadeOutScreen();
         }
     }
 }

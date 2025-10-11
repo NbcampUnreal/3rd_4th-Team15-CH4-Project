@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -54,8 +54,7 @@ class EG_API AEGGameStateBase : public AGameStateBase
 public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	void BeginPlay();
-	void RemovePlayerState(APlayerState* PlayerState);
+	virtual void BeginPlay() override;
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly)
 	int32 AlivePlayerControllerCount = 0;
@@ -67,7 +66,7 @@ public:
 	int32 RemainingCountdown = 100;
 
 	UPROPERTY(ReplicatedUsing = OnRep_RemainingPlayTime, VisibleAnywhere, BlueprintReadOnly)
-	int32 RemainingPlayTime = 30;
+	int32 RemainingPlayTime = 300;
 	
 	UPROPERTY()
 	class UEGDelegateManager* DelegateManager;

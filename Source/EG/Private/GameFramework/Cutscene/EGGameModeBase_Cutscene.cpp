@@ -49,17 +49,15 @@ void AEGGameModeBase_Cutscene::OnPlayCutscene()
 					[PlayerId](const FFinalResult& Result) {return Result.PlayerId == PlayerId;}
 					);
 
-				EG_LOG(LogKH, Log, TEXT("Player Id : %d"), PlayerId);
-				
-				if (Found)
-				{
-					EG_LOG(LogKH, Warning, TEXT("Player %d is %s"), PlayerId, Found->bIsWinner ? TEXT("Winner") : TEXT("Loser"));
-					PC->ClientRPC_PlayEndingSequence(Found->bIsWinner);
+					if (Found)
+					{
+						PC->ClientRPC_PlayEndingSequence(Found->bIsWinner);
+					}
 				}
 			}
 		}
+
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AEGGameModeBase_Cutscene::OnCutsceneFinished, 12.f, false);
 	}
-	
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AEGGameModeBase_Cutscene::OnCutsceneFinished, 11.f, false);
 }

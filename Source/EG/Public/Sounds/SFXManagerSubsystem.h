@@ -22,7 +22,7 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void PlaySFXLocalClientOnly(ESFXType InType, UObject* WorldContext);
+	void PlaySFXLocalClientOnly(ESFXType InType, UWorld* World);
 	/*void PlaySFXAtLocation(ESFXType InType, UObject* WorldContext, const FVector& Location);*/
 	void StopSFX(ESFXType InType);
 

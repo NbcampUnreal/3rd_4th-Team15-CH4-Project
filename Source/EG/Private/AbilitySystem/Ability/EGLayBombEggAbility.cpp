@@ -76,15 +76,22 @@ void UEGLayBombEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 					FRotator SpawnRotation = ActorInfo->AvatarActor->GetActorRotation();
 					FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
 					AEggActor* EggActor = PoolManager->GetEggFromPool(EEggType::BombEgg, SpawnLocation, SpawnRotation);
-					EggActor->SetOwner(ActorInfo->AvatarActor.Get());
-					ABombEggActor* BombEggActor = Cast<ABombEggActor>(EggActor);
-					if (BombEggActor)
+					if (EggActor)
 					{
-						BombEggActor->StartExplosionTimer();		// JM : 폭발 타이머 시작
+						EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+						ABombEggActor* BombEggActor = Cast<ABombEggActor>(EggActor);
+						if (BombEggActor)
+						{
+							BombEggActor->StartExplosionTimer();		// JM : 폭발 타이머 시작
+						}
+						else
+						{
+							EG_LOG(LogJM, Warning, TEXT("No BombEggActor"));
+						}
 					}
 					else
 					{
-						EG_LOG(LogJM, Warning, TEXT("No BombEggActor"));
+						EG_LOG(LogJM, Warning, TEXT("EggPoolManagerSubsystem::GetEggFromPool() is NULL"));
 					}
 				}
 				else

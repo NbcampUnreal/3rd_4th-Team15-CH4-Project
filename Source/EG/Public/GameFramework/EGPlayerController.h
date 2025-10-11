@@ -42,10 +42,10 @@ public:
 	void ToggleMouseCursor();
 
 	UFUNCTION(Client, Reliable)
-	void ClientShowBlackScreen();
+	void ClientRPCFadeInScreen();
 
 	UFUNCTION(Client, Reliable)
-	void ClientHideBlackScreen();
+	void ClientRPCFadeOutScreen();
 
 private:
 	bool bMouseVisible = false;	
@@ -58,8 +58,6 @@ public:
 
 	UFUNCTION()
 	void ActivateChatBox();
-	void WinnderLogic();
-	void LoserLogic();
 
 	UFUNCTION(Server, Reliable)
 	void ServerSendChatMessage(const FString& Message);

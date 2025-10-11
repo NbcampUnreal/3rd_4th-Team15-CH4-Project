@@ -119,10 +119,10 @@ void AEGChickenCharacter::BeginPlay()
 				{
 					AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0, this));
 					UE_LOG(LogTemp, Log, TEXT("Give Ability : %s"), *AbilityClass->GetName());
-					HandleStaminaRegen();
-					HandleEggEnergyRegen();
 				}
 			}
+			HandleStaminaRegen();
+			HandleEggEnergyRegen();
 
 			UE_LOG(LogTemp, Warning, TEXT("GAS Initialized"));
 		}
@@ -529,7 +529,8 @@ void AEGChickenCharacter::PlayBlockSkillSFX()
 	USFXManagerSubsystem* SFXManager = GetGameInstance()->GetSubsystem<USFXManagerSubsystem>();
 	if (SFXManager)
 	{
-		SFXManager->PlaySFXLocalClientOnly(ESFXType::BlockSkill, this);
+		// SFXManager->PlaySFXLocalClientOnly(ESFXType::BlockSkill, this);
+		SFXManager->PlaySFXLocalClientOnly(ESFXType::BlockSkill, GetWorld());
 	}
 }
 

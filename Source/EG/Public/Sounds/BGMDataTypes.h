@@ -15,14 +15,10 @@ enum class EBGMType : uint8
 {
 	None		UMETA(DisplayName = "None"),
 	MainMenu	UMETA(DisplayName = "MainMenu"),
-	Lobby		UMETA(DisplayName = "Lobby"),
-	Stage1		UMETA(DisplayName = "Stage1"),
-	Stage2		UMETA(DisplayName = "Stage2"),
-	VoiceTestMap UMETA(DisplayName = "VoiceTestMap"),	// 테스트용
-	VoiceTestMap2 UMETA(DisplayName = "VoiceTestMap2"),	// 테스트용
-	Level_1		UMETA(DisplayName = "Level_1"),			// 테스트용
-	Level_2		UMETA(DisplayName = "Level_2"),			// 테스트용
-	Level_3		UMETA(DisplayName = "Level_3"),			// 테스트용
+	LobbyMap	UMETA(DisplayName = "LobbyMap"),
+	Level_1		UMETA(DisplayName = "Level_1"),			
+	Level_2		UMETA(DisplayName = "Level_2"),			
+	Level_3		UMETA(DisplayName = "Level_3"),			
 };
 
 // Enum과 사운드 에셋을 묶어줄 구조체를 정의

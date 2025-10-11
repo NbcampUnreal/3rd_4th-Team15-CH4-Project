@@ -84,7 +84,14 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 					FRotator SpawnRotation = ActorInfo->AvatarActor->GetActorRotation();
 					FVector SpawnLocation = ActorInfo->AvatarActor->GetActorLocation();
 					AEggActor* EggActor = PoolManager->GetEggFromPool(EEggType::Egg, SpawnLocation, SpawnRotation);
-					EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+					if (EggActor)
+					{
+						EggActor->SetOwner(ActorInfo->AvatarActor.Get());
+					}
+					else
+					{
+						EG_LOG(LogJM, Warning, TEXT("EggPoolManagerSubsystem::GetEggFromPool() is NULL"));
+					}
 				}
 				else
 				{
@@ -109,11 +116,20 @@ void UEGLayEggAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 				if (APlayerController* PC = ActorInfo->PlayerController.Get())
 				{
 					UE_LOG(LogTemp, Log, TEXT("find PC"));
-					if (AEGPlayerState* EGPlayerState = Cast<AEGPlayerState>(PC->GetPlayerState<APlayerState>()))
+					if (APlayerState* PS = PC->GetPlayerState<APlayerState>())
+					{
+						if (AEGPlayerState* EGPlayerState = Cast<AEGPlayerState>(PS))
+						{
+							UE_LOG(LogTemp, Log, TEXT("lay egg set"));
+							EGPlayerState->ServerAddEgg(1);
+						}
+					}
+					
+					/*if (AEGPlayerState* EGPlayerState = Cast<AEGPlayerState>(PC->GetPlayerState<APlayerState>()))
 					{
 						UE_LOG(LogTemp, Log, TEXT("lay egg set"));
 						EGPlayerState->ServerAddEgg(1); 
-					}
+					}*/
 				}//여기까지 kms
 				
 				UE_LOG(LogTemp, Log, TEXT("Egg Spawned"));
