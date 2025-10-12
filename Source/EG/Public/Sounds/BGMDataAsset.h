@@ -8,7 +8,7 @@
 #include "BGMDataAsset.generated.h"
 
 UCLASS()
-class EG_API UBGMDataAsset : public UPrimaryDataAsset
+class EG_API UBGMDataAsset : public UDataAsset	//UPrimaryDataAsset
 {
 	GENERATED_BODY()
 	
