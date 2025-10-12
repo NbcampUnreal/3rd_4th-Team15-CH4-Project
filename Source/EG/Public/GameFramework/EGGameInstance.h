@@ -84,6 +84,7 @@ public:
 		{
 			PlayerIndex += Index;
 		}
+		UE_LOG(LogTemp, Log, TEXT("CurrentPlayer Num is %d"), PlayerIndex);
 	}
 
 	UPROPERTY();

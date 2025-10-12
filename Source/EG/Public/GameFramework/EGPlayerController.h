@@ -159,4 +159,7 @@ private:
 	void HandleSequenceFallbackTimeout();
 	
 #pragma endregion 
+
+public:
+	bool bChiefPlayera = false;
 };

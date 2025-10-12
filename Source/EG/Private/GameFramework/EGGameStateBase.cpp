@@ -20,7 +20,7 @@ void AEGGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(ThisClass, RemainingCountdown);
 	DOREPLIFETIME(ThisClass, RemainingPlayTime);
 	DOREPLIFETIME(ThisClass, LeaderboardSnapshot); //kms
-	DOREPLIFETIME(ThisClass, RoundAward);		//kms
+	DOREPLIFETIME(ThisClass, RoundAwards);		//kms
 }
 
 void AEGGameStateBase::BeginPlay()
@@ -59,13 +59,9 @@ void AEGGameStateBase::OnRep_Leaderboard()
 	}
 }
 
-void AEGGameStateBase::OnRep_Award()
+void AEGGameStateBase::OnRep_Awards()
 {
-	UE_LOG(LogTemp, Log, TEXT("Award replicated -> WinnerIndex: %d, Score: %d"),
-		RoundAward.PlayerID,
-		RoundAward.PlayerEggScore);
-	
-	DelegateManager->OnAwardUpdated.Broadcast(RoundAward);
+	DelegateManager->OnAwardUpdated.Broadcast(RoundAwards);
 }
 
 void AEGGameStateBase::CheckRoomLeader()
@@ -163,7 +159,7 @@ void AEGGameStateBase::FinalizeAward(const TArray<TWeakObjectPtr<AEGPlayerContro
 			}
 		}
 	}
-	OnRep_Award();
+	OnRep_Awards();
 }
 
 void AEGGameStateBase::SetFinalResults(const TArray<TPair<TWeakObjectPtr<AEGPlayerController>, int32>>& Scores)
@@ -174,19 +170,28 @@ void AEGGameStateBase::SetFinalResults(const TArray<TPair<TWeakObjectPtr<AEGPlay
 		if (Pair.Key.IsValid())
 		{
 			if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(Pair.Key->PlayerState))
-
-				{
-					FAward Entry;
-					Entry.PlayerID    = EGPS->GetPlayerId();         
-					Entry.PlayerEggScore = EGPS->GetPlayerEggCount(); 
-					LeaderboardSnapshot.Add(Entry);
-				}
+			{
+				FAward Entry;
+				Entry.PlayerID    = EGPS->GetPlayerId();         
+				Entry.PlayerEggScore = EGPS->GetPlayerEggCount(); 
+				LeaderboardSnapshot.Add(Entry);
+			}
 		}
 	}
 
+	RoundAwards.Empty(); // 이전 라운드 수상 기록 초기화
 	if (LeaderboardSnapshot.Num() > 0)
 	{
-		RoundAward.PlayerID = 0;
-		RoundAward.PlayerEggScore = LeaderboardSnapshot[0].PlayerEggScore;
+		// LeaderboardSnapshot은 이미 정렬되어 있으므로, 0번 인덱스가 1등입니다.
+		const FAward& WinnerInfo = LeaderboardSnapshot[0];
+
+		FAward FinalAward;
+		FinalAward.PlayerID = WinnerInfo.PlayerID;
+		FinalAward.PlayerEggScore = WinnerInfo.PlayerEggScore;
+        
+		RoundAwards.Add(FinalAward); // TArray에 새로운 Award를 추가
 	}
+    
+	// 서버에서도 변경사항을 바로 적용하기 위해 RepNotify를 직접 호출
+	OnRep_Awards();
 }

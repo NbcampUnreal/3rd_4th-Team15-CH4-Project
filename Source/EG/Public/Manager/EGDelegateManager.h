@@ -14,7 +14,8 @@ class AEGItemBase;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountdownUpdated, int32, NewCountdown);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayTimeUpdated, int32, NewPlayTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLeaderboardUpdated, const TArray<FAward>&, NewLeaderboard);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAwardUpdated, const FAward&, NewAward);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAwardUpdated, const TArray<FAward>&, Awards);
+
 
 #pragma endregion
 
