@@ -125,4 +125,8 @@ public:
 	
 #pragma endregion 
 
+	// JM : 보이스 로그아웃 함수 실행
+public:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Voice")
+	void LeaveVoiceRoom_BPImpl();
 };
