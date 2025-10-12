@@ -72,38 +72,30 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
              {
                  if (GI->PlayerIndex == playerCount)
                  {
-                     GameStart();
+                     //GameStart();
                  }
              }
         }        
     }
 }
 
-void AEGGameModeBase::HandleSeamlessTravelPlayer(AController* C)
+void AEGGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 {
     EG_LOG_ROLE(LogMS, Warning, TEXT("HandleSeamlessTravelPlayer Start"));
-    
+
     Super::HandleSeamlessTravelPlayer(C);
+
+    playerCount++;
+
     if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
     {
-        if (GI->PlayerIndex == GetNumPlayers())
+        // 모든 플레이어가 로드 완료했다고 판단되면 StartGame
+        if (GameState && playerCount == GI->PlayerIndex)
         {
-            EG_LOG_ROLE(LogMS, Warning, TEXT("player %d in."), C->GetPlayerState<AEGPlayerState>()->GetPlayerId());
             GameStart();
         }
-        else
-        {
-            EG_LOG_ROLE(LogMS, Warning, TEXT("player %d out."), C->GetPlayerState<AEGPlayerState>()->GetPlayerId());
-        }
     }
-    else
-    {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("PlayerIndex is null"));
-    }
-
-    EG_LOG_ROLE(LogMS, Warning, TEXT("HandleSeamlessTravelPlayer END"));
 }
-
 
 void AEGGameModeBase::Logout(AController* Exiting)
 {

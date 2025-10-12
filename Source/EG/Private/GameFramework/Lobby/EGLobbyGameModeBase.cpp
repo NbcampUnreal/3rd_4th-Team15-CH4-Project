@@ -12,7 +12,6 @@
 #include "Character/Egg/EggPoolManagerSubsystem.h"
 #include "GameFramework/EGGameStateBase.h"
 #include "GameFramework/EGPlayerState.h"
-#include "Character/Egg/EggPoolManagerSubsystem.h"
 
 AEGLobbyGameModeBase::AEGLobbyGameModeBase()
 {
@@ -67,6 +66,17 @@ void AEGLobbyGameModeBase::BeginPlay()
     }
 }
 
+void AEGLobbyGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
+{
+    Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+
+    if (GameState && GameState->PlayerArray.Num() >= 6)
+    {
+        ErrorMessage = TEXT("ServerError_MaxPlayersReached");
+        return;
+    }
+}
+
 void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
@@ -106,6 +116,28 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
     {
         GS->UpdateLeaderboard();
     }
+}
+
+void AEGLobbyGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
+{
+    Super::HandleSeamlessTravelPlayer(C);
+
+    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(C))
+    {
+        EGPC->bChiefPlayera = false;
+    }
+
+    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(C))
+    {
+        if (!bChiefPlayer) // 처음 접속한 플레이어만
+        {
+            bChiefPlayer = true;
+            EGPC->bChiefPlayera = true;
+            // 레벨변경 위젯 보이기
+            EGPC->ShowChiefPlayerUI();
+        }
+    }
+
 }
 
 void AEGLobbyGameModeBase::Logout(AController* Exiting)
@@ -202,7 +234,8 @@ void AEGLobbyGameModeBase::LevelChange()
     UEGGameInstance* EGGI = Cast<UEGGameInstance>(GetGameInstance());
     if (EGGI)
     {
-        EGGI->SetPlayerIndex(GetNumPlayers());
+        EG_LOG_ROLE(LogMS, Warning, TEXT("player: %d d"), GameState->PlayerArray.Num());
+        EGGI->SetPlayerIndex(GameState->PlayerArray.Num());
         EGGI->ChangeLevel();     
     }
 }
