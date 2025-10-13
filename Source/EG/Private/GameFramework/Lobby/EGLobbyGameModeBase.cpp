@@ -12,6 +12,7 @@
 #include "Character/Egg/EggPoolManagerSubsystem.h"
 #include "GameFramework/EGGameStateBase.h"
 #include "GameFramework/EGPlayerState.h"
+#include "GameFramework/GameSession.h"
 
 AEGLobbyGameModeBase::AEGLobbyGameModeBase()
 {
@@ -122,13 +123,35 @@ void AEGLobbyGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 {
     Super::HandleSeamlessTravelPlayer(C);
 
+    
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(C))
     {
-        EGPC->bChiefPlayera = false;
-    }
+        if (!EGPC->PlayerState)
+        {
+            EGPC->InitPlayerState();
+        }
+        TWeakObjectPtr<AEGPlayerController> WeakPC = EGPC;
+        FTimerHandle TimerHandle;
+        GetWorldTimerManager().SetTimer(TimerHandle, [this, WeakPC]()
+        {
+        if (!WeakPC.IsValid() || !GameSession) return;
+        AEGPlayerController* PC = WeakPC.Get();
 
-    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(C))
-    {
+        if (PC->PlayerState && PC->PlayerState->GetUniqueId().IsValid())
+        {
+            GameSession->RegisterPlayer(
+                PC,
+                PC->PlayerState->GetUniqueId().GetUniqueNetId(),
+                false
+            );
+            UE_LOG(LogTemp, Log, TEXT("✅ Player re-registered: %s"), *PC->GetName());
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("⚠️ Failed to register %s (Invalid UniqueId)"), *PC->GetName());
+        }
+        }, 0.2f, false);
+        
         if (!bChiefPlayer) // 처음 접속한 플레이어만
         {
             bChiefPlayer = true;
@@ -137,7 +160,6 @@ void AEGLobbyGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
             EGPC->ShowChiefPlayerUI();
         }
     }
-
 }
 
 void AEGLobbyGameModeBase::Logout(AController* Exiting)
