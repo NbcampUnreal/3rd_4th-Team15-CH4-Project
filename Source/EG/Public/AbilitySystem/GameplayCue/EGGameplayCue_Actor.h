@@ -32,4 +32,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sounds")
 	TObjectPtr<USoundAttenuation> SFXAttenuation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SFX")
+	float VolumeMultiplier = 1.0f;
 };

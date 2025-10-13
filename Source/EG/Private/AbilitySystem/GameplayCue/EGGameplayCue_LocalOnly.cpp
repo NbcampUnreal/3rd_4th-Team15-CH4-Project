@@ -54,7 +54,7 @@ void UEGGameplayCue_LocalOnly::PlaySFXLoopLocalOnly(AActor* MyTarget)
 	AudioComponent = UGameplayStatics::SpawnSound2D(
 		GetWorld(),
 		SFX,
-		1.0f,
+		VolumeMultiplier,
 		1.0f,
 		0.0f,
 		nullptr,
