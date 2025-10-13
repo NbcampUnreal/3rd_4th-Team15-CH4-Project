@@ -201,15 +201,9 @@ protected:
 private:
 	// 스태미나 회복
 	void HandleStaminaRegen();
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandleStaminaRegen();
-	void ExecuteStaminaRegen();
 
 	// 알 에너지 회복
 	void HandleEggEnergyRegen();
-	UFUNCTION(Server, Reliable)
-	void ServerRPCHandleEggEnergyRegen();
-	void ExecuteEggEnergyRegen();
 
 #pragma endregion
 

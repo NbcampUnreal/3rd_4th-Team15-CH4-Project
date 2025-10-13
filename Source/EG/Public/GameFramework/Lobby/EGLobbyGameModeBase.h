@@ -72,5 +72,3 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TMap<int32, AEGPlayerStart*> PlayerStartList;
 };
-
-#pragma endregion
