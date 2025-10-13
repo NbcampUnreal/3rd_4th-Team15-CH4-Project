@@ -126,32 +126,32 @@ void AEGLobbyGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
     
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(C))
     {
-        if (!EGPC->PlayerState)
-        {
-            EGPC->InitPlayerState();
-        }
-        TWeakObjectPtr<AEGPlayerController> WeakPC = EGPC;
-        FTimerHandle TimerHandle;
-        GetWorldTimerManager().SetTimer(TimerHandle, [this, WeakPC]()
-        {
-        if (!WeakPC.IsValid() || !GameSession) return;
-        AEGPlayerController* PC = WeakPC.Get();
-
-        if (PC->PlayerState && PC->PlayerState->GetUniqueId().IsValid())
-        {
-            GameSession->RegisterPlayer(
-                PC,
-                PC->PlayerState->GetUniqueId().GetUniqueNetId(),
-                false
-            );
-            UE_LOG(LogTemp, Log, TEXT("✅ Player re-registered: %s"), *PC->GetName());
-        }
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("⚠️ Failed to register %s (Invalid UniqueId)"), *PC->GetName());
-        }
-        }, 0.2f, false);
-        
+        // if (!EGPC->PlayerState)
+        // {
+        //     EGPC->InitPlayerState();
+        // }
+        // TWeakObjectPtr<AEGPlayerController> WeakPC = EGPC;
+        // FTimerHandle TimerHandle;
+        // GetWorldTimerManager().SetTimer(TimerHandle, [this, WeakPC]()
+        // {
+        // if (!WeakPC.IsValid() || !GameSession) return;
+        // AEGPlayerController* PC = WeakPC.Get();
+        //
+        // if (PC->PlayerState && PC->PlayerState->GetUniqueId().IsValid())
+        // {
+        //     GameSession->RegisterPlayer(
+        //         PC,
+        //         PC->PlayerState->GetUniqueId().GetUniqueNetId(),
+        //         false
+        //     );
+        //     UE_LOG(LogTemp, Log, TEXT("✅ Player re-registered: %s"), *PC->GetName());
+        // }
+        // else
+        // {
+        //     UE_LOG(LogTemp, Warning, TEXT("⚠️ Failed to register %s (Invalid UniqueId)"), *PC->GetName());
+        // }
+        // }, 0.2f, false);
+        //
         if (!bChiefPlayer) // 처음 접속한 플레이어만
         {
             bChiefPlayer = true;
@@ -175,39 +175,57 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
             });
     }
 
-    AEGPlayerController* PC = Cast<AEGPlayerController>(Exiting);
-
-    if (PC->bChiefPlayera == true && APlayingPlayerStates.Num() > 0)
+    if (AEGPlayerController* PC = Cast<AEGPlayerController>(Exiting))
     {
-        for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+        EG_LOG_ROLE(LogMS, Warning, TEXT("casting is right"));
+
+        if (PC->bChiefPlayera == true && APlayingPlayerStates.Num() > 0)
         {
-            if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
+            for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
             {
-                if (EGPC->bChiefPlayera == false)
+                if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
                 {
-                    bChiefPlayer = true;
-                    EGPC->bChiefPlayera = true;
-                    EGPC->ShowChiefPlayerUI();
-                    EG_LOG_ROLE(LogMS, Warning, TEXT("NewChiefasdf"));
-                    break;
+                    if (EGPC!=PC)
+                    {
+                        if (EGPC->bChiefPlayera == false)
+                        {
+                            EGPC->bChiefPlayera = true;
+                            EGPC->ShowChiefPlayerUI();
+                            bChiefPlayer = true;
+                            EG_LOG_ROLE(LogMS, Warning, TEXT("NewChiefasdf"));
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        EG_LOG_ROLE(LogMS, Warning, TEXT("Chief'controller is exist"));
+                        
+                        FTimerHandle TimerHandle;
+                        AController* ExitingController = Exiting; // 필요하다면 로컬 복사
+                        GetWorldTimerManager().SetTimer(TimerHandle, [this, ExitingController]()
+                        {
+                            Logout(ExitingController);
+                        }, 3.f, false);
+                        
+                    }
+                    
                 }
             }
-        }
 
         
-        /*if (AEGPlayerController* NewChief = Cast<AEGPlayerController>(APlayingPlayerStates[1].Pin()->GetOwner()))
-        {
-            bChiefPlayer = true;
-            NewChief->ShowChiefPlayerUI();
-            EG_LOG_ROLE(LogMS, Warning, TEXT("NewChiefasdf"));
-        }*/
+            /*if (AEGPlayerController* NewChief = Cast<AEGPlayerController>(APlayingPlayerStates[1].Pin()->GetOwner()))
+            {
+                bChiefPlayer = true;
+                NewChief->ShowChiefPlayerUI();
+                EG_LOG_ROLE(LogMS, Warning, TEXT("NewChiefasdf"));
+            }*/
+        }
     }
 
     if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
     {
         GS->UpdateLeaderboard();
     }
-    
     
 }
 
