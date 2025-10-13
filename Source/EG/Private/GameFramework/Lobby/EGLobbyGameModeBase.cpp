@@ -34,6 +34,8 @@ void AEGLobbyGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
 
+    FadeOutScreen(); // 처음 접속했을 때 페이드아웃 (작성자 : 김세훈)
+
     if(UEGGameInstance * GI = GetGameInstance<UEGGameInstance>())
     {
         GI->PlayerIndexReset();
@@ -94,8 +96,6 @@ void AEGLobbyGameModeBase::PostLogin(APlayerController* NewPlayer)
         }
 
         // =================================
-
-        EGPC->ClientRPCFadeOutScreen(); // 처음 접속했을 때 페이드아웃 (작성자 : 김세훈)
     }
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(NewPlayer->PlayerState))
     {
@@ -231,13 +231,7 @@ void AEGLobbyGameModeBase::LevelChange()
 {
     FadeInScreen();
 
-    UEGGameInstance* EGGI = Cast<UEGGameInstance>(GetGameInstance());
-    if (EGGI)
-    {
-        EG_LOG_ROLE(LogMS, Warning, TEXT("player: %d d"), GameState->PlayerArray.Num());
-        EGGI->SetPlayerIndex(GameState->PlayerArray.Num());
-        EGGI->ChangeLevel();     
-    }
+    GetWorldTimerManager().SetTimer(LevelChangeTimerHandle, this, &AEGLobbyGameModeBase::LevelChangeTimer, 2.0f, false);
 }
 
 void AEGLobbyGameModeBase::FadeInScreen()
@@ -259,6 +253,17 @@ void AEGLobbyGameModeBase::FadeOutScreen()
         {
             EGPC->ClientRPCFadeOutScreen();
         }
+    }
+}
+
+void AEGLobbyGameModeBase::LevelChangeTimer()
+{
+    UEGGameInstance* EGGI = Cast<UEGGameInstance>(GetGameInstance());
+    if (EGGI)
+    {
+        EG_LOG_ROLE(LogMS, Warning, TEXT("player: %d d"), GameState->PlayerArray.Num());
+        EGGI->SetPlayerIndex(GameState->PlayerArray.Num());
+        EGGI->ChangeLevel();     
     }
 }
 
