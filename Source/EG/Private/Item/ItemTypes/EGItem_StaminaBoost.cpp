@@ -28,7 +28,6 @@ void AEGItem_StaminaBoost::OnPickUp_Implementation(AActor* PickUpActor)
 					if (SpecHandle.IsValid())
 					{
 						ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-						EG_LOG(LogKH, Log, TEXT("%s : Stamina Boost Item Activated"), *PickUpActor->GetName());
 					}
 				}
 			}

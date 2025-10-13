@@ -36,8 +36,6 @@ void UEGItem_ForceJumpAbility::ActivateAbility(const FGameplayAbilitySpecHandle 
 	
 	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
-		EG_LOG(LogKH, Log, TEXT("Force Jump Started"));
-
 		GetWorld()->GetTimerManager().SetTimer(
 			JumpTimerHandle,
 			FTimerDelegate::CreateUObject(this, &ThisClass::ForceJump, Character),
@@ -87,7 +85,6 @@ void UEGItem_ForceJumpAbility::OnDurationFinished()
 {
 	GetWorld()->GetTimerManager().ClearTimer(JumpTimerHandle);
 	
-	EG_LOG(LogKH, Log, TEXT("Force Jump Finished"));
 	CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
 }
 

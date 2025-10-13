@@ -27,7 +27,6 @@ void AEGItem_OutlineActor::OnPickUp_Implementation(AActor* PickUpActor)
 				if (Handle.IsValid())
 				{
 					ASC->TryActivateAbility(Handle);
-					EG_LOG(LogKH, Log, TEXT("%s : Outline Player"), *PickUpActor->GetName());
 				}
 			}
 		}

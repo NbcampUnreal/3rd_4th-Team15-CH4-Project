@@ -16,8 +16,6 @@ AEGGameModeBase_Cutscene::AEGGameModeBase_Cutscene()
 void AEGGameModeBase_Cutscene::BeginPlay()
 {
 	Super::BeginPlay();
-
-	EG_LOG(LogKH, Log, TEXT("Cutscene Game Mode BeginPlay"));
 	
 	GetWorldTimerManager().SetTimer(TimerHandle_Cutscene, this, &AEGGameModeBase_Cutscene::OnPlayCutscene, 3.f, false);
 }
@@ -59,7 +57,6 @@ void AEGGameModeBase_Cutscene::OnPlayCutscene()
 
 				if (Found)
 				{
-					EG_LOG(LogKH, Log, TEXT("player %d : %s"), PlayerId, Found->bIsWinner ? TEXT("Winner") : TEXT("Loser"));
 					PC->ClientRPC_PlayEndingSequence(Found->bIsWinner);
 				}
 			}
