@@ -82,7 +82,7 @@ public:
 	{
 		if (GetWorld()->GetNetMode() == NM_DedicatedServer)
 		{
-			PlayerIndex += Index;
+			PlayerIndex = Index;
 		}
 		UE_LOG(LogTemp, Log, TEXT("CurrentPlayer Num is %d"), PlayerIndex);
 	}

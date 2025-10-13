@@ -64,6 +64,9 @@ private:
 	FTimerHandle GameStartingTimerHandle;
 	FTimerHandle GameEndTimerHandle;
 
+	FTimerHandle LevelChangeTimerHandle;
+	void LevelChangeTimer();
+
 protected:
 	bool bChiefPlayer = false;
 	int32 LeaderNum = 0;

@@ -55,6 +55,13 @@ void UBGMManagerSubsystem::Deinitialize()
 
 void UBGMManagerSubsystem::PlayBGM(EBGMType InLevelName)
 {
+	// JM : 시퀀스 레벨에서는 bgm이 정지하도록 함
+	if (InLevelName == EBGMType::None)
+	{
+		StopBGM();
+		return;
+	}
+	
     USoundBase* Sound = ResolveBGMSound(InLevelName, BGMDataAsset);
     if (!Sound)
     {
