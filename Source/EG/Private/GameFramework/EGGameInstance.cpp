@@ -3,6 +3,7 @@
 
 #include "GameFramework/EGGameInstance.h"
 
+#include "EGLog.h"
 #include "GameFramework/EGPlayerController.h"
 #include "Blueprint/UserWidget.h" 
 #include "Kismet/GameplayStatics.h"
@@ -100,15 +101,46 @@ void UEGGameInstance::ReturnMainMenu()
     APlayerController* PC = GetWorld()->GetFirstPlayerController();
     if (PC)
     {
+        // JM : voice room 나가기
+        LeaveVoiceRoom_BPImpl();
+        
         // 서버 연결 해제
         PC->ConsoleCommand(TEXT("disconnect"));
 
-        // 0.5초 뒤에 메인 메뉴 레벨로 이동
+        // JM : 레벨이동 필요없음. 서버랑 연결 끊기면 클라는 Default Game Map으로 이동하는데
+        // 이걸 MainMenu로 지정해두면 됨
+        /*// 0.5초 뒤에 메인 메뉴 레벨로 이동
         FTimerHandle TimerHandle;
         GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
             {
                 UGameplayStatics::OpenLevel(this, FName("MainMenu"));
-            }, 0.5f, false);
+            }, 0.5f, false);*/
     }
 }
-#pragma endregion 
+#pragma endregion
+
+void UEGGameInstance::ShowBlackScreen()
+{
+    if (BlackScreenWidget)
+    {
+        BlackScreenWidget->AddToViewport(1000);
+    }
+
+    if (!BlackScreenWidget && BlackScreenWidgetClass)
+    {
+        BlackScreenWidget = CreateWidget<UUserWidget>(this, BlackScreenWidgetClass);
+        if (BlackScreenWidget)
+        {
+            BlackScreenWidget->AddToViewport(1000);
+        }
+    }
+}
+
+void UEGGameInstance::HideBlackScreen()
+{
+    if (BlackScreenWidget)
+    {
+        BlackScreenWidget->RemoveFromParent();
+        BlackScreenWidget = nullptr;
+    }
+}

@@ -11,7 +11,7 @@
  * 
  */
 UCLASS()
-class EG_API USFXDataAsset : public UPrimaryDataAsset
+class EG_API USFXDataAsset : public UDataAsset // UPrimaryDataAsset
 {
 	GENERATED_BODY()
 

@@ -84,6 +84,7 @@ public:
 		{
 			PlayerIndex += Index;
 		}
+		UE_LOG(LogTemp, Log, TEXT("CurrentPlayer Num is %d"), PlayerIndex);
 	}
 
 	UPROPERTY();
@@ -107,6 +108,25 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void ReturnMainMenu();
 
+#pragma endregion
+
+// 작성자: 김혁
+#pragma region BlackScreen
+
+protected:
+	UPROPERTY()
+	TObjectPtr<UUserWidget> BlackScreenWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "BlackScreen")
+	TSubclassOf<UUserWidget> BlackScreenWidgetClass;
+
+public:
+	void ShowBlackScreen();
+	void HideBlackScreen();
+	
 #pragma endregion 
 
+	// JM : 보이스 로그아웃 함수 실행
+public:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Voice")
+	void LeaveVoiceRoom_BPImpl();
 };
