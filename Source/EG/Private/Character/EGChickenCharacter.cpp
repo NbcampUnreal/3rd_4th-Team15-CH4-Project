@@ -121,12 +121,11 @@ void AEGChickenCharacter::BeginPlay()
 					UE_LOG(LogTemp, Log, TEXT("Give Ability : %s"), *AbilityClass->GetName());
 				}
 			}
-			HandleStaminaRegen();
-			HandleEggEnergyRegen();
-
 			UE_LOG(LogTemp, Warning, TEXT("GAS Initialized"));
 		}
 	}
+	HandleStaminaRegen();
+	HandleEggEnergyRegen();
 }
 
 void AEGChickenCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -540,23 +539,6 @@ void AEGChickenCharacter::PlayBlockSkillSFX()
 // 스태미나 회복
 void AEGChickenCharacter::HandleStaminaRegen()
 {
-	if (HasAuthority()) // JM : 서버라면 바로 실행
-	{
-		ExecuteStaminaRegen();
-	}
-	else // JM : 클라라면 ServerRPC 요청
-	{
-		ServerRPCHandleStaminaRegen();
-	}
-}
-
-void AEGChickenCharacter::ServerRPCHandleStaminaRegen_Implementation()
-{
-	ExecuteStaminaRegen();
-}
-
-void AEGChickenCharacter::ExecuteStaminaRegen()
-{
 	if (AbilitySystemComponent && StaminaRegenAbilityClass)
 	{
 		const bool bSuccess = AbilitySystemComponent->TryActivateAbilityByClass(StaminaRegenAbilityClass);
@@ -566,23 +548,6 @@ void AEGChickenCharacter::ExecuteStaminaRegen()
 
 // 알 에너지 회복
 void AEGChickenCharacter::HandleEggEnergyRegen()
-{
-	if (HasAuthority()) // JM : 서버라면 바로 실행
-	{
-		ExecuteEggEnergyRegen();
-	}
-	else // JM : 클라라면 ServerRPC 요청
-	{
-		ServerRPCHandleEggEnergyRegen();
-	}
-}
-
-void AEGChickenCharacter::ServerRPCHandleEggEnergyRegen_Implementation()
-{
-	ExecuteEggEnergyRegen();
-}
-
-void AEGChickenCharacter::ExecuteEggEnergyRegen()
 {
 	if (AbilitySystemComponent && EggEnergyRegenAbilityClass)
 	{

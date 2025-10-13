@@ -16,8 +16,14 @@ void UEGGameInstance::Init()
 {
     Super::Init();
 
-    FadeInScreenWidget = UUserWidget::CreateWidgetInstance(*this, FadeInScreenClass, NAME_None);
-    FadeOutScreenWidget = UUserWidget::CreateWidgetInstance(*this, FadeOutScreenClass, NAME_None);
+    if (FadeInScreenClass)
+    {
+        FadeInScreenWidget = CreateWidget<UUserWidget>(this, FadeInScreenClass);
+    }
+    if (FadeOutScreenClass)
+    {
+        FadeOutScreenWidget = CreateWidget<UUserWidget>(this, FadeOutScreenClass);
+    }
 }
 
 // 작성자: 김효영
