@@ -33,15 +33,12 @@ void AEGItem_ForceJump::OnPickUp_Implementation(AActor* PickUpActor)
 						if (Handle.IsValid())
 						{
 							ASC->TryActivateAbility(Handle);
-							EG_LOG(LogKH, Log, TEXT("%s : Forced Jump by Item"), *OtherCharacter->GetName());
 						}
 					}
 				}
 			}
 		}
 	}
-
-	EG_LOG(LogKH, Log, TEXT("%s : Force Jump Item Activated"), *PickUpActor->GetName());
 	
 	Super::OnPickUp_Implementation(PickUpActor);
 }

@@ -26,4 +26,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SFX")
 	TObjectPtr<UNiagaraSystem> NiagaraSystem;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SFX")
+	float VolumeMultiplier = 1.0f;
 };

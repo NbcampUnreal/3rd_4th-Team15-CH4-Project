@@ -26,4 +26,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SFX")
 	TObjectPtr<UAudioComponent> AudioComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SFX")
+	float VolumeMultiplier = 1.0f;
 };

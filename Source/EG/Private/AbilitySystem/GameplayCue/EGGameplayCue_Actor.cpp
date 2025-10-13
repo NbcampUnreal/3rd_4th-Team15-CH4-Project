@@ -54,7 +54,7 @@ void AEGGameplayCue_Actor::PlaySFXLoop(AActor* MyTarget)
 		FVector::ZeroVector,
 		EAttachLocation::KeepRelativeOffset,
 		true,
-		1.0f,
+		VolumeMultiplier,
 		1.0f,
 		0.0f,
 		SFXAttenuation

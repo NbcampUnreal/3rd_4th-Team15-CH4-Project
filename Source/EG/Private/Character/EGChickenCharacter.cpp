@@ -122,10 +122,10 @@ void AEGChickenCharacter::BeginPlay()
 				}
 			}
 			UE_LOG(LogTemp, Warning, TEXT("GAS Initialized"));
+			HandleStaminaRegen();
+			HandleEggEnergyRegen();
 		}
 	}
-	HandleStaminaRegen();
-	HandleEggEnergyRegen();
 }
 
 void AEGChickenCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const

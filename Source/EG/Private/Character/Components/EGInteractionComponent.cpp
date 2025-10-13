@@ -56,8 +56,6 @@ void UEGInteractionComponent::HandleInteract(const FInputActionValue& Value)
 
 void UEGInteractionComponent::PerformInteraction()
 {
-	UE_LOG(LogTemp, Log, TEXT("Perform Interaction"));
-	
 	AActor* Owner = GetOwner();
 	if (!Owner) return;
 
@@ -94,9 +92,7 @@ void UEGInteractionComponent::ServerRPC_Interact_Implementation(AActor* Target)
 {
 	if (Target && Target->GetClass()->ImplementsInterface(UEGInteractInterface::StaticClass()))
 	{
-		EG_LOG(LogKH, Log, TEXT("Server RPC Interact Start"));
 		IEGInteractInterface::Execute_Interact(Target);
-		EG_LOG(LogKH, Log, TEXT("Server RPC Interact End"));
 	}
 }
 
