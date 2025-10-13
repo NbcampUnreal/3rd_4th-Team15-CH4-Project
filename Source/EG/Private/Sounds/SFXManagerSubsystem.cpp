@@ -46,8 +46,36 @@ void USFXManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void USFXManagerSubsystem::Deinitialize()
 {
+	// JM : 월드 이동시 AudioComponent가 null 참조 되는 문제 해결
+	// Deinitialize에서 모든 AudioComponent 정지, 등록해제
+	for (TPair<ESFXType, TObjectPtr<UAudioComponent>>& Pair : ActiveSFXMap)
+	{
+		UAudioComponent* AudioComp = Pair.Value;
+		if (AudioComp)
+		{
+			// 1. 재생 중인 사운드 정지
+			if (AudioComp->IsPlaying())
+			{
+				AudioComp->Stop();
+			}
+
+			// 2. 컴포넌트를 씬과 월드에서 등록 해제
+			// 이게 가장 중요합니다. 씬에 등록된 채로 GC가 월드를 파괴하면 크래시가 납니다.
+			if (AudioComp->IsRegistered())
+			{
+				AudioComp->UnregisterComponent();
+			}
+
+			// 3. 컴포넌트 파괴 (NewObject로 생성했으므로 명시적 파괴가 필요합니다)
+			// UAudioComponent::DestroyComponent()는 ActorComponent가 아닌 경우 바로 MarkPendingKill()을 호출합니다.
+			AudioComp->DestroyComponent();
+		}
+	}
+    
+	// 4. 맵 초기화
+	ActiveSFXMap.Empty();
+	
 	Super::Deinitialize();
-	// 불필요
 }
 
 void USFXManagerSubsystem::PlaySFXLocalClientOnly(ESFXType InType, UWorld* World)
@@ -161,11 +189,25 @@ UAudioComponent* USFXManagerSubsystem::GetAudioComponent(UWorld* World, ESFXType
 	}
 
 	// 기존 AudioComponent가 없다면 새로 생성
-	UAudioComponent* NewComp = NewObject<UAudioComponent>(this);
+	// JM : 월드 이동시 AudioComponent가 null 참조 되는 문제 해결
+	// NewObject<UAudioComponent>(this) 대신 World의 WorldSettings를 오너로 지정
+	UAudioComponent* NewComp = NewObject<UAudioComponent>(World->GetWorldSettings());
+	NewComp->bAutoActivate = false;
+    
+	// UAudioComponent가 ActorComponent를 상속받았으므로, RegisterComponentWithWorld(World)를 호출해야 합니다.
+	// 컴포넌트를 World에 등록
+	NewComp->RegisterComponentWithWorld(World); 
+    
+	ActiveSFXMap.Add(InType, NewComp);
+	return NewComp;
+	
+
+	/*UAudioComponent* NewComp = NewObject<UAudioComponent>(this);
 	NewComp->bAutoActivate = false;
 	NewComp->RegisterComponentWithWorld(World);	// World 에 등록
 	ActiveSFXMap.Add(InType, NewComp);
-	return NewComp;
+	return NewComp;*/
+
 	/*UAudioComponent* NewComp = NewObject<UAudioComponent>(World->GetWorldSettings());
 	NewComp->bAutoActivate = false;
 	NewComp->RegisterComponent();
