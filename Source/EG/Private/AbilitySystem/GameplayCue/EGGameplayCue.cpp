@@ -26,7 +26,7 @@ void UEGGameplayCue::HandleGameplayCue(AActor* Target, EGameplayCueEvent::Type E
 		
 		if (SFX)
 		{
-			UGameplayStatics::PlaySoundAtLocation(Target, SFX, Location, 1.0f, 1.0f, 0.0f, SFXAttenuation);
+			UGameplayStatics::PlaySoundAtLocation(Target, SFX, Location, VolumeMultiplier, 1.0f, 0.0f, SFXAttenuation);
 			EG_LOG(LogJM, Warning, TEXT("Play SFX"));
 		}
 
