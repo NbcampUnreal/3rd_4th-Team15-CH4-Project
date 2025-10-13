@@ -66,8 +66,6 @@ void AEGAICharacter::OnAngryMode(FVector AttackLocation)
 		{
 			if (UBlackboardComponent* Blackboard = EGAIController->GetBlackboardComponent())
 			{
-				EG_LOG(LogKH, Log, TEXT("%s : Angry"), *this->GetName());
-
 				Blackboard->SetValueAsEnum("ActionState", static_cast<uint8>(EAIState::Angry));
 				
 				FVector curLocation = GetActorLocation();

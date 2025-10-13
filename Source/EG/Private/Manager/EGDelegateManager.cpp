@@ -6,11 +6,9 @@
 void UEGDelegateManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-	EG_LOG(LogKH, Log, TEXT("Delegate Manager Initialized"));
 }
 
 void UEGDelegateManager::Deinitialize()
 {
-	EG_LOG(LogKH, Log, TEXT("Delegate Manager Deinitialized"));
 	Super::Deinitialize();
 }

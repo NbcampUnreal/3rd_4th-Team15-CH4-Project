@@ -430,7 +430,6 @@ void AEGPlayerController::PlayLevelSequence(ULevelSequence* Sequence, bool bIsFi
 	}
 	DurationSeconds += DURATION_PADDING;
 
-	EG_LOG(LogKH, Log, TEXT("PlayLevelSequence: Playing %s"), *Sequence->GetName());
 	CurrentSequencePlayer->Play();
 
 	GetWorldTimerManager().SetTimer(SequenceTimerHandle, this, &AEGPlayerController::HandleSequenceFallbackTimeout, DurationSeconds, false);
@@ -460,16 +459,12 @@ float AEGPlayerController::GetSequenceDuration(ULevelSequence* Sequence) const
 
 void AEGPlayerController::HandleSequenceFallbackTimeout()
 {
-	EG_LOG(LogKH, Warning, TEXT("HandleSequenceFallbackTimeout"));
-	
 	if (bSequenceHandled)
 	{
 		return;
 	}
 
 	bSequenceHandled = true;
-
-	UE_LOG(LogKH, Warning, TEXT("Sequence fallback timeout reached. bIsFinal=%d"), bCurrentSequenceIsFinal ? 1 : 0);
 
 	if (CurrentSequencePlayer)
 	{
@@ -493,8 +488,6 @@ void AEGPlayerController::HandleSequenceFallbackTimeout()
 
 void AEGPlayerController::OnCommonSequenceFinished()
 {
-	EG_LOG(LogKH, Log, TEXT("OnCommonSequenceFinished"));
-
 	if (bSequenceHandled || !IsLocalController())
 	{
 		return;
@@ -524,8 +517,6 @@ void AEGPlayerController::OnCommonSequenceFinished()
 
 void AEGPlayerController::OnFinalSequenceFinished()
 {
-	EG_LOG(LogKH, Log, TEXT("OnFinalSequenceFinished"));
-
 	if (bSequenceHandled || !IsLocalController())
 	{
 		return;

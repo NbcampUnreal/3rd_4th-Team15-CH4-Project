@@ -41,8 +41,6 @@ void UEGItem_OutlineAbility::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 		return;
 	}
 
-	EG_LOG(LogKH, Log, TEXT("Outline Ability Started"));
-
 	if (ActorInfo->IsLocallyControlled())
 	{
 		if (OutlineMaterial)
@@ -123,7 +121,6 @@ void UEGItem_OutlineAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 
 void UEGItem_OutlineAbility::OnDurationFinished()
 {
-	EG_LOG(LogKH, Log, TEXT("Outline Ability Finished"));
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
