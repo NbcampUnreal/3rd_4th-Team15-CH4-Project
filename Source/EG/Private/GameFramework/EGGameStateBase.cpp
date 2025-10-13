@@ -28,6 +28,11 @@ void AEGGameStateBase::BeginPlay()
 	Super::BeginPlay();
 
 	DelegateManager = GetGameInstance()->GetSubsystem<UEGDelegateManager>();
+
+	if (HasAuthority())
+	{
+		UpdateLeaderboard();
+	}
 }
 
 

@@ -120,7 +120,9 @@ protected:
 	TSubclassOf<UUserWidget> BlackScreenWidgetClass;
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "BlackScreen")
 	void ShowBlackScreen();
+	UFUNCTION(BlueprintCallable, Category = "BlackScreen")
 	void HideBlackScreen();
 	
 #pragma endregion 

@@ -263,13 +263,7 @@ void AEGGameModeBase::GameOver()
     FTimerHandle LevelTravelTimerHandle;
     GetWorldTimerManager().SetTimer(LevelTravelTimerHandle, this, &AEGGameModeBase::TravelToLevel, 1.0f, false);
 
-    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-    {
-        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
-        {
-            EGPC->ClientRPC_ShowBlackScreen();
-        }
-    }
+    FadeInScreen();
 }
 
 void AEGGameModeBase::TravelToLevel()
