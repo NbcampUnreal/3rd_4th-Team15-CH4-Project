@@ -123,35 +123,12 @@ void AEGLobbyGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 {
     Super::HandleSeamlessTravelPlayer(C);
 
-    
+    int32 PlayerPlayerNumNum = GameState->PlayerArray.Num();
+    EG_LOG_ROLE(LogMS, Warning, TEXT("player num : %d exist 1"), PlayerPlayerNumNum);
+
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(C))
     {
-        // if (!EGPC->PlayerState)
-        // {
-        //     EGPC->InitPlayerState();
-        // }
-        // TWeakObjectPtr<AEGPlayerController> WeakPC = EGPC;
-        // FTimerHandle TimerHandle;
-        // GetWorldTimerManager().SetTimer(TimerHandle, [this, WeakPC]()
-        // {
-        // if (!WeakPC.IsValid() || !GameSession) return;
-        // AEGPlayerController* PC = WeakPC.Get();
-        //
-        // if (PC->PlayerState && PC->PlayerState->GetUniqueId().IsValid())
-        // {
-        //     GameSession->RegisterPlayer(
-        //         PC,
-        //         PC->PlayerState->GetUniqueId().GetUniqueNetId(),
-        //         false
-        //     );
-        //     UE_LOG(LogTemp, Log, TEXT("✅ Player re-registered: %s"), *PC->GetName());
-        // }
-        // else
-        // {
-        //     UE_LOG(LogTemp, Warning, TEXT("⚠️ Failed to register %s (Invalid UniqueId)"), *PC->GetName());
-        // }
-        // }, 0.2f, false);
-        //
+        
         if (!bChiefPlayer) // 처음 접속한 플레이어만
         {
             bChiefPlayer = true;
@@ -160,12 +137,17 @@ void AEGLobbyGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
             EGPC->ShowChiefPlayerUI();
         }
     }
+    
+    EG_LOG_ROLE(LogMS, Warning, TEXT("player num : %d exist 2"), PlayerPlayerNumNum);
 }
 
 void AEGLobbyGameModeBase::Logout(AController* Exiting)
 {
     Super::Logout(Exiting);
 
+    int32 PlayerPlayerNumNum = GameState->PlayerArray.Num();
+    EG_LOG_ROLE(LogMS, Warning, TEXT("player num : %d exist 3"), PlayerPlayerNumNum);
+    
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(Exiting))
     {
         EG_LOG_ROLE(LogMS, Warning, TEXT("player %d logout."), EGPS->GetPlayerId());
@@ -179,7 +161,7 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
     {
         EG_LOG_ROLE(LogMS, Warning, TEXT("casting is right"));
 
-        if (PC->bChiefPlayera == true && APlayingPlayerStates.Num() > 0)
+        if (PC->bChiefPlayera == true)
         {
             for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
             {
@@ -220,13 +202,47 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
                 EG_LOG_ROLE(LogMS, Warning, TEXT("NewChiefasdf"));
             }*/
         }
+        else
+        {
+            EG_LOG_ROLE(LogMS, Warning, TEXT("planB"));
+            for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+            {
+                if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
+                {
+                    if (EGPC!=PC)
+                    {
+                        if (EGPC->bChiefPlayera == false)
+                        {
+                            EGPC->bChiefPlayera = true;
+                            EGPC->ShowChiefPlayerUI();
+                            bChiefPlayer = true;
+                            EG_LOG_ROLE(LogMS, Warning, TEXT("B chief"));
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        EG_LOG_ROLE(LogMS, Warning, TEXT("B Chief's controller is exist"));
+                        
+                        FTimerHandle TimerHandle;
+                        AController* ExitingController = Exiting; // 필요하다면 로컬 복사
+                        GetWorldTimerManager().SetTimer(TimerHandle, [this, ExitingController]()
+                        {
+                            Logout(ExitingController);
+                        }, 3.f, false);
+                        
+                    }
+                    
+                }
+            }
+        }
     }
 
     if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
     {
         GS->UpdateLeaderboard();
     }
-    
+    EG_LOG_ROLE(LogMS, Warning, TEXT("player num : %d exist 4"), PlayerPlayerNumNum);
 }
 
 void AEGLobbyGameModeBase::InitializeSpawnPoint()
