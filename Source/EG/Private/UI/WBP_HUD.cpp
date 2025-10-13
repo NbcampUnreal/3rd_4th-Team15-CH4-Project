@@ -32,19 +32,19 @@ void UWBP_HUD::InitWithASC(UAbilitySystemComponent* InASC)
 	StopReadyFX();
 	bEggFXVisible = false;
 
-	// [수정] 시작 시 스킬 ‘사용 가능’ 느낌으로 100% 표시
+	// [수정] 쿨타임 UI 초기화 (사용 가능 상태로 시작)
 	if (BombEgg)  BombEgg->SetPercent(1.f);
-	if (TrickEgg) TrickEgg->SetPercent(1.f); // [추가]
+	if (TrickEgg) TrickEgg->SetPercent(1.f);
+	if (AttackBar) AttackBar->SetPercent(1.f); // [추가]
+	if (DashBar)   DashBar->SetPercent(1.f);   // [추가]
 
 	if (!ASC) return;
 
-	{
-		const float CurSta = ASC->GetNumericAttribute(UEGCharacterAttributeSet::GetStaminaAttribute());
-		RefreshStamina(CurSta);
+	const float CurSta = ASC->GetNumericAttribute(UEGCharacterAttributeSet::GetStaminaAttribute());
+	RefreshStamina(CurSta);
 
-		const float CurEgg = ASC->GetNumericAttribute(UEGCharacterAttributeSet::GetEggEnergyAttribute());
-		RefreshEggEnergy(CurEgg);
-	}
+	const float CurEgg = ASC->GetNumericAttribute(UEGCharacterAttributeSet::GetEggEnergyAttribute());
+	RefreshEggEnergy(CurEgg);
 
 	StaminaChangedHandle =
 		ASC->GetGameplayAttributeValueChangeDelegate(
@@ -81,6 +81,16 @@ void UWBP_HUD::NativeDestruct()
 	ASC = nullptr;
 
 	Super::NativeDestruct();
+}
+
+void UWBP_HUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	UpdateBombCooldown();
+	UpdateTrickCooldown();
+	UpdateAttackCooldown(); // [추가]
+	UpdateDashCooldown();   // [추가]
 }
 
 void UWBP_HUD::OnStaminaChanged(const FOnAttributeChangeData& Data)
@@ -146,14 +156,6 @@ void UWBP_HUD::StopReadyFX()
 	}
 }
 
-void UWBP_HUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
-	UpdateBombCooldown();   // [추가]
-	UpdateTrickCooldown();  // [추가]
-}
-
-// [추가] 공통 쿨타임 처리: 태그가 활성화되어 있으면 0→1로 차오르게, 없으면 1.0 유지
 void UWBP_HUD::UpdateCooldownBarForTag(UProgressBar* Bar,
 	const FGameplayTag& CooldownTag,
 	float& OutRemaining, float& OutDuration)
@@ -202,18 +204,34 @@ void UWBP_HUD::UpdateCooldownBarForTag(UProgressBar* Bar,
 
 void UWBP_HUD::UpdateBombCooldown()
 {
-	// 기존 폭탄알 태그
 	static const FGameplayTag BombCooldownTag =
 		FGameplayTag::RequestGameplayTag(TEXT("Ability.Cooldown.LayBombEgg"));
 
-	UpdateCooldownBarForTag(BombEgg, BombCooldownTag, BombCooldownRemaining, BombCooldownDuration); // [추가]
+	UpdateCooldownBarForTag(BombEgg, BombCooldownTag, BombCooldownRemaining, BombCooldownDuration);
 }
 
 void UWBP_HUD::UpdateTrickCooldown()
 {
-	// [추가] 함정알(팀원 Ability) 태그 — 프로젝트 GameplayTags에 등록되어 있어야 함
 	static const FGameplayTag TrickCooldownTag =
 		FGameplayTag::RequestGameplayTag(TEXT("Ability.Cooldown.LayTrickEgg"));
 
-	UpdateCooldownBarForTag(TrickEgg, TrickCooldownTag, TrickCooldownRemaining, TrickCooldownDuration); // [추가]
+	UpdateCooldownBarForTag(TrickEgg, TrickCooldownTag, TrickCooldownRemaining, TrickCooldownDuration);
+}
+
+// [추가] 공격 쿨타임 처리
+void UWBP_HUD::UpdateAttackCooldown()
+{
+	static const FGameplayTag AttackCooldownTag =
+		FGameplayTag::RequestGameplayTag(TEXT("Ability.Cooldown.Attack")); // 공격 Ability에 등록된 태그
+
+	UpdateCooldownBarForTag(AttackBar, AttackCooldownTag, AttackCooldownRemaining, AttackCooldownDuration);
+}
+
+// [추가] 대쉬 쿨타임 처리
+void UWBP_HUD::UpdateDashCooldown()
+{
+	static const FGameplayTag DashCooldownTag =
+		FGameplayTag::RequestGameplayTag(TEXT("Ability.Cooldown.Dash")); // 대쉬 Ability에 등록된 태그
+
+	UpdateCooldownBarForTag(DashBar, DashCooldownTag, DashCooldownRemaining, DashCooldownDuration);
 }
