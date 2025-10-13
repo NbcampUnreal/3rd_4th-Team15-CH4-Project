@@ -57,6 +57,7 @@ protected:
 	
 private:
 	int32 playerCount = 0;
+	int32 currentPlayerCount = 0;
 
 // JM : 오브젝트 풀링
 public:
