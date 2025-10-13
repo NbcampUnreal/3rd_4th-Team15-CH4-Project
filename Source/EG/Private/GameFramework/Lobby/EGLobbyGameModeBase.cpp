@@ -123,9 +123,6 @@ void AEGLobbyGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 {
     Super::HandleSeamlessTravelPlayer(C);
 
-    int32 PlayerPlayerNumNum = GameState->PlayerArray.Num();
-    EG_LOG_ROLE(LogMS, Warning, TEXT("player num : %d exist 1"), PlayerPlayerNumNum);
-
     if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(C))
     {
         
@@ -138,15 +135,13 @@ void AEGLobbyGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
         }
     }
     
-    EG_LOG_ROLE(LogMS, Warning, TEXT("player num : %d exist 2"), PlayerPlayerNumNum);
 }
 
 void AEGLobbyGameModeBase::Logout(AController* Exiting)
 {
-    Super::Logout(Exiting);
+    
 
     int32 PlayerPlayerNumNum = GameState->PlayerArray.Num();
-    EG_LOG_ROLE(LogMS, Warning, TEXT("player num : %d exist 3"), PlayerPlayerNumNum);
     
     if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(Exiting))
     {
@@ -178,19 +173,6 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
                             break;
                         }
                     }
-                    else
-                    {
-                        EG_LOG_ROLE(LogMS, Warning, TEXT("Chief'controller is exist"));
-                        
-                        FTimerHandle TimerHandle;
-                        AController* ExitingController = Exiting; // 필요하다면 로컬 복사
-                        GetWorldTimerManager().SetTimer(TimerHandle, [this, ExitingController]()
-                        {
-                            Logout(ExitingController);
-                        }, 3.f, false);
-                        
-                    }
-                    
                 }
             }
 
@@ -202,41 +184,9 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
                 EG_LOG_ROLE(LogMS, Warning, TEXT("NewChiefasdf"));
             }*/
         }
-        else
-        {
-            EG_LOG_ROLE(LogMS, Warning, TEXT("planB"));
-            for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-            {
-                if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
-                {
-                    if (EGPC!=PC)
-                    {
-                        if (EGPC->bChiefPlayera == false)
-                        {
-                            EGPC->bChiefPlayera = true;
-                            EGPC->ShowChiefPlayerUI();
-                            bChiefPlayer = true;
-                            EG_LOG_ROLE(LogMS, Warning, TEXT("B chief"));
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        EG_LOG_ROLE(LogMS, Warning, TEXT("B Chief's controller is exist"));
-                        
-                        FTimerHandle TimerHandle;
-                        AController* ExitingController = Exiting; // 필요하다면 로컬 복사
-                        GetWorldTimerManager().SetTimer(TimerHandle, [this, ExitingController]()
-                        {
-                            Logout(ExitingController);
-                        }, 3.f, false);
-                        
-                    }
-                    
-                }
-            }
-        }
     }
+
+    Super::Logout(Exiting);
 
     if (AEGGameStateBase* GS = GetWorld()->GetGameState<AEGGameStateBase>())
     {
