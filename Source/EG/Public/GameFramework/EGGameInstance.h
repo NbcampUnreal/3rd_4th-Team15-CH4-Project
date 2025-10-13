@@ -82,7 +82,7 @@ public:
 	{
 		if (GetWorld()->GetNetMode() == NM_DedicatedServer)
 		{
-			PlayerIndex += Index;
+			PlayerIndex = Index;
 		}
 		UE_LOG(LogTemp, Log, TEXT("CurrentPlayer Num is %d"), PlayerIndex);
 	}
@@ -120,7 +120,9 @@ protected:
 	TSubclassOf<UUserWidget> BlackScreenWidgetClass;
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "BlackScreen")
 	void ShowBlackScreen();
+	UFUNCTION(BlueprintCallable, Category = "BlackScreen")
 	void HideBlackScreen();
 	
 #pragma endregion 

@@ -68,13 +68,10 @@ void AEGGameModeBase::PostLogin(APlayerController* NewPlayer)
             Entry.PlayerEggScore = 0;
             EGGS->LeaderboardSnapshot.Add(Entry);
             
-            if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
-             {
-                 if (GI->PlayerIndex == playerCount)
-                 {
-                     //GameStart();
-                 }
-             }
+            if (playerCount == currentPlayerCount)
+            {
+                //GameStart();
+            }
         }        
     }
 }
@@ -85,12 +82,12 @@ void AEGGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 
     Super::HandleSeamlessTravelPlayer(C);
 
-    playerCount++;
+    currentPlayerCount++;
 
     if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
     {
         // 모든 플레이어가 로드 완료했다고 판단되면 StartGame
-        if (GameState && playerCount == GI->PlayerIndex)
+        if (currentPlayerCount == playerCount)
         {
             GameStart();
         }
@@ -266,13 +263,7 @@ void AEGGameModeBase::GameOver()
     FTimerHandle LevelTravelTimerHandle;
     GetWorldTimerManager().SetTimer(LevelTravelTimerHandle, this, &AEGGameModeBase::TravelToLevel, 1.0f, false);
 
-    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-    {
-        if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
-        {
-            EGPC->ClientRPC_ShowBlackScreen();
-        }
-    }
+    FadeInScreen();
 }
 
 void AEGGameModeBase::TravelToLevel()
