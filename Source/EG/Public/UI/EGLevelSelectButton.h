@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,6 +7,8 @@
 #include "EGLevelSelectButton.generated.h"
 
 class UButton;
+class ULevelImageDataAsset;
+
 
 /**
  * 
@@ -29,10 +31,14 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
     bool bRightMove = false;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
+    TObjectPtr<ULevelImageDataAsset> LevelImageData;
+
 protected:
     UFUNCTION()
     void HandleClicked();
 	
-
+    UFUNCTION()
+    void UpdateMapImage();
 
 };
