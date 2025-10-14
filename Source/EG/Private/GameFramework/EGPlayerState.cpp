@@ -51,3 +51,9 @@ void AEGPlayerState::RemoveEgg_Internal(int32 Amount)
 		GS->UpdateLeaderboard();
 	}
 }
+
+void AEGPlayerState::ResetEggCount()
+{
+	PlayerEggCount = 0;
+	OnRep_PlayerEggCount();
+}

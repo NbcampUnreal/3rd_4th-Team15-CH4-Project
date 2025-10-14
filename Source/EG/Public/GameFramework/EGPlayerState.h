@@ -37,6 +37,7 @@ public:
 	
 	void AddEgg_Internal(int32 Amount);
 	void RemoveEgg_Internal(int32 Amount);
+	void ResetEggCount();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

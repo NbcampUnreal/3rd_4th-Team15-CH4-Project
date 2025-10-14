@@ -87,7 +87,8 @@ public:
 	void UpdateLeaderboard();
 	void FinalizeAward(const TArray<TWeakObjectPtr<AEGPlayerController>>& Winners);
 	void SetFinalResults(const TArray<TPair<TWeakObjectPtr<AEGPlayerController>, int32>>& Scores);
-	
+	void ResetLeaderboard();
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UPROPERTY(ReplicatedUsing=OnRep_Leaderboard)
