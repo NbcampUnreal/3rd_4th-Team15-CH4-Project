@@ -32,6 +32,20 @@ void AEGGameModeBase::BeginPlay()
     {
         EG_LOG_ROLE(LogJM, Warning, TEXT("EggPoolDataAsset is null"));
     }
+    if (AEGGameStateBase* GS = GetGameState<AEGGameStateBase>())
+    {
+        for (APlayerState* PS : GS->PlayerArray)
+        {
+            if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(PS))
+            {
+                EGPS->ResetEggCount();
+            }
+        }
+    }
+    if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
+    {
+        EGGS->UpdateLeaderboard();
+    }
 }
 
 AEGGameModeBase::AEGGameModeBase()
@@ -82,6 +96,18 @@ void AEGGameModeBase::HandleSeamlessTravelPlayer(AController*& C)
 
     Super::HandleSeamlessTravelPlayer(C);
 
+    if (AEGGameStateBase* GS = GetGameState<AEGGameStateBase>())
+    {
+        GS->ResetLeaderboard();
+    }
+    
+    if (APlayerState* PS = C->PlayerState)
+    {
+        if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(PS))
+        {
+            EGPS->ResetEggCount();
+        }
+    }
     currentPlayerCount++;
 
     if (UEGGameInstance* GI = GetGameInstance<UEGGameInstance>())
@@ -147,6 +173,11 @@ AActor* AEGGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 
 void AEGGameModeBase::GameStart()
 {
+    if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())
+    {
+        EGGS->UpdateLeaderboard();
+    }
+    
     if (GetNumPlayers() > 1)
     {
         if (AEGGameStateBase* EGGS = GetGameState<AEGGameStateBase>())

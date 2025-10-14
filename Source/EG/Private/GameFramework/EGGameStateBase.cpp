@@ -29,10 +29,15 @@ void AEGGameStateBase::BeginPlay()
 
 	DelegateManager = GetGameInstance()->GetSubsystem<UEGDelegateManager>();
 
-	if (HasAuthority())
-	{
-		UpdateLeaderboard();
-	}
+	 if (HasAuthority())
+    {
+        // 플레이어들이 완전히 등록된 후 0.2초 뒤 리더보드 업데이트
+        FTimerHandle TempHandle;
+        GetWorld()->GetTimerManager().SetTimer(TempHandle, [this]()
+        {
+            UpdateLeaderboard();
+        }, 0.2f, false);
+    }
 }
 
 
@@ -198,5 +203,13 @@ void AEGGameStateBase::SetFinalResults(const TArray<TPair<TWeakObjectPtr<AEGPlay
 	}
     
 	// 서버에서도 변경사항을 바로 적용하기 위해 RepNotify를 직접 호출
+	OnRep_Awards();
+}
+
+void AEGGameStateBase::ResetLeaderboard()
+{
+	LeaderboardSnapshot.Empty();
+	RoundAwards.Empty();
+	OnRep_Leaderboard();
 	OnRep_Awards();
 }
