@@ -25,6 +25,8 @@ protected:
 	UFUNCTION()
 	void OnRep_PlayerEggCount();
 
+	virtual void CopyProperties(APlayerState* PlayerState) override;
+
 public:
 	UFUNCTION(BlueprintPure, Category = "Score")
 	int32 GetPlayerEggCount() const { return PlayerEggCount; }

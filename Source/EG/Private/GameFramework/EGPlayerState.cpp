@@ -18,6 +18,16 @@ void AEGPlayerState::OnRep_PlayerEggCount()
 	UE_LOG(LogTemp, Log, TEXT("OnRep_PlayerEggCount: %s now has %d eggs"), *GetName(), PlayerEggCount);
 }
 
+void AEGPlayerState::CopyProperties(APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+
+	if (AEGPlayerState* EGPS = Cast<AEGPlayerState>(PlayerState))
+	{
+		EGPS->PlayerEggCount = PlayerEggCount;
+	}
+}
+
 void AEGPlayerState::ServerAddEgg_Implementation(int32 Amount)
 {
 	AddEgg_Internal(Amount);
