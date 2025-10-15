@@ -191,13 +191,14 @@ UAudioComponent* USFXManagerSubsystem::GetAudioComponent(UWorld* World, ESFXType
 	// 기존 AudioComponent가 없다면 새로 생성
 	// JM : 월드 이동시 AudioComponent가 null 참조 되는 문제 해결
 	// NewObject<UAudioComponent>(this) 대신 World의 WorldSettings를 오너로 지정
+	// (UAudioComponent는 ActorComponent계열이라 AActor에 붙어 있어야 정상적으로 동작하기 때문)
+	// (UWorld 는 Actor가 아니기 때문에 AWorldSetting 를 outer로 설정)
 	UAudioComponent* NewComp = NewObject<UAudioComponent>(World->GetWorldSettings());
 	NewComp->bAutoActivate = false;
     
 	// UAudioComponent가 ActorComponent를 상속받았으므로, RegisterComponentWithWorld(World)를 호출해야 합니다.
 	// 컴포넌트를 World에 등록
 	NewComp->RegisterComponentWithWorld(World); 
-    
 	ActiveSFXMap.Add(InType, NewComp);
 	return NewComp;
 	
