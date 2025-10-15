@@ -67,6 +67,11 @@ void AEGLobbyGameModeBase::BeginPlay()
             }
         }
     }
+
+    if (GameState->PlayerArray.Num() < 1)
+    {
+        bChiefPlayer = false;
+    }
 }
 
 void AEGLobbyGameModeBase::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
@@ -156,34 +161,43 @@ void AEGLobbyGameModeBase::Logout(AController* Exiting)
     {
         EG_LOG_ROLE(LogMS, Warning, TEXT("casting is right"));
 
-        if (PC->bChiefPlayera == true)
+        if (GameState->PlayerArray.Num() > 1)
         {
-            for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+            if (PC->bChiefPlayera == true)
             {
-                if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
+
+                for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
                 {
-                    if (EGPC!=PC)
+                    if (AEGPlayerController* EGPC = Cast<AEGPlayerController>(It->Get()))
                     {
-                        if (EGPC->bChiefPlayera == false)
+                        if (EGPC != PC)
                         {
-                            EGPC->bChiefPlayera = true;
-                            EGPC->ShowChiefPlayerUI();
-                            bChiefPlayer = true;
-                            EG_LOG_ROLE(LogMS, Warning, TEXT("NewChiefasdf"));
-                            break;
+                            if (EGPC->bChiefPlayera == false)
+                            {
+                                EGPC->bChiefPlayera = true;
+                                EGPC->ShowChiefPlayerUI();
+                                bChiefPlayer = true;
+                                EG_LOG_ROLE(LogMS, Warning, TEXT("NewChiefasdf"));
+                                break;
+                            }
                         }
                     }
                 }
-            }
 
-        
-            /*if (AEGPlayerController* NewChief = Cast<AEGPlayerController>(APlayingPlayerStates[1].Pin()->GetOwner()))
-            {
-                bChiefPlayer = true;
-                NewChief->ShowChiefPlayerUI();
-                EG_LOG_ROLE(LogMS, Warning, TEXT("NewChiefasdf"));
-            }*/
+
+                /*if (AEGPlayerController* NewChief = Cast<AEGPlayerController>(APlayingPlayerStates[1].Pin()->GetOwner()))
+                {
+                    bChiefPlayer = true;
+                    NewChief->ShowChiefPlayerUI();
+                    EG_LOG_ROLE(LogMS, Warning, TEXT("NewChiefasdf"));
+                }*/
+            }
         }
+        else
+        {
+			bChiefPlayer = false;
+        }
+        
     }
 
     Super::Logout(Exiting);
