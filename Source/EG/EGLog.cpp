@@ -3,6 +3,12 @@
 #include "EGLog.h"
 #include "Modules/ModuleManager.h"
 
+DEFINE_LOG_CATEGORY(LogJM);
+
+DEFINE_LOG_CATEGORY(LogMS);
+
+DEFINE_LOG_CATEGORY(LogKH);
+
 
 /* DedicatedX Log 예시 */
 /*

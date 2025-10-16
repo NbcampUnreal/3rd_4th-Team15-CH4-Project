@@ -1,23 +1,39 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
-
+using System.Linq;
+using System.IO;
 public class EG : ModuleRules
 {
 	public EG(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			// Initial Dependencies
+			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
+			
+			// AI
+			"AIModule", "NavigationSystem",
+			
+			// GAS
+			"GameplayAbilities", "GameplayTags", "GameplayTasks",
+
+			// UI
+			"UMG", "Slate", "SlateCore",
+			
+			// Niagara
+			"Niagara",
+			
+			// Sequence
+			"MovieScene", "LevelSequence",
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
-
-		// Uncomment if you are using Slate UI
-		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 		
-		// Uncomment if you are using online features
-		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
-
-		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
-	}
+		PublicIncludePaths.AddRange(new string[] { "EG" });
+		
+    }
+    
 }

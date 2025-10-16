@@ -1,0 +1,134 @@
+﻿// EGGameInstance.h (작성자 : JJM)
+// Voice chat 관련 기능을 Blueprint로 작성함
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Engine/GameInstance.h"
+#include "EGGameInstance.generated.h"
+
+USTRUCT()
+struct FFinalResult
+{
+	GENERATED_BODY()
+	
+	UPROPERTY()
+	int32 PlayerId = 0;
+
+	UPROPERTY()
+	bool bIsWinner = false;
+};
+
+/**
+ * 
+ */
+UCLASS()
+class EG_API UEGGameInstance : public UGameInstance
+{
+	GENERATED_BODY()
+
+public:
+	virtual void Init() override;
+	// 작성자: 김효영
+
+#pragma region Chatting
+	void SendChatMessage(const FString& Message);
+
+#pragma endregion
+
+#pragma region LevelChange
+	
+	UFUNCTION(BlueprintCallable)
+	void RecordLevel(const FString& MapName);
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeLevel();
+
+	void FadeInScreen();
+	void FadeOutScreen();
+
+	UPROPERTY()
+	UUserWidget* FadeInScreenWidget;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> FadeInScreenClass;
+
+	UPROPERTY()
+	UUserWidget* FadeOutScreenWidget;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> FadeOutScreenClass;
+
+private:
+	UPROPERTY()
+	FString CurrentLevelName = "Level_1";
+
+#pragma endregion
+
+public:
+	int32 GetPlayerIndex()
+	{
+		return PlayerIndex;
+	}
+
+	void PlayerIndexReset()
+	{
+		if (GetWorld()->GetNetMode() == NM_DedicatedServer)
+		{
+			PlayerIndex = 0;
+		}
+	}
+
+	void SetPlayerIndex(int32 Index)
+	{
+		if (GetWorld()->GetNetMode() == NM_DedicatedServer)
+		{
+			PlayerIndex = Index;
+		}
+		UE_LOG(LogTemp, Log, TEXT("CurrentPlayer Num is %d"), PlayerIndex);
+	}
+
+	UPROPERTY();
+	int32 PlayerIndex = 0;
+
+// 작성자: 김혁
+#pragma region MatchResult
+
+public:
+	UPROPERTY()
+	TArray<FFinalResult> FinalResults;
+
+	void SetFinalResults(const TArray<FFinalResult>& InResults);
+	TArray<FFinalResult>& GetFinalResults();
+
+#pragma endregion 
+
+	// 작성자: 김효영
+#pragma region LogOut
+public:
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void ReturnMainMenu();
+
+#pragma endregion
+
+// 작성자: 김혁
+#pragma region BlackScreen
+
+protected:
+	UPROPERTY()
+	TObjectPtr<UUserWidget> BlackScreenWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "BlackScreen")
+	TSubclassOf<UUserWidget> BlackScreenWidgetClass;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "BlackScreen")
+	void ShowBlackScreen();
+	UFUNCTION(BlueprintCallable, Category = "BlackScreen")
+	void HideBlackScreen();
+	
+#pragma endregion 
+
+	// JM : 보이스 로그아웃 함수 실행
+public:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Voice")
+	void LeaveVoiceRoom_BPImpl();
+};

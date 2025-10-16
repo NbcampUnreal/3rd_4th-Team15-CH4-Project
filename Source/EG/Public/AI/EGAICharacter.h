@@ -1,0 +1,52 @@
+// EGAICharacter.h
+
+#pragma once
+
+#include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
+#include "EGAICharacter.generated.h"
+
+class UGameplayAbility;
+class UEGAI_AttributeSet;
+
+UCLASS()
+class EG_API AEGAICharacter : public ACharacter, public IAbilitySystemInterface
+{
+	GENERATED_BODY()
+
+public:
+	AEGAICharacter();
+
+protected:
+	virtual void BeginPlay() override;
+
+#pragma region GAS
+	
+public:
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AICharacter|GAS")
+	TArray<TSubclassOf<UGameplayAbility>> GrantedAbilityClasses;
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = "AICharacter|GAS")
+	UAbilitySystemComponent* AbilitySystemComponent;
+
+	UPROPERTY()
+	UEGAI_AttributeSet* AttributeSet;
+
+	UPROPERTY(EditAnywhere, Category = "AICharacter|GAS")
+	TSubclassOf<UGameplayAbility> AngryAbility;
+
+	void GiveAbilities();
+	
+#pragma endregion
+	
+public:
+	UPROPERTY()
+	FRandomStream RandomStream;
+
+	// Set AI State -> Angry
+	UFUNCTION(BlueprintCallable)
+	void OnAngryMode(FVector AttackLocation);
+};
